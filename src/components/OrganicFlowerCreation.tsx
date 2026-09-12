@@ -10,6 +10,7 @@ import { HanniaBouquetAnimation } from './HanniaBouquetAnimation';
 import { LucianaBouquetAnimation } from './LucianaBouquetAnimation';
 import { StanleyBouquetAnimation } from './StanleyBouquetAnimation';
 import { DileidysBouquetAnimation } from './DileidysBouquetAnimation';
+import { LeiryBouquetAnimation } from './LeiryBouquetAnimation';
 import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 
 interface OrganicFlowerCreationProps {
@@ -37,6 +38,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   const isLuciana = experience.id === 'luciana' || experience.username?.toLowerCase() === 'luciana';
   const isStanley = experience.id === 'stanley' || experience.username?.toLowerCase() === 'stanley';
   const isDileidys = experience.id === 'dileidys' || experience.username?.toLowerCase() === 'dileidys';
+  const isLeiry = experience.id === 'leiry' || experience.username?.toLowerCase() === 'leiry';
 
   // Jhon's Bespoke Handcrafted Bouquet of Yellow Blooms & Signature Cobalt/Thunder/Shadow Flower
   if (isJhon) {
@@ -150,6 +152,18 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   if (isDileidys) {
     return (
       <DileidysBouquetAnimation
+        mode={mode}
+        onProceedToResponse={onProceedToResponse}
+        onBackToReading={onBackToReading}
+        onReplayFormation={onReplayFormation}
+      />
+    );
+  }
+
+  // Leiry's Bespoke Handcrafted Bouquet (Negro, Vinotinto y Morado Oscuro e Intenso)
+  if (isLeiry) {
+    return (
+      <LeiryBouquetAnimation
         mode={mode}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
