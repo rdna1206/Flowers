@@ -800,39 +800,70 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                     <circle
                       cx="210"
                       cy="145"
-                      r="13"
+                      r="14"
                       fill="#1E40AF"
                       filter="url(#jhonCenterGlowFilter)"
                     />
                     <circle
                       cx="210"
                       cy="145"
-                      r="9"
-                      fill="#38BDF8"
-                    />
-                    <circle
-                      cx="210"
-                      cy="145"
-                      r="5"
-                      fill="#93C5FD"
+                      r="11"
+                      fill="#0A192F"
+                      stroke="#38BDF8"
+                      strokeWidth="1"
                     />
 
-                    {/* 4. Pulsing Pure White Starlight Core (Precision & Focus) */}
-                    <motion.circle
-                      cx="210"
-                      cy="145"
-                      r="3.2"
-                      fill="#FFFFFF"
-                      animate={{
-                        scale: [1, 1.5, 1],
-                        opacity: [0.85, 1, 0.85],
-                      }}
+                    {/* 4. Exclusive Seamless Botanical 114 Medallion for Jhon */}
+                    <motion.g
+                      id="jhon-exclusive-114-core"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
                       transition={{
-                        duration: 2.2,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
+                        duration: 1.6,
+                        delay: mode === 'result' ? 0 : 0.8,
+                        ease: [0.16, 1, 0.3, 1],
                       }}
-                    />
+                      style={{ transformOrigin: '210px 145px' }}
+                    >
+                      {/* Inner deep navy core with golden border */}
+                      <circle
+                        cx="210"
+                        cy="145"
+                        r="9.5"
+                        fill="#0A192F"
+                        stroke="#FDE047"
+                        strokeWidth="0.9"
+                        strokeOpacity="0.9"
+                      />
+                      <circle
+                        cx="210"
+                        cy="145"
+                        r="8"
+                        fill="#0E2142"
+                      />
+
+                      {/* The 114 perfectly centered inside the circular flower nucleus */}
+                      <text
+                        x="210"
+                        y="145.5"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill="#FDE047"
+                        fontSize="8.5"
+                        fontFamily="ui-sans-serif, system-ui, -apple-system, sans-serif"
+                        fontWeight="800"
+                        letterSpacing="0.5px"
+                        className="select-none pointer-events-none"
+                        style={{
+                          filter: 'drop-shadow(0 0 2.5px rgba(253, 224, 71, 0.65))',
+                        }}
+                      >
+                        114
+                      </text>
+
+                      {/* Micro top starlight highlight */}
+                      <circle cx="210" cy="138" r="0.8" fill="#FFFFFF" opacity="0.9" />
+                    </motion.g>
 
                     {/* Radiant Sparkles Orbiting the Center */}
                     <motion.g

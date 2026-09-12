@@ -604,20 +604,60 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
 
                 {/* Sapphire Core Receptacle */}
                 <circle cx="200" cy="140" r="13" fill="#0077B6" />
-                <circle cx="200" cy="140" r="9.5" fill="#00B4D8" />
+                <circle cx="200" cy="140" r="10.5" fill="#023E8A" stroke="#00E5FF" strokeWidth="0.8" />
 
-                {/* Warm Amber Honey Pearl in Center (Chocorramo / Tajadas secret glint) */}
-                <circle cx="200" cy="140" r="6" fill="#F59E0B" />
+                {/* Exclusive Aquatic Botanical "25" Core for Isaías */}
+                <motion.g
+                  id="isaias-bouquet-exclusive-25-core"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{
+                    scale: 1,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    duration: 1.6,
+                    delay: mode === 'result' ? 0 : 0.8,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  style={{ transformOrigin: '200px 140px' }}
+                >
+                  <circle
+                    cx="200"
+                    cy="140"
+                    r="9"
+                    fill="#031E3D"
+                    stroke="#00E5FF"
+                    strokeWidth="0.9"
+                  />
+                  <circle
+                    cx="200"
+                    cy="140"
+                    r="7.5"
+                    fill="#06284F"
+                  />
 
-                {/* Tender Heart Glint (Sutil afecto interior) */}
-                <motion.circle
-                  cx="200"
-                  cy="140"
-                  r="3.5"
-                  fill="#FFFFFF"
-                  animate={{ scale: [0.9, 1.3, 0.9], opacity: [0.8, 1, 0.8] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                />
+                  {/* Perfectly centered 25 within the flower nucleus */}
+                  <text
+                    x="200"
+                    y="140.5"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#00E5FF"
+                    fontSize="8.5"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, sans-serif"
+                    fontWeight="800"
+                    letterSpacing="0.5px"
+                    className="select-none pointer-events-none"
+                    style={{
+                      filter: 'drop-shadow(0 0 2.5px rgba(0, 229, 255, 0.75))',
+                    }}
+                  >
+                    25
+                  </text>
+
+                  {/* Micro water glint highlight */}
+                  <circle cx="200" cy="134" r="0.8" fill="#FFFFFF" opacity="0.95" />
+                </motion.g>
               </motion.g>
             )}
 

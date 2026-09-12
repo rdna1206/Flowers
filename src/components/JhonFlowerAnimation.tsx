@@ -486,10 +486,9 @@ export const JhonFlowerAnimation: React.FC<JhonFlowerAnimationProps> = ({
                 }}
                 transition={{ duration: 1.8, delay: 2.0 }}
               >
-                {/* Central golden button */}
-                <circle cx="190" cy="165" r="13" fill="#D4AF37" />
-                <circle cx="190" cy="165" r="10" fill="#F4D03F" />
-                <circle cx="190" cy="165" r="6" fill="#FFF48F" />
+                {/* Central golden and deep navy button */}
+                <circle cx="190" cy="165" r="14" fill="#8C6314" stroke="#D4AF37" strokeWidth="0.8" />
+                <circle cx="190" cy="165" r="11" fill="#0A192F" stroke="#F4D03F" strokeWidth="0.8" />
 
                 {/* Stamen Radiating Filaments */}
                 {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
@@ -511,8 +510,37 @@ export const JhonFlowerAnimation: React.FC<JhonFlowerAnimationProps> = ({
                   </g>
                 ))}
 
-                {/* Center subtle light point */}
-                <circle cx="190" cy="165" r="2.5" fill="#FFFFFF" />
+                {/* Exclusive 114 Core - appears smoothly as the final crowning touch */}
+                <motion.g
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{
+                    opacity: phase === 'bloom' || isFullyBloomed ? 1 : 0,
+                    scale: phase === 'bloom' || isFullyBloomed ? 1 : 0.5,
+                  }}
+                  transition={{ duration: 1.5, delay: 0.6 }}
+                  style={{ transformOrigin: '190px 165px' }}
+                >
+                  <circle cx="190" cy="165" r="9" fill="#0A192F" stroke="#F4D03F" strokeWidth="0.9" />
+                  <circle cx="190" cy="165" r="7.5" fill="#0E2142" />
+                  <text
+                    x="190"
+                    y="165.5"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#FDE047"
+                    fontSize="8.5"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, sans-serif"
+                    fontWeight="800"
+                    letterSpacing="0.5px"
+                    className="select-none pointer-events-none"
+                    style={{
+                      filter: 'drop-shadow(0 0 2px rgba(244, 208, 63, 0.65))',
+                    }}
+                  >
+                    114
+                  </text>
+                  <circle cx="190" cy="158.5" r="0.8" fill="#FFFFFF" opacity="0.9" />
+                </motion.g>
               </motion.g>
             </motion.g>
 

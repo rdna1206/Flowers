@@ -8,10 +8,12 @@ import {
   Plus,
   Trash2,
   Lock,
+  KeyRound,
   Save,
   CheckCircle2,
   AlertCircle,
   Eye,
+  EyeOff,
   ShieldCheck,
   Search,
   RefreshCw,
@@ -55,6 +57,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [newName, setNewName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showNewUserPassword, setShowNewUserPassword] = useState(false);
+
+  // Edit User & Password Modal
+  const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
+  const [editUserModalName, setEditUserModalName] = useState('');
+  const [editUserModalPassword, setEditUserModalPassword] = useState('');
+  const [editUserModalIsActive, setEditUserModalIsActive] = useState(true);
+  const [showEditUserModalPassword, setShowEditUserModalPassword] = useState(false);
+  const [isSavingUserEdit, setIsSavingUserEdit] = useState(false);
 
   // Selected User Form state
   const [editName, setEditName] = useState('');
@@ -245,6 +256,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setTimeout(() => setSuccessMessage(null), 3500);
     } catch (err: any) {
       setErrorMessage(err.message || 'Error al crear el usuario.');
+    }
+  };
+
+  const handleOpenEditUser = (user: UserRecord) => {
+    setEditingUser(user);
+    setEditUserModalName(user.name);
+    setEditUserModalPassword(user.passwordPlain || '');
+    setEditUserModalIsActive(user.isActive);
+    setShowEditUserModalPassword(false);
+  };
+
+  const handleSaveUserEditModal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    const trimmedPass = editUserModalPassword.trim();
+    const trimmedName = editUserModalName.trim();
+    if (!trimmedPass) {
+      setErrorMessage('La contraseña no puede estar vacía.');
+      return;
+    }
+    if (!trimmedName) {
+      setErrorMessage('El nombre no puede estar vacío.');
+      return;
+    }
+
+    setIsSavingUserEdit(true);
+    setErrorMessage(null);
+    try {
+      const updated = await api.updateAdminUser(editingUser.id, {
+        name: trimmedName,
+        passwordPlain: trimmedPass,
+        isActive: editingUser.id === 'ronald' ? true : editUserModalIsActive,
+      });
+
+      // Update in-memory user list
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === editingUser.id
+            ? { ...u, name: trimmedName, passwordPlain: trimmedPass, isActive: editingUser.id === 'ronald' ? true : editUserModalIsActive }
+            : u
+        )
+      );
+
+      setEditingUser(null);
+      setSuccessMessage(`Contraseña y datos de ${trimmedName} actualizados correctamente en la base de datos.`);
+      setTimeout(() => setSuccessMessage(null), 4000);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Error al actualizar la contraseña del usuario.');
+    } finally {
+      setIsSavingUserEdit(false);
     }
   };
 
@@ -670,11 +731,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-white border border-[#EDE6DB] flex items-center justify-between text-xs">
-                    <span className="text-[#8C847B]">Contraseña:</span>
-                    <span className="font-mono font-medium text-[#2C2926] bg-[#FAF8F5] px-2.5 py-0.5 rounded-md border border-[#E8E2D9]">
-                      {u.passwordPlain}
+                  {/* Password row with direct edit trigger */}
+                  <div
+                    onClick={() => handleOpenEditUser(u)}
+                    className="p-2.5 rounded-xl bg-white border border-[#EDE6DB] flex items-center justify-between text-xs cursor-pointer hover:border-[#D4AF37] transition-colors"
+                    title="Pulsar para cambiar contraseña"
+                  >
+                    <span className="text-[#8C847B] flex items-center space-x-1.5">
+                      <Lock className="w-3.5 h-3.5 text-[#937C67]" />
+                      <span>Contraseña:</span>
                     </span>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="font-mono font-semibold text-[#2C2926] bg-[#FAF8F5] px-2.5 py-0.5 rounded-md border border-[#E8E2D9]">
+                        {u.passwordPlain}
+                      </span>
+                      <span className="text-[10px] text-[#8C6D37] font-medium bg-[#FAF0E6] px-1.5 py-0.5 rounded border border-[#E8DFC8]">
+                        Cambiar
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2 pt-1 border-t border-[#F0EAE1]">
@@ -682,7 +756,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectUserToPreview(u.username, u.passwordPlain)}
-                        className="flex-1 py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-white border border-[#E2DBD2] flex items-center justify-center space-x-1 hover:bg-[#F2ECE4] transition-colors cursor-pointer"
+                        className="py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-white border border-[#E2DBD2] flex items-center justify-center space-x-1 hover:bg-[#F2ECE4] transition-colors cursor-pointer"
+                        title="Ver experiencia"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#937C67]" />
                         <span>Ver</span>
@@ -690,13 +765,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     )}
                     <button
                       type="button"
+                      onClick={() => handleOpenEditUser(u)}
+                      className="flex-1 py-2 px-2.5 rounded-xl text-xs font-semibold text-[#2C2926] bg-[#FAF0E6] hover:bg-[#F3E7D3] border border-[#E8DFC8] flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                    >
+                      <KeyRound className="w-3.5 h-3.5 text-[#8C6D37]" />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => {
                         setSelectedUserId(u.id);
                         setActiveTab('texts');
                       }}
-                      className="flex-1 py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-[#F2EDE5] hover:bg-[#EAE2D6] border border-[#E2DBD2] flex items-center justify-center space-x-1 transition-colors cursor-pointer"
+                      className="py-2 px-2.5 rounded-xl text-xs font-medium text-[#736C65] bg-[#F2EDE5] hover:bg-[#EAE2D6] border border-[#E2DBD2] flex items-center justify-center space-x-1 transition-colors cursor-pointer"
+                      title="Configurar carta y textos"
                     >
-                      <span>Configurar</span>
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Textos</span>
                     </button>
                     {!isAdmin && (
                       <button
@@ -739,9 +824,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         {u.username}
                       </td>
                       <td className="py-3.5 px-3.5 font-mono text-[#2C2926]">
-                        <span className="bg-[#FAF8F5] px-2.5 py-1 rounded-md border border-[#E8E2D9] inline-block">
-                          {u.passwordPlain}
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditUser(u)}
+                          className="group inline-flex items-center space-x-1.5 bg-[#FAF8F5] hover:bg-[#FAF0E6] px-2.5 py-1 rounded-md border border-[#E8E2D9] hover:border-[#E8DFC8] transition-colors cursor-pointer"
+                          title="Clic para cambiar contraseña"
+                        >
+                          <span className="font-semibold">{u.passwordPlain}</span>
+                          <KeyRound className="w-3 h-3 text-[#8C847B] group-hover:text-[#8C6D37]" />
+                        </button>
                       </td>
                       <td className="py-3.5 px-3.5">
                         <span
@@ -793,13 +884,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           )}
                           <button
                             type="button"
+                            onClick={() => handleOpenEditUser(u)}
+                            className="inline-flex items-center space-x-1 text-[11px] text-[#2C2926] font-semibold bg-[#FAF0E6] hover:bg-[#F3E7D3] px-2.5 py-1 rounded-lg border border-[#E8DFC8] transition-colors cursor-pointer"
+                            title="Editar contraseña y datos de usuario"
+                          >
+                            <KeyRound className="w-3 h-3 text-[#8C6D37]" />
+                            <span>Editar</span>
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => {
                               setSelectedUserId(u.id);
                               setActiveTab('texts');
                             }}
-                            className="text-[11px] text-[#2C2926] bg-[#F2EDE5] hover:bg-[#EAE2D6] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                            className="text-[11px] text-[#736C65] hover:text-[#2C2926] bg-[#F2EDE5] hover:bg-[#EAE2D6] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                            title="Configurar carta y textos"
                           >
-                            Editar
+                            Textos
                           </button>
                           {!isAdmin && (
                             <button
@@ -1194,15 +1295,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs text-[#736C65] mb-1">Contraseña</label>
-                <input
-                  type="text"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Contraseña inicial"
-                  className="w-full px-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] font-mono"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs text-[#736C65]">Contraseña</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                    className="text-[10px] text-[#8C6D37] hover:text-[#2C2926] flex items-center space-x-1 cursor-pointer"
+                  >
+                    {showNewUserPassword ? (
+                      <>
+                        <EyeOff className="w-3 h-3" />
+                        <span>Ocultar</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3 h-3" />
+                        <span>Mostrar</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showNewUserPassword ? 'text' : 'password'}
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Contraseña inicial"
+                    className="w-full pl-3 pr-9 py-2 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-[#8C847B] hover:text-[#2C2926] cursor-pointer"
+                  >
+                    {showNewUserPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
               </div>
 
               <div className="pt-2 flex items-center justify-end space-x-2">
@@ -1215,9 +1344,172 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-[#2C2926] text-white text-xs font-medium"
+                  className="px-4 py-1.5 rounded-xl bg-[#2C2926] text-white text-xs font-medium cursor-pointer"
                 >
                   Crear Usuario
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User & Password Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 w-full max-w-md border border-[#E8E2D9] shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-start justify-between pb-3.5 border-b border-[#F0EAE1]">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#2C2926] text-[#FAF8F5] flex items-center justify-center shadow-xs shrink-0">
+                  <KeyRound className="w-5 h-5 text-[#D4AF37]" />
+                </div>
+                <div>
+                  <h4 className="font-serif-display text-lg sm:text-xl text-[#2C2926] font-semibold leading-tight">
+                    Editar Credenciales
+                  </h4>
+                  <p className="text-xs text-[#8C847B] mt-0.5">
+                    Modificar contraseña para <span className="font-mono text-[#2C2926]">@{editingUser.username}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingUser(null)}
+                className="p-1.5 text-[#8C847B] hover:text-[#2C2926] hover:bg-[#FAF8F5] rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveUserEditModal} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#5A524A] mb-1.5">
+                  Nombre completo
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editUserModalName}
+                  onChange={(e) => setEditUserModalName(e.target.value)}
+                  placeholder="ej. Mariana"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs sm:text-sm text-[#2C2926] focus:outline-hidden focus:ring-1 focus:ring-[#C29B38]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#5A524A] mb-1.5">
+                  Nombre de usuario (Identificador)
+                </label>
+                <input
+                  type="text"
+                  disabled
+                  value={editingUser.username}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#F0EAE1]/70 border border-[#E2DBD2] text-xs sm:text-sm text-[#736C65] font-mono cursor-not-allowed"
+                />
+                <span className="text-[11px] text-[#8C847B] mt-1 block">
+                  El nombre de usuario se mantiene fijo para preservar su correspondencia botánica y textos personales.
+                </span>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-[#5A524A]">
+                    Nueva Contraseña de Acceso
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowEditUserModalPassword(!showEditUserModalPassword)}
+                    className="text-[11px] text-[#8C6D37] hover:text-[#2C2926] flex items-center space-x-1 cursor-pointer"
+                  >
+                    {showEditUserModalPassword ? (
+                      <>
+                        <EyeOff className="w-3 h-3" />
+                        <span>Ocultar</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3 h-3" />
+                        <span>Mostrar</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showEditUserModalPassword ? 'text' : 'password'}
+                    required
+                    value={editUserModalPassword}
+                    onChange={(e) => setEditUserModalPassword(e.target.value)}
+                    placeholder="Escribe la nueva contraseña..."
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs sm:text-sm text-[#2C2926] font-mono focus:outline-hidden focus:ring-1 focus:ring-[#C29B38]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditUserModalPassword(!showEditUserModalPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#8C847B] hover:text-[#2C2926] cursor-pointer"
+                    title={showEditUserModalPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                  >
+                    {showEditUserModalPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {editingUser.id !== 'ronald' && (
+                <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EDE6DB] flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-semibold text-[#2C2926] block">Estado de la cuenta</span>
+                    <span className="text-[11px] text-[#8C847B]">Permitir iniciar sesión</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditUserModalIsActive(!editUserModalIsActive)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                      editUserModalIsActive
+                        ? 'bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]'
+                        : 'bg-[#FDF2F0] text-[#902A24] border border-[#FCA5A5]'
+                    }`}
+                  >
+                    {editUserModalIsActive ? 'Activo' : 'Inactivo'}
+                  </button>
+                </div>
+              )}
+
+              <div className="p-3 rounded-xl bg-[#FAF0E6] border border-[#E8DFC8] text-[11px] text-[#8C6D37] leading-relaxed flex items-start space-x-2">
+                <ShieldCheck className="w-4 h-4 shrink-0 text-[#C29B38] mt-0.5" />
+                <span>
+                  <strong>Sincronización Inmediata:</strong> Al guardar, la contraseña se actualizará de inmediato en Firestore y en el almacenamiento local. El usuario deberá usar esta nueva contraseña en su próximo inicio de sesión.
+                </span>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  disabled={isSavingUserEdit}
+                  className="px-4 py-2.5 rounded-xl text-xs text-[#736C65] hover:bg-[#FAF8F5] transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingUserEdit}
+                  className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-[#2C2926] hover:bg-[#1A1817] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingUserEdit ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Guardando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Guardar Contraseña</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

@@ -638,26 +638,61 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
 
                 {/* Central Sapphire & Cyan Receptacle */}
                 <circle cx="200" cy="160" r="14" fill="#0077B6" />
-                <circle cx="200" cy="160" r="10.5" fill="#00B4D8" />
+                <circle cx="200" cy="160" r="11" fill="#023E8A" stroke="#00E5FF" strokeWidth="0.8" />
 
-                {/* Easter Egg: Chocorramo / Tajadas Warm Amber Secret Pearl in Deep Center */}
-                <circle cx="200" cy="160" r="7.5" fill="url(#amberGlintGrad)" />
-
-                {/* Easter Egg: Gentle Tender Heart Glint ("algún día será afectuoso") */}
-                <motion.circle
-                  cx="200"
-                  cy="160"
-                  r="4"
-                  fill="url(#tenderHeartGrad)"
+                {/* Exclusive Aquatic Botanical "25" Core for Isaías */}
+                <motion.g
+                  id="isaias-exclusive-25-core"
+                  initial={{ scale: 0, opacity: 0 }}
                   animate={{
-                    scale: [0.9, 1.25, 0.9],
-                    opacity: [0.7, 1, 0.7],
+                    scale: phase === 'bloom' || isFullyBloomed ? 1 : 0,
+                    opacity: phase === 'bloom' || isFullyBloomed ? 1 : 0,
                   }}
-                  transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-                />
+                  transition={{
+                    duration: 1.6,
+                    delay: mode === 'result' ? 0 : 0.7,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  style={{ transformOrigin: '200px 160px' }}
+                >
+                  {/* Concentric deep ocean nucleus with cyan & electric water highlights */}
+                  <circle
+                    cx="200"
+                    cy="160"
+                    r="9.5"
+                    fill="#031E3D"
+                    stroke="#00E5FF"
+                    strokeWidth="0.9"
+                  />
+                  <circle
+                    cx="200"
+                    cy="160"
+                    r="8"
+                    fill="#06284F"
+                  />
 
-                {/* Pure central point of light */}
-                <circle cx="200" cy="160" r="1.8" fill="#FFFFFF" />
+                  {/* Perfectly centered 25 within the aquatic flower nucleus */}
+                  <text
+                    x="200"
+                    y="160.5"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#00E5FF"
+                    fontSize="9"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, sans-serif"
+                    fontWeight="800"
+                    letterSpacing="0.5px"
+                    className="select-none pointer-events-none"
+                    style={{
+                      filter: 'drop-shadow(0 0 2.5px rgba(0, 229, 255, 0.75))',
+                    }}
+                  >
+                    25
+                  </text>
+
+                  {/* Micro water glint highlight */}
+                  <circle cx="200" cy="153.5" r="0.8" fill="#FFFFFF" opacity="0.95" />
+                </motion.g>
               </motion.g>
             </motion.g>
 
