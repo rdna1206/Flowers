@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "username": { "type": "string" },
+        "passwordPlain": { "type": "string" },
+        "role": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "profiling": { "type": "string" },
+        "personalText": { "type": "string" },
+        "theme": { "type": "object" },
+        "flowerConfig": { "type": "object" },
+        "generatedFormulation": { "type": "object" },
+        "userResponse": { "type": "object" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "Response": {
+      "collection": "responses",
+      "fields": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "username": { "type": "string" },
+        "text": { "type": "string" },
+        "submittedAt": { "type": "string" }
+      }
+    }
+  }
+}
