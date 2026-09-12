@@ -5,6 +5,7 @@ import type {
   UserExperienceData,
   UserResponse,
 } from './types';
+import { BackgroundVideo } from './components/BackgroundVideo';
 import { PetalBackground } from './components/PetalBackground';
 import { HeaderNav } from './components/HeaderNav';
 import { LoginView } from './components/LoginView';
@@ -128,48 +129,21 @@ export default function App() {
     }
   };
 
-  // Dark mode override state (persisted in localStorage)
-  const [isDarkOverride, setIsDarkOverride] = useState<boolean>(() => {
-    return localStorage.getItem('floral_dark_mode') === 'true';
-  });
-
-  const handleToggleDarkTheme = () => {
-    setIsDarkOverride((prev) => {
-      const next = !prev;
-      localStorage.setItem('floral_dark_mode', String(next));
-      return next;
-    });
-  };
-
-  // Determine current user theme
+  // Determine current user theme (Dark Mode is now permanently fixed & non-modifiable)
   const userTheme = experience?.theme;
   const isNeutralView = currentStep === 'login' || currentStep === 'admin';
-  const isDarkTheme =
-    isDarkOverride ||
-    (!isNeutralView &&
-      (userTheme?.backgroundColor?.startsWith('#0') ||
-        userTheme?.backgroundColor?.startsWith('#1') ||
-        experience?.id === 'jhon'));
+  const isDarkTheme = true;
 
-  const pageBg = isDarkTheme
-    ? '#090D16'
-    : isNeutralView
-    ? '#FAF8F5'
-    : userTheme?.backgroundColor || '#FAF8F5';
-  const userTextColor = isDarkTheme
-    ? '#E6EDF8'
-    : isNeutralView
-    ? '#2C2926'
-    : userTheme?.textColor || '#2C2926';
+  const pageBg = 'transparent';
+  const userTextColor = '#E6EDF8';
 
   return (
     <div
-      className="min-h-screen flex flex-col relative selection:bg-[#E8DED1] transition-colors duration-700"
-      style={{
-        backgroundColor: pageBg,
-        color: userTextColor,
-      }}
+      className="min-h-screen flex flex-col relative selection:bg-[#E8DED1] transition-colors duration-700 bg-[#050811] text-[#E6EDF8]"
     >
+      {/* Dynamic Space Background Video (Vertical/Cell vs Horizontal/Desktop) */}
+      <BackgroundVideo />
+
       {/* Delicate floating background petals */}
       <PetalBackground
         petalColors={!isNeutralView ? userTheme?.petalColors : undefined}
@@ -185,7 +159,6 @@ export default function App() {
         onLogout={handleLogout}
         onOpenAdmin={() => setCurrentStep('admin')}
         onViewExperience={handleAdminViewOwnExperience}
-        onToggleDarkTheme={handleToggleDarkTheme}
       />
 
       {/* Main Content Area */}
@@ -206,7 +179,6 @@ export default function App() {
                 isLoading={isLoginLoading}
                 errorMessage={loginError}
                 isDarkTheme={isDarkTheme}
-                onToggleDarkTheme={handleToggleDarkTheme}
               />
             )}
 

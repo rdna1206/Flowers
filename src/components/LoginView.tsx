@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, User, Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { LogoR } from './LogoR';
 
 interface LoginViewProps {
@@ -7,15 +7,13 @@ interface LoginViewProps {
   isLoading: boolean;
   errorMessage: string | null;
   isDarkTheme?: boolean;
-  onToggleDarkTheme?: () => void;
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({
   onLogin,
   isLoading,
   errorMessage,
-  isDarkTheme = false,
-  onToggleDarkTheme,
+  isDarkTheme = true,
 }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -34,30 +32,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
     >
       <div className="w-full max-w-md relative">
         {/* Minimalist & Elegant Card */}
-        <div
-          className={`backdrop-blur-md rounded-2xl sm:rounded-3xl border shadow-sm p-8 sm:p-11 relative overflow-hidden transition-all duration-500 ${
-            isDarkTheme
-              ? 'bg-[#121824]/90 border-[#232D42] text-[#E2E8F0]'
-              : 'bg-[#FFFFFF]/95 border-[#E8E2D9] text-[#2C2926]'
-          }`}
-        >
-          {/* Top Dark Mode Quick Toggle */}
-          {onToggleDarkTheme && (
-            <div className="absolute top-4 right-4">
-              <button
-                type="button"
-                onClick={onToggleDarkTheme}
-                className={`p-2 rounded-full border transition-all cursor-pointer hover:scale-105 ${
-                  isDarkTheme
-                    ? 'bg-[#1E293B] border-[#334155] text-[#F4D03F]'
-                    : 'bg-[#FAF6F0] border-[#E8E0D5] text-[#736C65]'
-                }`}
-                title={isDarkTheme ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              >
-                {isDarkTheme ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-            </div>
-          )}
+        <div className="bg-[#121824]/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-[#232D42] text-[#E2E8F0] shadow-xl p-8 sm:p-11 relative overflow-hidden transition-all duration-500">
 
           {/* Subtle top delicate accent line */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#E6A598]/30 via-[#A594B8]/30 to-[#8A9A86]/30" />
