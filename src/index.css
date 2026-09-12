@@ -41,3 +41,37 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #C8BFB3;
 }
+
+/* Main Home Screen Exclusive Background Animations */
+@keyframes floatPetalSlow {
+  0% {
+    transform: translateY(0px) rotate(0deg) translateX(0px);
+  }
+  50% {
+    transform: translateY(-35px) rotate(180deg) translateX(20px);
+  }
+  100% {
+    transform: translateY(0px) rotate(360deg) translateX(0px);
+  }
+}
+
+@keyframes mainHomeGlowPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes mainHomeFlowerRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+

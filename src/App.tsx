@@ -7,6 +7,7 @@ import type {
 } from './types';
 import { BackgroundVideo } from './components/BackgroundVideo';
 import { PetalBackground } from './components/PetalBackground';
+import { MainHomePageBackground } from './components/MainHomePageBackground';
 import { HeaderNav } from './components/HeaderNav';
 import { LoginView } from './components/LoginView';
 import { ReadingExperience } from './components/ReadingExperience';
@@ -139,17 +140,24 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen flex flex-col relative selection:bg-[#E8DED1] transition-colors duration-700 bg-[#050811] text-[#E6EDF8]"
+      className="min-h-screen flex flex-col relative selection:bg-[#E8DED1] transition-colors duration-700 bg-[#030206] text-[#E6EDF8]"
     >
-      {/* Dynamic Space Background Video (Vertical/Cell vs Horizontal/Desktop) */}
-      <BackgroundVideo />
+      {/* EXCLUSIVE MAIN HOME SCREEN BACKGROUND vs REGULAR APP BACKGROUNDS */}
+      {currentStep === 'login' ? (
+        <MainHomePageBackground />
+      ) : (
+        <>
+          {/* Dynamic Space Background Video (Vertical/Cell vs Horizontal/Desktop) */}
+          <BackgroundVideo />
 
-      {/* Delicate floating background petals */}
-      <PetalBackground
-        petalColors={!isNeutralView ? userTheme?.petalColors : undefined}
-        ambientGlow={!isNeutralView ? userTheme?.ambientGlow : undefined}
-        backgroundColor={pageBg}
-      />
+          {/* Delicate floating background petals */}
+          <PetalBackground
+            petalColors={!isNeutralView ? userTheme?.petalColors : undefined}
+            ambientGlow={!isNeutralView ? userTheme?.ambientGlow : undefined}
+            backgroundColor={pageBg}
+          />
+        </>
+      )}
 
       {/* Header bar: Icon only brand, role controls & logout */}
       <HeaderNav

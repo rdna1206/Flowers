@@ -35,7 +35,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <div className="bg-[#121824]/90 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-[#232D42] text-[#E2E8F0] shadow-xl p-8 sm:p-11 relative overflow-hidden transition-all duration-500">
 
           {/* Subtle top delicate accent line */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#E6A598]/30 via-[#A594B8]/30 to-[#8A9A86]/30" />
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#701A75]/50 via-[#FACC15]/70 to-[#4C0519]/50" />
 
           {/* Icon Only Header */}
           <div className="flex flex-col items-center text-center mb-9">
