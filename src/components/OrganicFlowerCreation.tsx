@@ -38,7 +38,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   const isLuciana = experience.id === 'luciana' || experience.username?.toLowerCase() === 'luciana';
   const isStanley = experience.id === 'stanley' || experience.username?.toLowerCase() === 'stanley';
   const isDileidys = experience.id === 'dileidys' || experience.username?.toLowerCase() === 'dileidys';
-  const isLeiry = experience.id === 'leiry' || experience.username?.toLowerCase() === 'leiry';
+  const isLeiry = experience.id?.toLowerCase() === 'leiry' || experience.username?.toLowerCase() === 'leiry' || experience.name?.toLowerCase().includes('leiry');
 
   // Jhon's Bespoke Handcrafted Bouquet of Yellow Blooms & Signature Cobalt/Thunder/Shadow Flower
   if (isJhon) {

@@ -46,13 +46,17 @@ function getLocalUsers(): UserRecord[] {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Ensure leiry is present
-      if (!parsed.some((u: UserRecord) => u.id === 'leiry')) {
-        const leiryUser = INITIAL_USERS.find((u) => u.id === 'leiry');
-        if (leiryUser) {
-          parsed.push(leiryUser);
-          localStorage.setItem(USERS_DB_KEY, JSON.stringify(parsed));
+      // Ensure leiry is present and updated
+      const leiryInitial = INITIAL_USERS.find((u) => u.id === 'leiry');
+      if (leiryInitial) {
+        const idx = parsed.findIndex((u: UserRecord) => u.id === 'leiry');
+        if (idx === -1) {
+          parsed.push(leiryInitial);
+        } else {
+          parsed[idx].theme = leiryInitial.theme;
+          parsed[idx].flowerConfig = leiryInitial.flowerConfig;
         }
+        localStorage.setItem(USERS_DB_KEY, JSON.stringify(parsed));
       }
       return parsed;
     }

@@ -77,9 +77,16 @@ export async function getCloudUsers(): Promise<UserRecord[]> {
       users.push(d.data() as UserRecord);
     });
     const leiryUser = INITIAL_USERS.find((u) => u.id === 'leiry');
-    if (leiryUser && !users.some((u) => u.id === 'leiry')) {
-      await saveCloudUser(leiryUser);
-      users.push(leiryUser);
+    if (leiryUser) {
+      const existingLeiryIndex = users.findIndex((u) => u.id === 'leiry');
+      if (existingLeiryIndex === -1) {
+        await saveCloudUser(leiryUser);
+        users.push(leiryUser);
+      } else {
+        // Ensure leiry theme and flowerConfig are up to date
+        users[existingLeiryIndex].theme = leiryUser.theme;
+        users[existingLeiryIndex].flowerConfig = leiryUser.flowerConfig;
+      }
     }
     return users;
   } catch (err) {
