@@ -36,6 +36,8 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
   const rawText = experience.personalText || '';
   const hasText = rawText.trim().length > 0;
 
+  const isLeiry = experience.id?.toLowerCase() === 'leiry' || experience.username?.toLowerCase() === 'leiry' || experience.name?.toLowerCase().includes('leiry');
+
   return (
     <div
       id="reading-experience-container"
@@ -57,17 +59,19 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
           <Flower2 className="w-5 h-5 stroke-[1.5]" />
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className={`${
-            isSans ? 'font-sans' : 'font-serif-display'
-          } text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight`}
-          style={{ color: textColor }}
-        >
-          {experience.name}
-        </motion.h1>
+        {!isLeiry && (
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className={`${
+              isSans ? 'font-sans' : 'font-serif-display'
+            } text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight`}
+            style={{ color: textColor }}
+          >
+            {experience.name}
+          </motion.h1>
+        )}
       </div>
 
       {/* Main Letter Card */}
