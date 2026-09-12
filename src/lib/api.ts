@@ -46,6 +46,14 @@ function getLocalUsers(): UserRecord[] {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
+      // Ensure leiry is present
+      if (!parsed.some((u: UserRecord) => u.id === 'leiry')) {
+        const leiryUser = INITIAL_USERS.find((u) => u.id === 'leiry');
+        if (leiryUser) {
+          parsed.push(leiryUser);
+          localStorage.setItem(USERS_DB_KEY, JSON.stringify(parsed));
+        }
+      }
       return parsed;
     }
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(INITIAL_USERS));

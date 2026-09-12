@@ -76,6 +76,11 @@ export async function getCloudUsers(): Promise<UserRecord[]> {
     snap.forEach((d) => {
       users.push(d.data() as UserRecord);
     });
+    const leiryUser = INITIAL_USERS.find((u) => u.id === 'leiry');
+    if (leiryUser && !users.some((u) => u.id === 'leiry')) {
+      await saveCloudUser(leiryUser);
+      users.push(leiryUser);
+    }
     return users;
   } catch (err) {
     console.warn('Fallback a almacenamiento local tras error en Firestore:', err);
