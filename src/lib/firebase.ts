@@ -102,7 +102,27 @@ export async function getCloudUser(id: string): Promise<UserRecord | null> {
   try {
     const snap = await getDoc(doc(db, USERS_COLLECTION, id));
     if (snap.exists()) {
-      return snap.data() as UserRecord;
+      const data = snap.data() as UserRecord;
+      if (id.toLowerCase() === 'leiry') {
+        const leiryInitial = INITIAL_USERS.find((u) => u.id === 'leiry');
+        if (leiryInitial) {
+          const merged = {
+            ...data,
+            theme: leiryInitial.theme,
+            flowerConfig: leiryInitial.flowerConfig,
+          };
+          saveCloudUser(merged).catch(() => {});
+          return merged;
+        }
+      }
+      return data;
+    }
+    if (id.toLowerCase() === 'leiry') {
+      const leiryInitial = INITIAL_USERS.find((u) => u.id === 'leiry');
+      if (leiryInitial) {
+        await saveCloudUser(leiryInitial);
+        return leiryInitial;
+      }
     }
     return null;
   } catch (err) {
