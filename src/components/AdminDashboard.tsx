@@ -29,6 +29,7 @@ import type { UserRecord, UserTheme, AdminUserResponseItem } from '../types';
 interface AdminDashboardProps {
   onSelectUserToPreview?: (username: string, passwordPlain: string) => void;
   onViewMyExperience?: () => void;
+  isDarkTheme?: boolean;
 }
 
 type AdminTab = 'responses' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
@@ -36,6 +37,7 @@ type AdminTab = 'responses' | 'users' | 'texts' | 'profiling' | 'styles' | 'flow
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSelectUserToPreview,
   onViewMyExperience,
+  isDarkTheme = false,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('responses');
   const [users, setUsers] = useState<UserRecord[]>([]);

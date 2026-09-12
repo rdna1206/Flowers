@@ -128,17 +128,39 @@ export default function App() {
     }
   };
 
+  // Dark mode override state (persisted in localStorage)
+  const [isDarkOverride, setIsDarkOverride] = useState<boolean>(() => {
+    return localStorage.getItem('floral_dark_mode') === 'true';
+  });
+
+  const handleToggleDarkTheme = () => {
+    setIsDarkOverride((prev) => {
+      const next = !prev;
+      localStorage.setItem('floral_dark_mode', String(next));
+      return next;
+    });
+  };
+
   // Determine current user theme
   const userTheme = experience?.theme;
   const isNeutralView = currentStep === 'login' || currentStep === 'admin';
   const isDarkTheme =
-    !isNeutralView &&
-    (userTheme?.backgroundColor?.startsWith('#0') ||
-      userTheme?.backgroundColor?.startsWith('#1') ||
-      experience?.id === 'jhon');
+    isDarkOverride ||
+    (!isNeutralView &&
+      (userTheme?.backgroundColor?.startsWith('#0') ||
+        userTheme?.backgroundColor?.startsWith('#1') ||
+        experience?.id === 'jhon'));
 
-  const pageBg = isNeutralView ? '#FAF8F5' : userTheme?.backgroundColor || '#FAF8F5';
-  const userTextColor = isNeutralView ? '#2C2926' : userTheme?.textColor || '#2C2926';
+  const pageBg = isDarkTheme
+    ? '#090D16'
+    : isNeutralView
+    ? '#FAF8F5'
+    : userTheme?.backgroundColor || '#FAF8F5';
+  const userTextColor = isDarkTheme
+    ? '#E6EDF8'
+    : isNeutralView
+    ? '#2C2926'
+    : userTheme?.textColor || '#2C2926';
 
   return (
     <div
@@ -163,6 +185,7 @@ export default function App() {
         onLogout={handleLogout}
         onOpenAdmin={() => setCurrentStep('admin')}
         onViewExperience={handleAdminViewOwnExperience}
+        onToggleDarkTheme={handleToggleDarkTheme}
       />
 
       {/* Main Content Area */}
@@ -182,6 +205,8 @@ export default function App() {
                 onLogin={handleLogin}
                 isLoading={isLoginLoading}
                 errorMessage={loginError}
+                isDarkTheme={isDarkTheme}
+                onToggleDarkTheme={handleToggleDarkTheme}
               />
             )}
 
@@ -190,6 +215,7 @@ export default function App() {
               <AdminDashboard
                 onSelectUserToPreview={handlePreviewAsUser}
                 onViewMyExperience={handleAdminViewOwnExperience}
+                isDarkTheme={isDarkTheme}
               />
             )}
 
