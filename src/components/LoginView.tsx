@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Flower, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import { LogoR } from './LogoR';
 
 interface LoginViewProps {
   onLogin: (username: string, password: string) => Promise<void>;
@@ -35,8 +36,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
           {/* Icon Only Header */}
           <div className="flex flex-col items-center text-center mb-9">
-            <div className="w-14 h-14 rounded-full bg-[#FAF6F0] border border-[#E8E0D5] flex items-center justify-center text-[#8C7A67] shadow-xs hover:scale-105 transition-transform">
-              <Flower className="w-7 h-7 stroke-[1.3]" />
+            <div className="w-14 h-14 rounded-full bg-[#FAF6F0] border border-[#E8E0D5] flex items-center justify-center text-[#2C2926] shadow-xs hover:scale-105 transition-transform">
+              <LogoR className="w-7 h-7 p-0.5" />
             </div>
           </div>
 

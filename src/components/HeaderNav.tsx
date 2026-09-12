@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flower2, LogOut, ShieldCheck } from 'lucide-react';
+import { LogOut, ShieldCheck } from 'lucide-react';
+import { LogoR } from './LogoR';
 import type { UserSummary } from '../types';
 
 interface HeaderNavProps {
@@ -39,12 +40,12 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             style={{
               backgroundColor: isDarkTheme ? 'rgba(15, 29, 62, 0.8)' : '#F3ECE4',
               borderColor: isDarkTheme ? 'rgba(43, 120, 228, 0.35)' : '#E2DBD2',
-              color: isDarkTheme ? '#F4D03F' : '#937C67',
+              color: isDarkTheme ? '#E6EDF8' : '#2C2926',
             }}
             title="Inicio"
             onClick={user?.role === 'admin' ? onOpenAdmin : onViewExperience}
           >
-            <Flower2 className="w-5 h-5 stroke-[1.4]" />
+            <LogoR className="w-5 h-5 p-0.5" />
           </div>
         </div>
 
