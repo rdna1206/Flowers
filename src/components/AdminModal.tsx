@@ -132,7 +132,6 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
       await api.updateAdminUser(selectedUser.id, {
         name: editName,
-        passwordPlain: editPassword,
         isActive: editIsActive,
         profiling: editProfiling,
         personalText: editText,
@@ -157,31 +156,33 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     e.preventDefault();
     if (!newName.trim() || !newUsername.trim() || !newPassword.trim()) return;
     try {
-      await api.createAdminUser({
-        name: newName.trim(),
-        username: newUsername.trim(),
-        passwordPlain: newPassword.trim(),
-        role: 'user',
-        profiling: '',
-        personalText: '',
-        theme: {
-          primaryColor: '',
-          secondaryColor: '',
-          backgroundColor: '',
-          surfaceColor: '',
-          textColor: '',
-          accentColor: '',
-          petalColors: [],
-          fontStyle: 'serif',
-          ambientGlow: '',
-          themeName: '',
+      await api.createAdminUser(
+        {
+          name: newName.trim(),
+          username: newUsername.trim(),
+          role: 'user',
+          profiling: '',
+          personalText: '',
+          theme: {
+            primaryColor: '',
+            secondaryColor: '',
+            backgroundColor: '',
+            surfaceColor: '',
+            textColor: '',
+            accentColor: '',
+            petalColors: [],
+            fontStyle: 'serif',
+            ambientGlow: '',
+            themeName: '',
+          },
+          flowerConfig: {
+            specificInstructions: '',
+            preferredTone: '',
+            customFormulation: null,
+          },
         },
-        flowerConfig: {
-          specificInstructions: '',
-          preferredTone: '',
-          customFormulation: null,
-        },
-      });
+        newPassword.trim()
+      );
       setShowNewUserModal(false);
       setNewName('');
       setNewUsername('');

@@ -276,7 +276,6 @@ app.post('/api/admin/user', requireAdmin, (req, res) => {
     id: cleanId,
     name,
     username,
-    passwordPlain,
     role: role === 'admin' ? 'admin' : 'user',
     isActive: true,
     profiling: profiling || '',

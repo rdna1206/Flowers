@@ -47,7 +47,7 @@ export interface UserRecord {
   id: string;
   name: string;
   username: string;
-  passwordPlain: string;
+  authUid?: string;
   role: UserRole;
   isActive: boolean;
   profiling: string;

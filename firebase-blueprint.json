@@ -1,13 +1,15 @@
 {
   "entities": {
     "User": {
-      "collection": "users",
-      "fields": {
+      "title": "User",
+      "description": "User profile with personal experience configurations and responses",
+      "type": "object",
+      "properties": {
         "id": { "type": "string" },
+        "authUid": { "type": "string" },
         "name": { "type": "string" },
         "username": { "type": "string" },
-        "passwordPlain": { "type": "string" },
-        "role": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
         "isActive": { "type": "boolean" },
         "profiling": { "type": "string" },
         "personalText": { "type": "string" },
@@ -17,17 +19,49 @@
         "userResponse": { "type": "object" },
         "createdAt": { "type": "string" },
         "updatedAt": { "type": "string" }
-      }
+      },
+      "required": ["id", "username", "name", "role", "isActive"]
     },
-    "Response": {
-      "collection": "responses",
-      "fields": {
+    "Admin": {
+      "title": "Admin",
+      "description": "Admin registry record marking Ronald as administrator",
+      "type": "object",
+      "properties": {
         "userId": { "type": "string" },
+        "authUid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "role"]
+    },
+    "UserResponse": {
+      "title": "UserResponse",
+      "description": "Response submitted by user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "authUid": { "type": "string" },
         "name": { "type": "string" },
         "username": { "type": "string" },
-        "text": { "type": "string" },
+        "response": { "type": "object" },
         "submittedAt": { "type": "string" }
-      }
+      },
+      "required": ["userId", "name", "username", "response", "submittedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User documents containing personal experience data"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Admin registry indicating authorized administrator UIDs"
+    },
+    "/responses/{responseId}": {
+      "schema": { "$ref": "#/entities/UserResponse" },
+      "description": "User submitted responses"
     }
   }
 }

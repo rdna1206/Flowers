@@ -6,20 +6,25 @@ import type {
   UserResponse,
   AdminUserResponseItem,
 } from '../types';
-import { INITIAL_USERS } from '../data/initialUsers';
 import {
-  getCloudUsers,
-  getCloudUser,
-  saveCloudUser,
-  submitCloudResponse,
-  deleteCloudResponse,
-  deleteCloudUser,
+  auth,
+  loginWithFirebaseAuth,
+  logoutFromFirebaseAuth,
+  getAuthenticatedUserDoc,
+  submitAuthenticatedUserResponse,
+  saveAuthenticatedUserFormulation,
+  getAdminAllUsers,
+  saveAdminUserDoc,
+  createAdminUserWithAuth,
+  updateAdminUserPassword,
+  deleteAdminResponseDoc,
+  deleteAdminUserDoc,
   ensureCloudDatabaseSeeded,
 } from './firebase';
 
 const TOKEN_KEY = 'floral_session_token';
-const USERS_DB_KEY = 'floral_offline_users_db';
-const ACTIVE_USER_ID_KEY = 'floral_offline_active_user_id';
+const ACTIVE_USER_ID_KEY = 'floral_active_user_id';
+const ACTIVE_USER_ROLE_KEY = 'floral_active_user_role';
 
 export function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -32,90 +37,17 @@ export function setStoredToken(token: string): void {
 export function clearStoredToken(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ACTIVE_USER_ID_KEY);
+  localStorage.removeItem(ACTIVE_USER_ROLE_KEY);
 }
 
-// ----------------------------------------------------------------------------
-// LOCAL CACHE SYNC ENGINE
-// ----------------------------------------------------------------------------
-function mergeUserRecords(cached: UserRecord, incoming: UserRecord): UserRecord {
-  // If incoming has personalText, use incoming. If incoming is empty but cached has personalText, preserve cached!
-  const personalText =
-    incoming.personalText && incoming.personalText.trim().length > 0
-      ? incoming.personalText
-      : cached.personalText || '';
-
-  const profiling =
-    incoming.profiling && incoming.profiling.trim().length > 0
-      ? incoming.profiling
-      : cached.profiling || '';
-
-  const userResponse = incoming.userResponse || cached.userResponse || null;
-
-  return {
-    ...cached,
-    ...incoming,
-    id: incoming.id || cached.id,
-    personalText,
-    profiling,
-    userResponse,
-    theme: incoming.theme || cached.theme,
-    flowerConfig: incoming.flowerConfig || cached.flowerConfig,
-  };
+function getActiveUserId(): string | null {
+  return localStorage.getItem(ACTIVE_USER_ID_KEY);
 }
 
-function getLocalUsers(): UserRecord[] {
-  try {
-    const raw = localStorage.getItem(USERS_DB_KEY);
-    if (!raw) {
-      localStorage.setItem(USERS_DB_KEY, JSON.stringify(INITIAL_USERS));
-      return INITIAL_USERS;
-    }
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      // Ensure leiry is present and updated
-      const leiryInitial = INITIAL_USERS.find((u) => u.id === 'leiry');
-      if (leiryInitial) {
-        const idx = parsed.findIndex((u: UserRecord) => u.id === 'leiry');
-        if (idx === -1) {
-          parsed.push(leiryInitial);
-        } else {
-          parsed[idx].theme = leiryInitial.theme;
-          parsed[idx].flowerConfig = leiryInitial.flowerConfig;
-        }
-        localStorage.setItem(USERS_DB_KEY, JSON.stringify(parsed));
-      }
-      return parsed;
-    }
-    localStorage.setItem(USERS_DB_KEY, JSON.stringify(INITIAL_USERS));
-    return INITIAL_USERS;
-  } catch {
-    return INITIAL_USERS;
-  }
-}
-
-function saveLocalUsers(users: UserRecord[]): void {
-  try {
-    localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
-  } catch (err) {
-    console.warn('Failed to persist users in localStorage:', err);
-  }
-}
-
-function getActiveLocalUser(): UserRecord | null {
-  const userId = localStorage.getItem(ACTIVE_USER_ID_KEY);
-  if (!userId) return null;
-  const users = getLocalUsers();
-  const norm = userId.trim().toLowerCase();
-  return users.find((u) => u.id.toLowerCase() === norm || u.username.toLowerCase() === norm) || null;
-}
-
-function toUserSummary(user: UserRecord): UserSummary {
-  return {
-    id: user.id,
-    name: user.name,
-    username: user.username,
-    role: user.role,
-  };
+function setActiveUserSession(user: UserSummary, token: string): void {
+  setStoredToken(token);
+  localStorage.setItem(ACTIVE_USER_ID_KEY, user.id);
+  localStorage.setItem(ACTIVE_USER_ROLE_KEY, user.role);
 }
 
 function toUserExperienceData(user: UserRecord): UserExperienceData {
@@ -133,7 +65,7 @@ function toUserExperienceData(user: UserRecord): UserExperienceData {
   };
 }
 
-// Fallback formulation generator
+// Fallback formulation generator if Gemini is offline
 function createSimulatedFormulation(user: UserRecord): FlowerFormulation {
   return {
     title: `Armonía y Esencia Botánica para ${user.name}`,
@@ -179,194 +111,113 @@ function createSimulatedFormulation(user: UserRecord): FlowerFormulation {
 ensureCloudDatabaseSeeded().catch(() => {});
 
 // ----------------------------------------------------------------------------
-// UNIFIED REAL-TIME API OBJECT (CLOUD FIRESTORE + LOCAL CACHE + GH PAGES)
+// SECURE API CLIENT (FIREBASE AUTH + ISOLATED FIRESTORE + GH PAGES COMPATIBLE)
 // ----------------------------------------------------------------------------
 export const api = {
-  async login(username: string, password: string): Promise<{ token: string; user: UserSummary }> {
-    const normInputUser = username.trim().toLowerCase();
-    const normInputPass = password.trim();
+  /**
+   * Secure Login using Firebase Authentication
+   */
+  async login(username: string, passwordPlain: string): Promise<{ token: string; user: UserSummary }> {
+    const { user, token } = await loginWithFirebaseAuth(username, passwordPlain);
+    setActiveUserSession(user, token);
+    return { token, user };
+  },
 
-    // 1. Try Firebase Cloud Firestore first
-    try {
-      const cloudUsers = await getCloudUsers();
-      if (cloudUsers && cloudUsers.length > 0) {
-        const localUsers = getLocalUsers();
-        // Merge cloud users with local users without wiping local text
-        const mergedUsers = cloudUsers.map((cu) => {
-          const matchingLocal = localUsers.find(
-            (lu) => lu.id.toLowerCase() === cu.id.toLowerCase()
-          );
-          return matchingLocal ? mergeUserRecords(matchingLocal, cu) : cu;
-        });
-        saveLocalUsers(mergedUsers);
-
-        const cloudUser = mergedUsers.find(
-          (u) =>
-            u.isActive &&
-            (u.username.toLowerCase() === normInputUser || u.name.toLowerCase() === normInputUser) &&
-            u.passwordPlain === normInputPass
-        );
-        if (cloudUser) {
-          const token = `firebase_token_${cloudUser.id}_${Date.now()}`;
-          setStoredToken(token);
-          localStorage.setItem(ACTIVE_USER_ID_KEY, cloudUser.id);
-          return {
-            token,
-            user: toUserSummary(cloudUser),
-          };
-        }
-      }
-    } catch (cloudErr) {
-      console.warn('Login cloud lookup failed, checking local cache:', cloudErr);
+  /**
+   * Get authenticated user summary
+   */
+  async getMe(): Promise<UserSummary> {
+    const userId = getActiveUserId();
+    if (!userId) {
+      throw new Error('No hay sesión activa.');
     }
 
-    // 2. Fallback to Local Storage
-    const users = getLocalUsers();
-    const user = users.find(
-      (u) =>
-        u.isActive &&
-        (u.username.toLowerCase() === normInputUser || u.name.toLowerCase() === normInputUser) &&
-        u.passwordPlain === normInputPass
-    );
-
-    if (!user) {
-      throw new Error('Usuario o contraseña incorrectos. Verifica tus datos.');
+    const userDoc = await getAuthenticatedUserDoc(userId);
+    if (!userDoc) {
+      throw new Error('No se pudo encontrar el usuario autenticado.');
     }
-
-    const dummyToken = `token_${user.id}_${Date.now()}`;
-    setStoredToken(dummyToken);
-    localStorage.setItem(ACTIVE_USER_ID_KEY, user.id);
 
     return {
-      token: dummyToken,
-      user: toUserSummary(user),
+      id: userDoc.id,
+      name: userDoc.name,
+      username: userDoc.username,
+      role: userDoc.role,
     };
   },
 
-  async getMe(): Promise<UserSummary> {
-    const userId = localStorage.getItem(ACTIVE_USER_ID_KEY);
-    if (!userId) {
-      throw new Error('No active local session');
-    }
-
-    try {
-      const cloudUser = await getCloudUser(userId);
-      if (cloudUser) {
-        return toUserSummary(cloudUser);
-      }
-    } catch {
-      // ignore
-    }
-
-    const user = getActiveLocalUser();
-    if (!user) {
-      throw new Error('No active local session');
-    }
-    return toUserSummary(user);
-  },
-
+  /**
+   * Logout from Firebase Auth and clear session
+   */
   async logout(): Promise<void> {
+    await logoutFromFirebaseAuth();
     clearStoredToken();
   },
 
+  /**
+   * Fetch authenticated user's own experience (STRICT PRIVACY: reads ONLY this user's doc)
+   */
   async getExperience(): Promise<UserExperienceData> {
-    const userId = localStorage.getItem(ACTIVE_USER_ID_KEY);
-    const localUser = getActiveLocalUser();
-
-    if (userId) {
-      try {
-        const cloudUser = await getCloudUser(userId);
-        if (cloudUser) {
-          const merged = localUser ? mergeUserRecords(localUser, cloudUser) : cloudUser;
-          // update local cache for this user
-          const localUsers = getLocalUsers();
-          const updated = localUsers.map((u) =>
-            u.id.toLowerCase() === cloudUser.id.toLowerCase() ? merged : u
-          );
-          saveLocalUsers(updated);
-          return toUserExperienceData(merged);
-        }
-      } catch (err) {
-        console.warn('Could not fetch cloud experience, using cached data:', err);
-      }
+    const userId = getActiveUserId();
+    if (!userId) {
+      throw new Error('No hay sesión activa.');
     }
 
-    if (!localUser) {
-      throw new Error('No active local user');
+    const userDoc = await getAuthenticatedUserDoc(userId);
+    if (!userDoc) {
+      throw new Error('Perfil de usuario no encontrado.');
     }
-    return toUserExperienceData(localUser);
+
+    return toUserExperienceData(userDoc);
   },
 
+  /**
+   * Submit personal user response (STRICT IMMUTABILITY: only once)
+   */
   async submitResponse(responseText: string): Promise<{ success: boolean; userResponse: UserResponse }> {
-    const activeUser = getActiveLocalUser();
-    if (!activeUser) {
-      throw new Error('No active local user');
+    const userId = getActiveUserId();
+    if (!userId) {
+      throw new Error('No hay sesión activa.');
     }
 
-    // STRICT SECURITY & IMMUTABILITY:
-    // A regular user can only submit their response once. It is permanently locked thereafter.
-    if (
-      activeUser.userResponse &&
-      activeUser.userResponse.text &&
-      activeUser.userResponse.text.trim().length > 0
-    ) {
+    const userDoc = await getAuthenticatedUserDoc(userId);
+    if (!userDoc) {
+      throw new Error('Usuario no encontrado.');
+    }
+
+    if (userDoc.userResponse && userDoc.userResponse.text && userDoc.userResponse.text.trim().length > 0) {
       throw new Error(
         'Tu respuesta ya fue enviada y se encuentra bloqueada de forma permanente. No es posible modificarla ni reemplazarla.'
       );
     }
 
-    const userResponse: UserResponse = {
-      text: responseText.trim(),
-      submittedAt: new Date().toISOString(),
-    };
-
-    // 1. Update local cache immediately for instant UI feedback
-    const users = getLocalUsers();
-    const updatedUsers = users.map((u) => (u.id === activeUser.id ? { ...u, userResponse } : u));
-    saveLocalUsers(updatedUsers);
-
-    // 2. Submit to Firebase Cloud Firestore for real-time sync across all devices
-    try {
-      await submitCloudResponse(activeUser, responseText);
-      console.log('✅ Respuesta sincronizada exitosamente en la nube (Firestore)');
-    } catch (cloudErr) {
-      console.warn('⚠️ Guardado localmente. Error al enviar a la nube:', cloudErr);
-    }
-
-    // 3. Try server API if present
-    try {
-      const token = getStoredToken();
-      if (token) {
-        await fetch('/api/user/response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ responseText: responseText.trim() }),
-        });
-      }
-    } catch {
-      // server optional
-    }
-
+    const userResponse = await submitAuthenticatedUserResponse(userDoc, responseText);
     return { success: true, userResponse };
   },
 
+  /**
+   * Security enforcement: users CANNOT delete responses
+   */
   async deleteUserResponse(): Promise<{ success: boolean }> {
-    // SECURITY: Users can NEVER delete their own response. Only Ronald can from the admin dashboard.
     throw new Error(
       'Acceso denegado: los usuarios no tienen autorización para eliminar respuestas. Esta acción es exclusiva de Ronald.'
     );
   },
 
+  /**
+   * Flower Formulation Generator
+   */
   async formulateFlowers(): Promise<{ formulation: FlowerFormulation }> {
-    const user = getActiveLocalUser();
-    if (!user) {
-      throw new Error('No active local user');
+    const userId = getActiveUserId();
+    if (!userId) {
+      throw new Error('No hay sesión activa.');
     }
 
-    // Try server API first if server is running
+    const user = await getAuthenticatedUserDoc(userId);
+    if (!user) {
+      throw new Error('Usuario no encontrado.');
+    }
+
+    // If server is running with Gemini API key, try it
     try {
       const token = getStoredToken();
       const res = await fetch('/api/flowers/formulate', {
@@ -379,85 +230,48 @@ export const api = {
       if (res.ok) {
         const data = await res.json();
         if (data.formulation) {
-          // save to cloud
-          const updatedUser = { ...user, generatedFormulation: data.formulation };
-          saveCloudUser(updatedUser).catch(() => {});
+          await saveAuthenticatedUserFormulation(user.id, data.formulation);
           return { formulation: data.formulation };
         }
       }
     } catch {
-      // server not present (GitHub Pages)
+      // Fallback for static GitHub Pages client
     }
 
     const formulation = createSimulatedFormulation(user);
-    const users = getLocalUsers();
-    const updatedUser = { ...user, generatedFormulation: formulation };
-    const updatedUsers = users.map((u) =>
-      u.id === user.id ? updatedUser : u
-    );
-    saveLocalUsers(updatedUsers);
-
-    // Sync to Cloud
-    saveCloudUser(updatedUser).catch(() => {});
-
+    await saveAuthenticatedUserFormulation(user.id, formulation);
     return { formulation };
   },
 
+  /**
+   * Reset flower formulation
+   */
   async resetFormulation(): Promise<{ success: boolean }> {
-    const user = getActiveLocalUser();
-    if (!user) {
-      throw new Error('No active local user');
+    const userId = getActiveUserId();
+    if (!userId) {
+      throw new Error('No hay sesión activa.');
     }
-
-    const users = getLocalUsers();
-    const updatedUser = { ...user, generatedFormulation: null };
-    const updatedUsers = users.map((u) =>
-      u.id === user.id ? updatedUser : u
-    );
-    saveLocalUsers(updatedUsers);
-
-    // Sync to Cloud
-    saveCloudUser(updatedUser).catch(() => {});
-
+    await saveAuthenticatedUserFormulation(userId, null);
     return { success: true };
   },
 
   // --------------------------------------------------------------------------
-  // ADMIN APIS (Ronald)
+  // ADMIN APIS (RONALD ONLY)
   // --------------------------------------------------------------------------
+
+  /**
+   * Ronald fetches all users from Firestore
+   */
   async getAdminUsers(): Promise<{ users: UserRecord[] }> {
-    try {
-      const cloudUsers = await getCloudUsers();
-      if (cloudUsers && cloudUsers.length > 0) {
-        saveLocalUsers(cloudUsers);
-        return { users: cloudUsers };
-      }
-    } catch (err) {
-      console.warn('Error loading admin users from cloud, using cache:', err);
-    }
-    return { users: getLocalUsers() };
+    const users = await getAdminAllUsers();
+    return { users };
   },
 
+  /**
+   * Ronald fetches all user responses
+   */
   async getAdminResponses(): Promise<{ responses: AdminUserResponseItem[] }> {
-    try {
-      const cloudUsers = await getCloudUsers();
-      if (cloudUsers && cloudUsers.length > 0) {
-        saveLocalUsers(cloudUsers);
-        const responses: AdminUserResponseItem[] = cloudUsers
-          .filter((u) => u.userResponse && u.userResponse.text)
-          .map((u) => ({
-            userId: u.id,
-            name: u.name,
-            username: u.username,
-            response: u.userResponse!,
-          }));
-        return { responses };
-      }
-    } catch (err) {
-      console.warn('Error loading admin responses from cloud, using cache:', err);
-    }
-
-    const users = getLocalUsers();
+    const users = await getAdminAllUsers();
     const responses: AdminUserResponseItem[] = users
       .filter((u) => u.userResponse && u.userResponse.text)
       .map((u) => ({
@@ -469,145 +283,65 @@ export const api = {
     return { responses };
   },
 
+  /**
+   * Ronald deletes a user response
+   */
   async deleteAdminResponse(userId: string): Promise<{ success: boolean }> {
-    const activeUser = getActiveLocalUser();
-    if (!activeUser || activeUser.role !== 'admin') {
-      throw new Error('Permiso denegado: solo Ronald tiene autorización para eliminar respuestas.');
-    }
-
-    const users = getLocalUsers();
-    const updatedUsers = users.map((u) => (u.id === userId ? { ...u, userResponse: null } : u));
-    saveLocalUsers(updatedUsers);
-
-    try {
-      await deleteCloudResponse(userId);
-      console.log(`✅ Respuesta de usuario ${userId} eliminada de la nube`);
-    } catch (err) {
-      console.warn('Error deleting response from cloud:', err);
-    }
-
-    try {
-      const token = getStoredToken();
-      if (token) {
-        await fetch(`/api/admin/response/${userId}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-    } catch {
-      // server optional
-    }
-
+    await deleteAdminResponseDoc(userId);
     return { success: true };
   },
 
+  /**
+   * Ronald updates user details in Firestore
+   */
   async updateAdminUser(id: string, updates: Partial<UserRecord>): Promise<{ user: UserRecord }> {
-    const users = getLocalUsers();
-    const norm = id.trim().toLowerCase();
-    const index = users.findIndex((u) => u.id.toLowerCase() === norm || u.username.toLowerCase() === norm);
-    if (index === -1) {
-      throw new Error('Usuario no encontrado');
+    const existing = await getAuthenticatedUserDoc(id);
+    if (!existing) {
+      throw new Error('Usuario no encontrado.');
     }
 
     const updatedUser: UserRecord = {
-      ...users[index],
+      ...existing,
       ...updates,
-      id: users[index].id,
+      id: existing.id,
       updatedAt: new Date().toISOString(),
     };
-    users[index] = updatedUser;
-    saveLocalUsers(users);
 
-    // Sync immediately to Firestore Cloud
-    try {
-      await saveCloudUser(updatedUser);
-      console.log(`✅ Usuario ${id} sincronizado en la nube`);
-    } catch (err) {
-      console.warn('Error syncing user update to cloud:', err);
-    }
-
-    // Try server API sync as well if server is active
-    try {
-      const token = getStoredToken();
-      if (token) {
-        await fetch(`/api/admin/user/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updates),
-        });
-      }
-    } catch {
-      // server optional
-    }
-
+    await saveAdminUserDoc(updatedUser);
     return { user: updatedUser };
   },
 
-  async createAdminUser(data: Partial<UserRecord>): Promise<{ user: UserRecord }> {
-    const users = getLocalUsers();
-    const newId =
-      data.username?.toLowerCase().replace(/\s+/g, '_') || `user_${Date.now()}`;
-
-    const newUser: UserRecord = {
-      id: newId,
-      name: data.name || 'Nuevo Usuario',
-      username: data.username || newId,
-      passwordPlain: data.passwordPlain || '123456',
-      role: 'user',
-      isActive: true,
-      profiling: data.profiling || '',
-      personalText: data.personalText || '',
-      theme: data.theme || {
-        primaryColor: '#F59E0B',
-        secondaryColor: '#D97706',
-        backgroundColor: '#FAF8F5',
-        surfaceColor: '#FFFFFF',
-        textColor: '#2C2926',
-        accentColor: '#FBBF24',
-        petalColors: ['#FBBF24', '#F59E0B', '#D97706'],
-        fontStyle: 'serif',
-        ambientGlow: 'rgba(245, 158, 11, 0.08)',
-        themeName: 'Dorado Silvestre',
-      },
-      flowerConfig: data.flowerConfig || {
-        specificInstructions: '',
-        preferredTone: '',
-        customFormulation: null,
-      },
-      generatedFormulation: null,
-      userResponse: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    users.push(newUser);
-    saveLocalUsers(users);
-
-    // Sync to Firestore Cloud
-    try {
-      await saveCloudUser(newUser);
-    } catch (err) {
-      console.warn('Error syncing new user to cloud:', err);
+  /**
+   * Ronald previews any user's experience
+   */
+  async getAdminUserExperience(userId: string): Promise<UserExperienceData> {
+    const userDoc = await getAuthenticatedUserDoc(userId);
+    if (!userDoc) {
+      throw new Error('Usuario no encontrado.');
     }
-
-    return { user: newUser };
+    return toUserExperienceData(userDoc);
   },
 
+  /**
+   * Ronald changes a user's password in Firebase Auth
+   */
+  async updateAdminUserPassword(username: string, newPasswordPlain: string): Promise<{ success: boolean; message: string }> {
+    return await updateAdminUserPassword(username, newPasswordPlain);
+  },
+
+  /**
+   * Ronald creates a new user in Firebase Auth and Firestore
+   */
+  async createAdminUser(data: Partial<UserRecord>, passwordPlain: string = '123456'): Promise<{ user: UserRecord }> {
+    const user = await createAdminUserWithAuth(data, passwordPlain);
+    return { user };
+  },
+
+  /**
+   * Ronald deletes a user
+   */
   async deleteAdminUser(id: string): Promise<{ success: boolean }> {
-    const users = getLocalUsers();
-    const filtered = users.filter((u) => u.id !== id);
-    saveLocalUsers(filtered);
-
-    // Delete in Firestore Cloud
-    try {
-      await deleteCloudUser(id);
-    } catch (err) {
-      console.warn('Error deleting user in cloud:', err);
-    }
-
+    await deleteAdminUserDoc(id);
     return { success: true };
   },
 };

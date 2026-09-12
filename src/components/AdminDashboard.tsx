@@ -25,11 +25,11 @@ import {
   Cloud,
 } from 'lucide-react';
 import { api } from '../lib/api';
-import { subscribeToCloudUsers } from '../lib/firebase';
+import { subscribeToAdminAllUsers } from '../lib/firebase';
 import type { UserRecord, UserTheme, AdminUserResponseItem } from '../types';
 
 interface AdminDashboardProps {
-  onSelectUserToPreview?: (username: string, passwordPlain: string) => void;
+  onSelectUserToPreview?: (username: string, passwordPlain?: string) => void;
   onViewMyExperience?: () => void;
   isDarkTheme?: boolean;
 }
@@ -115,7 +115,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     loadData();
 
     // Subscribe to real-time changes in Firestore Cloud
-    const unsubscribe = subscribeToCloudUsers((cloudUsers) => {
+    const unsubscribe = subscribeToAdminAllUsers((cloudUsers) => {
       if (cloudUsers && cloudUsers.length > 0) {
         setUsers(cloudUsers);
         const liveResponses: AdminUserResponseItem[] = cloudUsers
@@ -140,7 +140,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   useEffect(() => {
     if (selectedUser) {
       setEditName(selectedUser.name);
-      setEditPassword(selectedUser.passwordPlain);
+      setEditPassword('');
       setEditIsActive(selectedUser.isActive);
       setEditProfiling(selectedUser.profiling || '');
       setEditText(selectedUser.personalText || '');
@@ -185,7 +185,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       await api.updateAdminUser(selectedUser.id, {
         name: editName,
-        passwordPlain: editPassword,
         isActive: editIsActive,
         profiling: editProfiling,
         personalText: editText,
@@ -221,38 +220,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     e.preventDefault();
     if (!newName.trim() || !newUsername.trim() || !newPassword.trim()) return;
     try {
-      await api.createAdminUser({
-        name: newName.trim(),
-        username: newUsername.trim(),
-        passwordPlain: newPassword.trim(),
-        role: 'user',
-        profiling: '',
-        personalText: '',
-        theme: {
-          primaryColor: '',
-          secondaryColor: '',
-          backgroundColor: '',
-          surfaceColor: '',
-          textColor: '',
-          accentColor: '',
-          petalColors: [],
-          fontStyle: 'serif',
-          ambientGlow: '',
-          themeName: '',
+      await api.createAdminUser(
+        {
+          name: newName.trim(),
+          username: newUsername.trim(),
+          role: 'user',
+          profiling: '',
+          personalText: '',
+          theme: {
+            primaryColor: '',
+            secondaryColor: '',
+            backgroundColor: '',
+            surfaceColor: '',
+            textColor: '',
+            accentColor: '',
+            petalColors: [],
+            fontStyle: 'serif',
+            ambientGlow: '',
+            themeName: '',
+          },
+          flowerConfig: {
+            specificInstructions: '',
+            preferredTone: '',
+            customFormulation: null,
+          },
         },
-        flowerConfig: {
-          specificInstructions: '',
-          preferredTone: '',
-          customFormulation: null,
-        },
-      });
+        newPassword.trim()
+      );
       setShowNewUserModal(false);
       setNewName('');
       setNewUsername('');
       setNewPassword('');
       await loadData();
       setSelectedUserId(newUsername.toLowerCase().trim());
-      setSuccessMessage('Nuevo usuario agregado con éxito.');
+      setSuccessMessage('Nuevo usuario creado y credencial registrada con éxito.');
       setTimeout(() => setSuccessMessage(null), 3500);
     } catch (err: any) {
       setErrorMessage(err.message || 'Error al crear el usuario.');
@@ -262,7 +263,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleOpenEditUser = (user: UserRecord) => {
     setEditingUser(user);
     setEditUserModalName(user.name);
-    setEditUserModalPassword(user.passwordPlain || '');
+    setEditUserModalPassword('');
     setEditUserModalIsActive(user.isActive);
     setShowEditUserModalPassword(false);
   };
@@ -284,9 +285,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setIsSavingUserEdit(true);
     setErrorMessage(null);
     try {
-      const updated = await api.updateAdminUser(editingUser.id, {
+      // 1. Update password in Firebase Auth
+      await api.updateAdminUserPassword(editingUser.username, trimmedPass);
+
+      // 2. Update user name and status in Firestore
+      await api.updateAdminUser(editingUser.id, {
         name: trimmedName,
-        passwordPlain: trimmedPass,
         isActive: editingUser.id === 'ronald' ? true : editUserModalIsActive,
       });
 
@@ -294,13 +298,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setUsers((prev) =>
         prev.map((u) =>
           u.id === editingUser.id
-            ? { ...u, name: trimmedName, passwordPlain: trimmedPass, isActive: editingUser.id === 'ronald' ? true : editUserModalIsActive }
+            ? { ...u, name: trimmedName, isActive: editingUser.id === 'ronald' ? true : editUserModalIsActive }
             : u
         )
       );
 
       setEditingUser(null);
-      setSuccessMessage(`Contraseña y datos de ${trimmedName} actualizados correctamente en la base de datos.`);
+      setSuccessMessage(`Contraseña de ${trimmedName} actualizada correctamente en Firebase Auth.`);
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Error al actualizar la contraseña del usuario.');
@@ -742,10 +746,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span>Contraseña:</span>
                     </span>
                     <div className="flex items-center space-x-1.5">
-                      <span className="font-mono font-semibold text-[#2C2926] bg-[#FAF8F5] px-2.5 py-0.5 rounded-md border border-[#E8E2D9]">
-                        {u.passwordPlain}
+                      <span className="font-mono text-xs font-semibold text-[#2C2926] bg-[#FAF8F5] px-2.5 py-0.5 rounded-md border border-[#E8E2D9]">
+                        ••••••••
                       </span>
-                      <span className="text-[10px] text-[#8C6D37] font-medium bg-[#FAF0E6] px-1.5 py-0.5 rounded border border-[#E8DFC8]">
+                      <span className="text-[10px] text-[#8C6D37] font-medium bg-[#FAF0E6] px-2 py-0.5 rounded border border-[#E8DFC8]">
                         Cambiar
                       </span>
                     </div>
@@ -755,7 +759,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     {onSelectUserToPreview && (
                       <button
                         type="button"
-                        onClick={() => onSelectUserToPreview(u.username, u.passwordPlain)}
+                        onClick={() => onSelectUserToPreview(u.username)}
                         className="py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-white border border-[#E2DBD2] flex items-center justify-center space-x-1 hover:bg-[#F2ECE4] transition-colors cursor-pointer"
                         title="Ver experiencia"
                       >
@@ -830,7 +834,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           className="group inline-flex items-center space-x-1.5 bg-[#FAF8F5] hover:bg-[#FAF0E6] px-2.5 py-1 rounded-md border border-[#E8E2D9] hover:border-[#E8DFC8] transition-colors cursor-pointer"
                           title="Clic para cambiar contraseña"
                         >
-                          <span className="font-semibold">{u.passwordPlain}</span>
+                          <span className="font-semibold text-xs tracking-widest text-[#5A524A]">••••••••</span>
+                          <span className="text-[10px] text-[#8C6D37] font-sans font-medium ml-1">Cambiar</span>
                           <KeyRound className="w-3 h-3 text-[#8C847B] group-hover:text-[#8C6D37]" />
                         </button>
                       </td>
@@ -875,7 +880,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {onSelectUserToPreview && (
                             <button
                               type="button"
-                              onClick={() => onSelectUserToPreview(u.username, u.passwordPlain)}
+                              onClick={() => onSelectUserToPreview(u.username)}
                               className="p-1.5 text-[#736C65] hover:text-[#2C2926] hover:bg-[#F2ECE4] rounded-lg transition-colors cursor-pointer"
                               title={`Probar experiencia como ${u.name}`}
                             >
@@ -1019,7 +1024,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     {onSelectUserToPreview && (
                       <button
                         type="button"
-                        onClick={() => onSelectUserToPreview(selectedUser.username, selectedUser.passwordPlain)}
+                        onClick={() => onSelectUserToPreview(selectedUser.username)}
                         className="w-full sm:w-auto inline-flex items-center justify-center space-x-1 text-xs text-[#2C2926] bg-[#F5F1EB] hover:bg-[#EBE5DC] px-3.5 py-2 rounded-xl border border-[#E2DBD2] transition-colors cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#937C67]" />

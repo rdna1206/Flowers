@@ -105,8 +105,17 @@ export default function App() {
   };
 
   // Preview experience for Ronald
-  const handlePreviewAsUser = async (username: string, passwordPlain: string) => {
-    await handleLogin(username, passwordPlain);
+  const handlePreviewAsUser = async (username: string) => {
+    try {
+      setIsLoading(true);
+      const exp = await api.getAdminUserExperience(username);
+      setExperience(exp);
+      setCurrentStep('flower-formation');
+    } catch (err: any) {
+      alert(err?.message || 'No se pudo cargar la experiencia del usuario.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAdminViewOwnExperience = async () => {
