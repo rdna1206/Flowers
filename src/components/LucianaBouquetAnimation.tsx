@@ -762,42 +762,24 @@ export const LucianaBouquetAnimation: React.FC<LucianaBouquetAnimationProps> = (
           </svg>
         </div>
 
-        {/* Tarjeta de lectura con el botón 'Leer' (Exclusivo para Luciana) */}
+        {/* Acción directa y minimalista 'Leer' */}
         <div className="mt-8 flex items-center justify-center w-full px-4">
           {isCompleted && (
-            <motion.div
-              id="tarjeta-lectura-luciana"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md p-4 sm:p-5 rounded-2xl border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-              style={{
-                backgroundColor: 'rgba(15, 12, 24, 0.92)',
-                borderColor: 'rgba(147, 51, 234, 0.35)',
-              }}
+            <motion.button
+              id="btn-luciana-read-text"
+              type="button"
+              onClick={onProceedToReading || onProceedToResponse}
+              initial={{ opacity: 0, y: 14, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex items-center justify-center space-x-2.5 px-8 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#FAF8F5] text-xs font-semibold tracking-widest uppercase shadow-[0_0_25px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all cursor-pointer"
             >
-              <div className="flex items-center space-x-3.5 text-left w-full sm:w-auto">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border bg-[#9333EA]/40 border-[#7E22CE]/40 text-[#F59E0B]">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-serif font-medium text-[#FAF8F5]">Texto Personal</h4>
-                  <p className="text-xs text-[#E9D5FF]">Palabras dedicadas por Ronald</p>
-                </div>
-              </div>
-              <motion.button
-                id="btn-luciana-read-text"
-                type="button"
-                onClick={onProceedToReading || onProceedToResponse}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7E22CE] to-[#D97706] hover:from-[#7E22CE] hover:to-[#B45309] text-white text-xs font-semibold tracking-wider uppercase shadow-[0_0_20px_rgba(147,51,234,0.45)] transition-all cursor-pointer"
-              >
-                <BookOpen className="w-4 h-4 text-inherit" />
-                <span>Leer</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
-              </motion.button>
-            </motion.div>
+              <BookOpen className="w-4 h-4 text-[#F59E0B]" />
+              <span>Leer</span>
+              <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
+            </motion.button>
           )}
         </div>
       </div>

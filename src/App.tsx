@@ -124,6 +124,18 @@ export default function App() {
 
   // Determine current user theme (Dark Mode is now permanently fixed & non-modifiable)
   const userTheme = experience?.theme;
+  const handleProceedToReading = async () => {
+    try {
+      const latestExp = await api.getExperience();
+      if (latestExp) {
+        setExperience(latestExp);
+      }
+    } catch {
+      // non-blocking fallback
+    }
+    setCurrentStep('reading');
+  };
+
   const isNeutralView = currentStep === 'login' || currentStep === 'admin';
   const isDarkTheme = true;
 
@@ -132,7 +144,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen flex flex-col relative selection:bg-[#E8DED1] transition-colors duration-700 bg-[#030206] text-[#E6EDF8]"
+      className="min-h-screen flex flex-col relative w-full max-w-full overflow-x-hidden selection:bg-[#E8DED1] transition-colors duration-700 bg-[#030206] text-[#E6EDF8]"
     >
       {/* EXCLUSIVE MAIN HOME SCREEN BACKGROUND vs REGULAR APP BACKGROUNDS */}
       {currentStep === 'login' ? (
@@ -162,7 +174,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col relative z-10">
+      <main className="flex-1 flex flex-col relative z-10 w-full max-w-full min-w-0 overflow-x-hidden">
         {isLoading ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8">
             <div className="w-8 h-8 rounded-full border-2 border-[#E8DFC8] border-t-[#C29B38] animate-spin mb-4" />
@@ -195,7 +207,7 @@ export default function App() {
             {currentStep === 'reading' && experience && (
               <ReadingExperience
                 experience={experience}
-                onProceedToFlowers={() => setCurrentStep('flower-formation')}
+                onProceedToFlowers={() => setCurrentStep('flower-result')}
                 onProceedToResponse={() => setCurrentStep('response')}
               />
             )}
@@ -205,8 +217,9 @@ export default function App() {
               <OrganicFlowerCreation
                 experience={experience}
                 mode="formation"
+                onProceedToReading={handleProceedToReading}
                 onProceedToResponse={() => setCurrentStep('response')}
-                onBackToReading={() => setCurrentStep('reading')}
+                onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
             )}
@@ -216,8 +229,9 @@ export default function App() {
               <OrganicFlowerCreation
                 experience={experience}
                 mode="result"
+                onProceedToReading={handleProceedToReading}
                 onProceedToResponse={() => setCurrentStep('response')}
-                onBackToReading={() => setCurrentStep('reading')}
+                onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
             )}

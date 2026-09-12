@@ -301,47 +301,47 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   return (
     <div
       id="admin-dashboard-container"
-      className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10"
+      className="relative z-10 w-full max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 min-w-0"
     >
       {/* Top Banner & Stats */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-6 sm:p-8 shadow-xs mb-6 sm:mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#F0EAE1]">
-          <div className="flex items-center space-x-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#2C2926] text-[#FAF8F5] flex items-center justify-center shadow-xs">
-              <ShieldCheck className="w-6 h-6 text-[#D4AF37]" />
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-4 sm:p-7 shadow-xs mb-5 sm:mb-8 min-w-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-[#F0EAE1]">
+          <div className="flex items-start sm:items-center space-x-3 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#2C2926] text-[#FAF8F5] flex items-center justify-center shadow-xs shrink-0 mt-0.5 sm:mt-0">
+              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF37]" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="font-serif-display text-2xl sm:text-3xl text-[#2C2926] font-semibold">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <h1 className="font-serif-display text-lg sm:text-2xl md:text-3xl text-[#2C2926] font-semibold leading-tight">
                   Panel de Administración
                 </h1>
-                <span className="text-[10px] uppercase tracking-wider font-semibold bg-[#FAF0E6] text-[#8C6D37] border border-[#E8DFC8] px-2 py-0.5 rounded-full">
+                <span className="text-[10px] uppercase tracking-wider font-semibold bg-[#FAF0E6] text-[#8C6D37] border border-[#E8DFC8] px-2 py-0.5 rounded-full shrink-0">
                   Ronald
                 </span>
               </div>
-              <p className="text-xs text-[#8C847B] mt-0.5">
+              <p className="text-xs text-[#8C847B] mt-1 leading-normal break-words">
                 Control y personalización individual de usuarios, textos, estilos, flores y respuestas privadas.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={loadData}
               disabled={isLoading}
-              className="inline-flex items-center space-x-1.5 text-xs text-[#736C65] hover:text-[#2C2926] bg-[#FAF8F5] hover:bg-[#F2ECE4] px-3.5 py-2 rounded-xl border border-[#E2DBD2] transition-colors"
+              className="inline-flex items-center space-x-1.5 text-xs text-[#736C65] hover:text-[#2C2926] bg-[#FAF8F5] hover:bg-[#F2ECE4] px-3.5 py-2 rounded-xl border border-[#E2DBD2] transition-colors cursor-pointer"
               title="Recargar información"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Actualizar</span>
+              <span>Actualizar</span>
             </button>
 
             {onViewMyExperience && (
               <button
                 type="button"
                 onClick={onViewMyExperience}
-                className="inline-flex items-center space-x-1.5 text-xs text-[#2C2926] bg-[#F3ECE4] hover:bg-[#EAE1D6] px-3.5 py-2 rounded-xl border border-[#DCD3C5] font-medium transition-colors shadow-2xs"
+                className="inline-flex items-center space-x-1.5 text-xs text-[#2C2926] bg-[#F3ECE4] hover:bg-[#EAE1D6] px-3.5 py-2 rounded-xl border border-[#DCD3C5] font-medium transition-colors shadow-2xs cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5 text-[#937C67]" />
                 <span>Ver Mi Experiencia</span>
@@ -351,7 +351,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* Quick Stats bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 pt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 pt-4 sm:pt-5">
           <div className="p-3 sm:p-4 rounded-xl bg-[#FAF8F5] border border-[#EDE6DB]">
             <span className="text-[10px] uppercase tracking-wider text-[#8C847B] font-semibold block">
               Total Usuarios
@@ -377,11 +377,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
-          <div className="p-3 sm:p-4 rounded-xl bg-[#FAF8F5] border border-[#EDE6DB] col-span-2 sm:col-span-1">
+          <div className="p-3 sm:p-4 rounded-xl bg-[#FAF8F5] border border-[#EDE6DB]">
             <span className="text-[10px] uppercase tracking-wider text-[#8C847B] font-semibold block">
               Sincronización
             </span>
-            <span className="text-xs font-medium text-[#15803D] mt-2 flex items-center space-x-1.5">
+            <span className="text-xs font-medium text-[#15803D] mt-1.5 flex items-center space-x-1.5">
               <Cloud className="w-3.5 h-3.5 text-[#16A34A] animate-pulse" />
               <span>Nube en Tiempo Real</span>
             </span>
@@ -391,20 +391,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Notifications */}
       {successMessage && (
-        <div className="mb-6 p-3.5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs flex items-center space-x-2 animate-fadeIn">
+        <div className="mb-5 p-3.5 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs flex items-center space-x-2 animate-fadeIn">
           <Check className="w-4 h-4 shrink-0 text-[#16A34A]" />
           <span>{successMessage}</span>
         </div>
       )}
       {errorMessage && (
-        <div className="mb-6 p-3.5 rounded-xl bg-[#FDF2F0] border border-[#F5C6CB] text-[#902A24] text-xs flex items-center space-x-2 animate-fadeIn">
+        <div className="mb-5 p-3.5 rounded-xl bg-[#FDF2F0] border border-[#F5C6CB] text-[#902A24] text-xs flex items-center space-x-2 animate-fadeIn">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex overflow-x-auto sm:flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-[#E8E2D9] mb-6 shadow-2xs no-scrollbar">
+      <div className="w-full max-w-full overflow-x-auto flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-[#E8E2D9] mb-5 sm:mb-6 shadow-2xs no-scrollbar touch-pan-x min-w-0">
         <button
           type="button"
           onClick={() => setActiveTab('responses')}

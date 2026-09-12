@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Flower2, ArrowRight, MessageSquare } from 'lucide-react';
+import { api } from '../lib/api';
 import type { UserExperienceData } from '../types';
 
 interface ReadingExperienceProps {
@@ -10,10 +11,26 @@ interface ReadingExperienceProps {
 }
 
 export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
-  experience,
+  experience: initialExperience,
   onProceedToFlowers,
   onProceedToResponse,
 }) => {
+  const [experience, setExperience] = useState<UserExperienceData>(initialExperience);
+
+  useEffect(() => {
+    setExperience(initialExperience);
+    // Fetch latest fresh experience data to ensure newly configured text from Ronald is immediately visible
+    api.getExperience()
+      .then((latest) => {
+        if (latest && (latest.id === initialExperience.id || latest.username === initialExperience.username)) {
+          setExperience(latest);
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not refresh reading experience in real time:', err);
+      });
+  }, [initialExperience]);
+
   const isJhon = experience.id === 'jhon' || experience.username?.toLowerCase() === 'jhon';
   const theme = experience.theme || {};
   const isDarkTheme =

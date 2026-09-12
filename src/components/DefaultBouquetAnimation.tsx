@@ -314,42 +314,24 @@ export const DefaultBouquetAnimation: React.FC<DefaultBouquetAnimationProps> = (
           </svg>
         </div>
 
-        {/* Tarjeta de lectura con el botón 'Leer' (Default) */}
+        {/* Acción directa y minimalista 'Leer' */}
         <div className="mt-8 flex items-center justify-center w-full px-4">
           {isCompleted && (
-            <motion.div
-              id="tarjeta-lectura-default"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-md p-4 sm:p-5 rounded-2xl border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-              style={{
-                backgroundColor: 'rgba(28, 25, 23, 0.92)',
-                borderColor: 'rgba(245, 158, 11, 0.35)',
-              }}
+            <motion.button
+              id="btn-default-read-text"
+              type="button"
+              onClick={onProceedToReading || onProceedToResponse}
+              initial={{ opacity: 0, y: 14, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex items-center justify-center space-x-2.5 px-8 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#FAF8F5] text-xs font-semibold tracking-widest uppercase shadow-[0_0_25px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all cursor-pointer"
             >
-              <div className="flex items-center space-x-3.5 text-left w-full sm:w-auto">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border bg-[#F59E0B]/30 border-[#F59E0B]/50 text-[#FBBF24]">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-serif font-medium text-[#FAF8F5]">Texto Personal</h4>
-                  <p className="text-xs text-[#FEF3C7]">Palabras dedicadas por Ronald</p>
-                </div>
-              </div>
-              <motion.button
-                id="btn-default-read-text"
-                type="button"
-                onClick={onProceedToReading || onProceedToResponse}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:from-[#FBBF24] hover:to-[#FDE047] text-[#1C1917] text-xs font-semibold tracking-wider uppercase shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all cursor-pointer"
-              >
-                <BookOpen className="w-4 h-4 text-inherit" />
-                <span>Leer</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
-              </motion.button>
-            </motion.div>
+              <BookOpen className="w-4 h-4 text-[#FBBF24]" />
+              <span>Leer</span>
+              <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
+            </motion.button>
           )}
         </div>
       </div>

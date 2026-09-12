@@ -37,6 +37,32 @@ export function clearStoredToken(): void {
 // ----------------------------------------------------------------------------
 // LOCAL CACHE SYNC ENGINE
 // ----------------------------------------------------------------------------
+function mergeUserRecords(cached: UserRecord, incoming: UserRecord): UserRecord {
+  // If incoming has personalText, use incoming. If incoming is empty but cached has personalText, preserve cached!
+  const personalText =
+    incoming.personalText && incoming.personalText.trim().length > 0
+      ? incoming.personalText
+      : cached.personalText || '';
+
+  const profiling =
+    incoming.profiling && incoming.profiling.trim().length > 0
+      ? incoming.profiling
+      : cached.profiling || '';
+
+  const userResponse = incoming.userResponse || cached.userResponse || null;
+
+  return {
+    ...cached,
+    ...incoming,
+    id: incoming.id || cached.id,
+    personalText,
+    profiling,
+    userResponse,
+    theme: incoming.theme || cached.theme,
+    flowerConfig: incoming.flowerConfig || cached.flowerConfig,
+  };
+}
+
 function getLocalUsers(): UserRecord[] {
   try {
     const raw = localStorage.getItem(USERS_DB_KEY);
@@ -79,7 +105,8 @@ function getActiveLocalUser(): UserRecord | null {
   const userId = localStorage.getItem(ACTIVE_USER_ID_KEY);
   if (!userId) return null;
   const users = getLocalUsers();
-  return users.find((u) => u.id === userId) || null;
+  const norm = userId.trim().toLowerCase();
+  return users.find((u) => u.id.toLowerCase() === norm || u.username.toLowerCase() === norm) || null;
 }
 
 function toUserSummary(user: UserRecord): UserSummary {
@@ -163,8 +190,17 @@ export const api = {
     try {
       const cloudUsers = await getCloudUsers();
       if (cloudUsers && cloudUsers.length > 0) {
-        saveLocalUsers(cloudUsers);
-        const cloudUser = cloudUsers.find(
+        const localUsers = getLocalUsers();
+        // Merge cloud users with local users without wiping local text
+        const mergedUsers = cloudUsers.map((cu) => {
+          const matchingLocal = localUsers.find(
+            (lu) => lu.id.toLowerCase() === cu.id.toLowerCase()
+          );
+          return matchingLocal ? mergeUserRecords(matchingLocal, cu) : cu;
+        });
+        saveLocalUsers(mergedUsers);
+
+        const cloudUser = mergedUsers.find(
           (u) =>
             u.isActive &&
             (u.username.toLowerCase() === normInputUser || u.name.toLowerCase() === normInputUser) &&
@@ -235,30 +271,30 @@ export const api = {
 
   async getExperience(): Promise<UserExperienceData> {
     const userId = localStorage.getItem(ACTIVE_USER_ID_KEY);
-    if (!userId) {
-      const user = getActiveLocalUser();
-      if (!user) throw new Error('No active local user');
-      return toUserExperienceData(user);
-    }
+    const localUser = getActiveLocalUser();
 
-    try {
-      const cloudUser = await getCloudUser(userId);
-      if (cloudUser) {
-        // update local cache for this user
-        const localUsers = getLocalUsers();
-        const updated = localUsers.map((u) => (u.id === cloudUser.id ? cloudUser : u));
-        saveLocalUsers(updated);
-        return toUserExperienceData(cloudUser);
+    if (userId) {
+      try {
+        const cloudUser = await getCloudUser(userId);
+        if (cloudUser) {
+          const merged = localUser ? mergeUserRecords(localUser, cloudUser) : cloudUser;
+          // update local cache for this user
+          const localUsers = getLocalUsers();
+          const updated = localUsers.map((u) =>
+            u.id.toLowerCase() === cloudUser.id.toLowerCase() ? merged : u
+          );
+          saveLocalUsers(updated);
+          return toUserExperienceData(merged);
+        }
+      } catch (err) {
+        console.warn('Could not fetch cloud experience, using cached data:', err);
       }
-    } catch (err) {
-      console.warn('Could not fetch cloud experience, using cached data:', err);
     }
 
-    const user = getActiveLocalUser();
-    if (!user) {
+    if (!localUser) {
       throw new Error('No active local user');
     }
-    return toUserExperienceData(user);
+    return toUserExperienceData(localUser);
   },
 
   async submitResponse(responseText: string): Promise<{ success: boolean; userResponse: UserResponse }> {
@@ -467,7 +503,8 @@ export const api = {
 
   async updateAdminUser(id: string, updates: Partial<UserRecord>): Promise<{ user: UserRecord }> {
     const users = getLocalUsers();
-    const index = users.findIndex((u) => u.id === id);
+    const norm = id.trim().toLowerCase();
+    const index = users.findIndex((u) => u.id.toLowerCase() === norm || u.username.toLowerCase() === norm);
     if (index === -1) {
       throw new Error('Usuario no encontrado');
     }
@@ -475,6 +512,7 @@ export const api = {
     const updatedUser: UserRecord = {
       ...users[index],
       ...updates,
+      id: users[index].id,
       updatedAt: new Date().toISOString(),
     };
     users[index] = updatedUser;

@@ -99,11 +99,12 @@ export async function getCloudUsers(): Promise<UserRecord[]> {
  * Fetch a single user by ID
  */
 export async function getCloudUser(id: string): Promise<UserRecord | null> {
+  const normId = id.trim().toLowerCase();
   try {
-    const snap = await getDoc(doc(db, USERS_COLLECTION, id));
+    const snap = await getDoc(doc(db, USERS_COLLECTION, normId));
     if (snap.exists()) {
       const data = snap.data() as UserRecord;
-      if (id.toLowerCase() === 'leiry') {
+      if (normId === 'leiry') {
         const leiryInitial = INITIAL_USERS.find((u) => u.id === 'leiry');
         if (leiryInitial) {
           const merged = {
@@ -117,7 +118,19 @@ export async function getCloudUser(id: string): Promise<UserRecord | null> {
       }
       return data;
     }
-    if (id.toLowerCase() === 'leiry') {
+    // Try querying by username or name if doc ID didn't match directly
+    const users = await getCloudUsers();
+    const found = users.find(
+      (u) =>
+        u.id.toLowerCase() === normId ||
+        u.username.toLowerCase() === normId ||
+        u.name.toLowerCase() === normId
+    );
+    if (found) {
+      return found;
+    }
+
+    if (normId === 'leiry') {
       const leiryInitial = INITIAL_USERS.find((u) => u.id === 'leiry');
       if (leiryInitial) {
         await saveCloudUser(leiryInitial);
@@ -135,10 +148,12 @@ export async function getCloudUser(id: string): Promise<UserRecord | null> {
  * Save or update user in Firestore cloud
  */
 export async function saveCloudUser(user: UserRecord): Promise<void> {
+  const normId = user.id.trim().toLowerCase();
   try {
-    const userRef = doc(db, USERS_COLLECTION, user.id);
+    const userRef = doc(db, USERS_COLLECTION, normId);
     await setDoc(userRef, {
       ...user,
+      id: normId,
       updatedAt: new Date().toISOString(),
     }, { merge: true });
   } catch (err) {

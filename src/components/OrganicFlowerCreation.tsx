@@ -16,6 +16,7 @@ import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 interface OrganicFlowerCreationProps {
   experience: UserExperienceData;
   mode: 'formation' | 'result';
+  onProceedToReading?: () => void;
   onProceedToResponse: () => void;
   onBackToReading: () => void;
   onReplayFormation: () => void;
@@ -24,6 +25,7 @@ interface OrganicFlowerCreationProps {
 export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   experience,
   mode,
+  onProceedToReading,
   onProceedToResponse,
   onBackToReading,
   onReplayFormation,
@@ -45,6 +47,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <JhonBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -57,6 +60,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <IsaiasBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -69,6 +73,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <GenesisBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -81,6 +86,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <AndreaBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -93,6 +99,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <ShadayBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -105,6 +112,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <IsabellaBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -117,6 +125,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <HanniaBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -129,6 +138,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <LucianaBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -141,6 +151,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <StanleyBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -153,6 +164,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <DileidysBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -165,6 +177,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     return (
       <LeiryBouquetAnimation
         mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
@@ -177,6 +190,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
     <DefaultBouquetAnimation
       experience={experience}
       mode={mode}
+      onProceedToReading={onProceedToReading || onBackToReading}
       onProceedToResponse={onProceedToResponse}
       onBackToReading={onBackToReading}
       onReplayFormation={onReplayFormation}
