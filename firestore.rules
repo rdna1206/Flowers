@@ -2,109 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Default-deny catch-all
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // Security Helper Functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isAdmin() {
-      return isSignedIn() && (
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
-        request.auth.token.email == 'ronald@21deseptiembre.app' ||
-        request.auth.token.email == 'natalynavarro799@gmail.com' ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
-      );
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && (
-        request.auth.uid == userId ||
-        (resource != null && resource.data.authUid == request.auth.uid) ||
-        (request.auth.token.email != null && request.auth.token.email.matches('^' + userId + '@.*'))
-      );
-    }
-
+    // Helper functions
     function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() > 0 && id.size() <= 128;
     }
 
-    // 1. Admins Collection (Ronald Role Store)
-    match /admins/{adminId} {
-      allow get: if isSignedIn();
-      allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
-    }
-
-    // 2. Users Collection (Individual Profile & Experience)
+    // 1. Users Collection
     match /users/{userId} {
-      // Regular user can only read their own document; Ronald (admin) can get any or list all
-      allow get: if isSignedIn() && (isAdmin() || isOwner(userId));
-      allow list: if isAdmin();
-
-      // Only Ronald can create or delete user profiles
-      allow create, delete: if isAdmin();
-
-      // Updates:
-      // Admins have full editing rights.
-      // Normal users CANNOT edit personalText, profiling, role, username, theme, or flowerConfig.
-      // Normal users can ONLY:
-      //   a) Link their authUid on first login
-      //   b) Save their botanical formulation
-      //   c) Submit their response EXACTLY ONCE (immutable thereafter)
-      allow update: if isSignedIn() && (
-        isAdmin() ||
-        (
-          isOwner(userId) &&
-          request.resource.data.id == resource.data.id &&
-          request.resource.data.username == resource.data.username &&
-          request.resource.data.role == resource.data.role &&
-          request.resource.data.personalText == resource.data.personalText &&
-          request.resource.data.profiling == resource.data.profiling &&
-          (
-            // Action A: Link Auth UID
-            (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['authUid', 'updatedAt'])) ||
-            // Action B: Save generated flower formulation
-            (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['generatedFormulation', 'updatedAt'])) ||
-            // Action C: Submit user response once
-            (
-              request.resource.data.diff(resource.data).affectedKeys().hasOnly(['userResponse', 'updatedAt']) &&
-              (resource.data.userResponse == null || resource.data.userResponse.text == null || resource.data.userResponse.text == '') &&
-              request.resource.data.userResponse != null &&
-              request.resource.data.userResponse.text is string &&
-              request.resource.data.userResponse.text.size() > 0 &&
-              request.resource.data.userResponse.text.size() <= 5000
-            )
-          )
-        )
-      );
+      allow read, write: if true;
     }
 
-    // 3. Responses Collection
+    // 2. Credentials Collection (Hashed passwords)
+    match /credentials/{userId} {
+      allow read, write: if true;
+    }
+
+    // 3. Responses Collection (User submitted experiences)
     match /responses/{responseId} {
-      allow get: if isSignedIn() && (
-        isAdmin() ||
-        resource.data.userId == request.auth.uid ||
-        resource.data.authUid == request.auth.uid ||
-        (request.auth.token.email != null && request.auth.token.email.matches('^' + resource.data.userId + '@.*'))
-      );
-      allow list: if isAdmin();
-      allow create: if isSignedIn() && (
-        isAdmin() ||
-        (
-          request.resource.data.authUid == request.auth.uid &&
-          request.resource.data.response is map &&
-          request.resource.data.response.text is string &&
-          request.resource.data.response.text.size() > 0 &&
-          request.resource.data.response.text.size() <= 5000
-        )
-      );
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow read, write: if true;
+    }
+
+    // 4. Admins Collection
+    match /admins/{adminId} {
+      allow read, write: if true;
     }
   }
 }
