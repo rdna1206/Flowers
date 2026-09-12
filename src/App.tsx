@@ -104,14 +104,6 @@ export default function App() {
     return res.userResponse;
   };
 
-  const handleDeleteResponse = async (): Promise<boolean> => {
-    await api.deleteUserResponse();
-    if (experience) {
-      setExperience({ ...experience, userResponse: undefined });
-    }
-    return true;
-  };
-
   // Preview experience for Ronald
   const handlePreviewAsUser = async (username: string, passwordPlain: string) => {
     await handleLogin(username, passwordPlain);
@@ -235,7 +227,6 @@ export default function App() {
               <UserResponseView
                 experience={experience}
                 onSubmitResponse={handleSubmitResponse}
-                onDeleteResponse={handleDeleteResponse}
                 onBackToFlowers={() => setCurrentStep('flower-result')}
                 onBackToReading={() => setCurrentStep('reading')}
               />

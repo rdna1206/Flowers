@@ -129,7 +129,7 @@ export const JhonFlowerAnimation: React.FC<JhonFlowerAnimationProps> = ({
         >
           <div className="w-1.5 h-1.5 rounded-full bg-[#F4D03F] animate-pulse" />
           <span className="text-[11px] font-mono tracking-widest text-[#8EAFDD] uppercase">
-            Creación Floral Personalizada
+            Jhon
           </span>
         </motion.div>
 

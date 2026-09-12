@@ -107,7 +107,7 @@ export const FinalResultView: React.FC<FinalResultViewProps> = ({
               className="text-[10px] uppercase tracking-widest block font-mono"
               style={{ color: secondaryColor }}
             >
-              Composición Botánica
+              Ramo Floral
             </span>
             <h2
               className={`${
@@ -246,7 +246,7 @@ export const FinalResultView: React.FC<FinalResultViewProps> = ({
             }}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Mi Respuesta Personal</span>
+            <span>Mi respuesta</span>
           </button>
         )}
 

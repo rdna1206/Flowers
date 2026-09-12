@@ -6,6 +6,7 @@ import type { UserExperienceData } from '../types';
 interface DefaultBouquetAnimationProps {
   experience: UserExperienceData;
   mode?: 'formation' | 'result';
+  onProceedToReading?: () => void;
   onProceedToResponse?: () => void;
   onBackToReading?: () => void;
   onReplayFormation?: () => void;
@@ -22,6 +23,7 @@ type AssemblyStep =
 export const DefaultBouquetAnimation: React.FC<DefaultBouquetAnimationProps> = ({
   experience,
   mode = 'formation',
+  onProceedToReading,
   onProceedToResponse,
   onBackToReading,
   onReplayFormation,
@@ -312,48 +314,42 @@ export const DefaultBouquetAnimation: React.FC<DefaultBouquetAnimationProps> = (
           </svg>
         </div>
 
-        {/* Action Controls */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
+        {/* Tarjeta de lectura con el botón 'Leer' (Default) */}
+        <div className="mt-8 flex items-center justify-center w-full px-4">
           {isCompleted && (
-            <>
+            <motion.div
+              id="tarjeta-lectura-default"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-md p-4 sm:p-5 rounded-2xl border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+              style={{
+                backgroundColor: 'rgba(28, 25, 23, 0.92)',
+                borderColor: 'rgba(245, 158, 11, 0.35)',
+              }}
+            >
+              <div className="flex items-center space-x-3.5 text-left w-full sm:w-auto">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border bg-[#F59E0B]/30 border-[#F59E0B]/50 text-[#FBBF24]">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-serif font-medium text-[#FAF8F5]">Texto Personal</h4>
+                  <p className="text-xs text-[#FEF3C7]">Palabras dedicadas por Ronald</p>
+                </div>
+              </div>
               <motion.button
-                id="btn-def-enter-response"
+                id="btn-default-read-text"
                 type="button"
-                onClick={onProceedToResponse}
-                initial={{ opacity: 0, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:from-[#FBBF24] hover:to-[#FDE047] text-[#1C1917] text-xs font-semibold tracking-wider uppercase shadow-md transition-all hover:scale-102 cursor-pointer"
+                onClick={onProceedToReading || onProceedToResponse}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:from-[#FBBF24] hover:to-[#FDE047] text-[#1C1917] text-xs font-semibold tracking-wider uppercase shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4 text-[#1C1917]" />
-                <span>Mi respuesta</span>
+                <BookOpen className="w-4 h-4 text-inherit" />
+                <span>Leer</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.2]" />
               </motion.button>
-
-              {onBackToReading && (
-                <button
-                  id="btn-def-view-message"
-                  type="button"
-                  onClick={onBackToReading}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#E8DFC8] bg-[#FAF8F5]/80 hover:bg-[#FAF8F5] text-[#8C7A5B] hover:text-[#2C2926] text-xs transition-colors cursor-pointer"
-                  title="Mensaje"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Mensaje</span>
-                </button>
-              )}
-
-              <button
-                id="btn-def-replay-bouquet"
-                type="button"
-                onClick={handleReplay}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#D4BEA7] hover:border-[#8C7A5B] bg-[#FAF8F5] text-[#8C7A5B] text-xs transition-colors cursor-pointer"
-                title="Volver a armar"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Volver a armar</span>
-              </button>
-            </>
+            </motion.div>
           )}
         </div>
       </div>

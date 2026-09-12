@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Send, CheckCircle2, Lock, Edit3, Flower2, BookOpen, Trash2 } from 'lucide-react';
+import { Send, CheckCircle2, Lock, Flower2, BookOpen } from 'lucide-react';
 import type { UserExperienceData, UserResponse } from '../types';
 
 interface UserResponseViewProps {
   experience: UserExperienceData;
   onSubmitResponse: (text: string) => Promise<UserResponse | null>;
-  onDeleteResponse?: () => Promise<boolean | void>;
   onBackToFlowers: () => void;
   onBackToReading: () => void;
 }
@@ -14,7 +13,6 @@ interface UserResponseViewProps {
 export const UserResponseView: React.FC<UserResponseViewProps> = ({
   experience,
   onSubmitResponse,
-  onDeleteResponse,
   onBackToFlowers,
   onBackToReading,
 }) => {
@@ -40,18 +38,19 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   const isSans = theme.fontStyle === 'sans';
 
   const existingResponse = experience.userResponse;
-  const [responseText, setResponseText] = useState(existingResponse?.text || '');
-  const [isEditing, setIsEditing] = useState(!existingResponse);
+  const [responseText, setResponseText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedResponse, setSubmittedResponse] = useState<UserResponse | null>(
-    existingResponse || null
+    existingResponse && existingResponse.text && existingResponse.text.trim().length > 0
+      ? existingResponse
+      : null
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!responseText.trim()) return;
+    if (!responseText.trim() || isSubmitting || submittedResponse) return;
 
     setIsSubmitting(true);
     setErrorMessage(null);
@@ -59,9 +58,8 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       const res = await onSubmitResponse(responseText.trim());
       if (res) {
         setSubmittedResponse(res);
-        setIsEditing(false);
         setSuccessToast(true);
-        setTimeout(() => setSuccessToast(false), 4000);
+        setTimeout(() => setSuccessToast(false), 4500);
       }
     } catch (err: any) {
       setErrorMessage(
@@ -72,32 +70,17 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     }
   };
 
-  const handleDelete = async () => {
-    if (!onDeleteResponse) return;
-    setIsSubmitting(true);
-    try {
-      await onDeleteResponse();
-      setSubmittedResponse(null);
-      setResponseText('');
-      setIsEditing(true);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Error al eliminar la respuesta');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div
       id="user-response-view-container"
-      className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-16"
+      className="relative z-10 w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-14"
     >
       {/* Header with strictly EXACT title: "Mi respuesta" */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-6 sm:mb-8">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="inline-flex items-center justify-center w-12 h-12 rounded-full border mb-3 shadow-2xs"
+          className="inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border mb-3 shadow-2xs"
           style={{
             backgroundColor: subCardBg,
             borderColor: borderColor,
@@ -111,7 +94,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
         <h1
           className={`${
             isSans ? 'font-sans' : 'font-serif-display'
-          } text-3xl sm:text-4xl font-normal tracking-tight`}
+          } text-2xl sm:text-4xl font-normal tracking-tight`}
           style={{ color: textColor }}
         >
           Mi respuesta
@@ -123,62 +106,68 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
-        className="backdrop-blur-md rounded-2xl sm:rounded-3xl border shadow-sm p-6 sm:p-10 relative overflow-hidden"
+        className="backdrop-blur-md rounded-2xl sm:rounded-3xl border shadow-sm p-5 sm:p-9 relative overflow-hidden"
         style={{ backgroundColor: surfaceColor, borderColor: borderColor }}
       >
         {/* Privacy Note */}
         <div
-          className="mb-6 p-3.5 rounded-xl border flex items-center space-x-2.5 text-xs"
+          className="mb-5 p-3 rounded-xl border flex items-center space-x-2 text-xs"
           style={{
             backgroundColor: innerCardBg,
             borderColor: borderColor,
             color: mutedTextColor,
           }}
         >
-          <Lock className="w-4 h-4 shrink-0" style={{ color: accentColor }} />
-          <span>Tu respuesta solo será vista por Ronald.</span>
+          <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+          <span className="leading-snug">
+            {submittedResponse
+              ? 'Tu respuesta ya fue enviada y solo es visible para Ronald.'
+              : 'Tu respuesta solo será vista por Ronald.'}
+          </span>
         </div>
 
         {/* Success toast */}
         {successToast && (
           <div className="mb-5 p-3 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-[#16A34A]" />
-            <span>Respuesta guardada con éxito.</span>
+            <span>Respuesta enviada con éxito. Ha quedado guardada de forma definitiva.</span>
           </div>
         )}
 
         {/* Error alert */}
         {errorMessage && (
-          <div className="mb-5 p-3 rounded-xl bg-[#FDF2F0] border border-[#F5C6CB] text-[#902A24] text-xs">
+          <div className="mb-5 p-3 rounded-xl bg-[#FDF2F0] border border-[#F5C6CB] text-[#902A24] text-xs leading-relaxed">
             {errorMessage}
           </div>
         )}
 
-        {/* View / Edit Mode */}
-        {submittedResponse && !isEditing ? (
+        {/* PERMANENT READ-ONLY MODE (NO EDIT, NO DELETE, NO REPLACE) */}
+        {submittedResponse ? (
           <div className="space-y-5">
             <div
-              className="flex items-center justify-between pb-3 border-b"
+              className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b"
               style={{ borderColor: dividerColor }}
             >
               <div className="flex items-center space-x-2 text-xs" style={{ color: secondaryColor }}>
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 <span className="font-medium">Respuesta enviada</span>
               </div>
-              <span className="text-[11px]" style={{ color: mutedTextColor }}>
+              <span className="text-[11px] font-mono" style={{ color: mutedTextColor }}>
                 {new Date(
                   submittedResponse.updatedAt || submittedResponse.submittedAt
                 ).toLocaleString('es-ES', {
                   day: 'numeric',
                   month: 'short',
+                  year: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
               </span>
             </div>
 
+            {/* Read-only content */}
             <div
-              className={`p-4 sm:p-6 rounded-xl border text-base leading-relaxed whitespace-pre-wrap ${
+              className={`p-4 sm:p-6 rounded-xl border text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words ${
                 isSans ? 'font-sans' : 'font-serif'
               }`}
               style={{
@@ -190,67 +179,39 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
               {submittedResponse.text}
             </div>
 
-            <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center space-x-1.5 text-xs py-2 px-3 rounded-lg border transition-colors cursor-pointer"
-                  style={{
-                    borderColor: borderColor,
-                    color: mutedTextColor,
-                    backgroundColor: innerCardBg,
-                  }}
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Modificar</span>
-                </button>
+            {/* Simple navigation controls */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={onBackToFlowers}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-xs py-2.5 px-4 rounded-full border transition-colors cursor-pointer"
+                style={{
+                  borderColor: borderColor,
+                  color: textColor,
+                  backgroundColor: innerCardBg,
+                }}
+              >
+                <Flower2 className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                <span>Volver a la flor</span>
+              </button>
 
-                {onDeleteResponse && (
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    disabled={isSubmitting}
-                    className="inline-flex items-center space-x-1.5 text-xs py-2 px-3 rounded-lg border border-red-200 text-red-700 bg-red-50/70 hover:bg-red-100/70 transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Borrar</span>
-                  </button>
-                )}
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={onBackToFlowers}
-                  className="inline-flex items-center space-x-1.5 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer"
-                  style={{
-                    borderColor: borderColor,
-                    color: mutedTextColor,
-                    backgroundColor: innerCardBg,
-                  }}
-                >
-                  <Flower2 className="w-3.5 h-3.5" />
-                  <span>Volver a la flor</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onBackToReading}
-                  className="inline-flex items-center space-x-1.5 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer"
-                  style={{
-                    borderColor: borderColor,
-                    color: mutedTextColor,
-                    backgroundColor: innerCardBg,
-                  }}
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Releer</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={onBackToReading}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-xs py-2.5 px-4 rounded-full border transition-colors cursor-pointer"
+                style={{
+                  borderColor: borderColor,
+                  color: textColor,
+                  backgroundColor: innerCardBg,
+                }}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Releer</span>
+              </button>
             </div>
           </div>
         ) : (
+          /* WRITE MODE (AVAILABLE ONLY ONCE BEFORE SUBMITTING) */
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <textarea
@@ -260,7 +221,8 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
                 placeholder="Escribe aquí tu respuesta..."
-                className={`w-full p-4 rounded-xl border text-sm sm:text-base leading-relaxed focus:outline-hidden transition-all resize-y ${
+                disabled={isSubmitting}
+                className={`w-full p-4 rounded-xl border text-sm sm:text-base leading-relaxed focus:outline-hidden transition-all resize-y break-words ${
                   isSans ? 'font-sans' : 'font-serif'
                 }`}
                 style={{
@@ -272,11 +234,11 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+              <div className="w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={onBackToFlowers}
-                  className="inline-flex items-center space-x-1.5 text-xs py-2 px-3 rounded-lg border transition-colors cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 text-xs py-2.5 px-4 rounded-full border transition-colors cursor-pointer"
                   style={{
                     borderColor: borderColor,
                     color: mutedTextColor,
@@ -286,33 +248,22 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                   <Flower2 className="w-3.5 h-3.5" />
                   <span>Volver a la flor</span>
                 </button>
-
-                {submittedResponse && (
-                  <button
-                    type="button"
-                    onClick={() => setIsEditing(false)}
-                    className="text-xs py-2 px-3 cursor-pointer"
-                    style={{ color: mutedTextColor }}
-                  >
-                    Cancelar
-                  </button>
-                )}
               </div>
 
-              <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
+              <div className="w-full sm:w-auto">
                 <button
                   id="btn-submit-user-response"
                   type="submit"
                   disabled={isSubmitting || !responseText.trim()}
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3.5 rounded-full text-white text-xs sm:text-sm font-medium shadow-md hover:shadow-lg transition-all hover:opacity-95 disabled:opacity-50 cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full text-white text-xs sm:text-sm font-medium shadow-md hover:shadow-lg transition-all hover:opacity-95 disabled:opacity-50 cursor-pointer"
                   style={{ backgroundColor: primaryColor }}
                 >
                   {isSubmitting ? (
-                    <span>Guardando...</span>
+                    <span>Enviando...</span>
                   ) : (
                     <>
                       <Send className="w-4 h-4" style={{ color: accentColor }} />
-                      <span>{submittedResponse ? 'Actualizar respuesta' : 'Enviar respuesta'}</span>
+                      <span>Enviar respuesta</span>
                     </>
                   )}
                 </button>

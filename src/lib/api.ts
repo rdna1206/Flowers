@@ -267,6 +267,18 @@ export const api = {
       throw new Error('No active local user');
     }
 
+    // STRICT SECURITY & IMMUTABILITY:
+    // A regular user can only submit their response once. It is permanently locked thereafter.
+    if (
+      activeUser.userResponse &&
+      activeUser.userResponse.text &&
+      activeUser.userResponse.text.trim().length > 0
+    ) {
+      throw new Error(
+        'Tu respuesta ya fue enviada y se encuentra bloqueada de forma permanente. No es posible modificarla ni reemplazarla.'
+      );
+    }
+
     const userResponse: UserResponse = {
       text: responseText.trim(),
       submittedAt: new Date().toISOString(),
@@ -285,27 +297,31 @@ export const api = {
       console.warn('⚠️ Guardado localmente. Error al enviar a la nube:', cloudErr);
     }
 
+    // 3. Try server API if present
+    try {
+      const token = getStoredToken();
+      if (token) {
+        await fetch('/api/user/response', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ responseText: responseText.trim() }),
+        });
+      }
+    } catch {
+      // server optional
+    }
+
     return { success: true, userResponse };
   },
 
   async deleteUserResponse(): Promise<{ success: boolean }> {
-    const activeUser = getActiveLocalUser();
-    if (!activeUser) {
-      throw new Error('No active local user');
-    }
-
-    const users = getLocalUsers();
-    const updatedUsers = users.map((u) => (u.id === activeUser.id ? { ...u, userResponse: null } : u));
-    saveLocalUsers(updatedUsers);
-
-    try {
-      await deleteCloudResponse(activeUser.id);
-      console.log('✅ Respuesta eliminada en la nube (Firestore)');
-    } catch (cloudErr) {
-      console.warn('⚠️ Error al eliminar respuesta en la nube:', cloudErr);
-    }
-
-    return { success: true };
+    // SECURITY: Users can NEVER delete their own response. Only Ronald can from the admin dashboard.
+    throw new Error(
+      'Acceso denegado: los usuarios no tienen autorización para eliminar respuestas. Esta acción es exclusiva de Ronald.'
+    );
   },
 
   async formulateFlowers(): Promise<{ formulation: FlowerFormulation }> {
@@ -418,6 +434,11 @@ export const api = {
   },
 
   async deleteAdminResponse(userId: string): Promise<{ success: boolean }> {
+    const activeUser = getActiveLocalUser();
+    if (!activeUser || activeUser.role !== 'admin') {
+      throw new Error('Permiso denegado: solo Ronald tiene autorización para eliminar respuestas.');
+    }
+
     const users = getLocalUsers();
     const updatedUsers = users.map((u) => (u.id === userId ? { ...u, userResponse: null } : u));
     saveLocalUsers(updatedUsers);
@@ -427,6 +448,18 @@ export const api = {
       console.log(`✅ Respuesta de usuario ${userId} eliminada de la nube`);
     } catch (err) {
       console.warn('Error deleting response from cloud:', err);
+    }
+
+    try {
+      const token = getStoredToken();
+      if (token) {
+        await fetch(`/api/admin/response/${userId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch {
+      // server optional
     }
 
     return { success: true };
@@ -453,6 +486,23 @@ export const api = {
       console.log(`✅ Usuario ${id} sincronizado en la nube`);
     } catch (err) {
       console.warn('Error syncing user update to cloud:', err);
+    }
+
+    // Try server API sync as well if server is active
+    try {
+      const token = getStoredToken();
+      if (token) {
+        await fetch(`/api/admin/user/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updates),
+        });
+      }
+    } catch {
+      // server optional
     }
 
     return { user: updatedUser };

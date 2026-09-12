@@ -76,6 +76,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [themeFontStyle, setThemeFontStyle] = useState<'serif' | 'sans'>('serif');
   const [themeName, setThemeName] = useState('');
   const [deletingResponseUserId, setDeletingResponseUserId] = useState<string | null>(null);
+  const [confirmDeleteResponse, setConfirmDeleteResponse] = useState<{ userId: string; name: string } | null>(null);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -265,14 +266,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  const handleDeleteResponse = async (userId: string, userName: string) => {
-    if (
-      !window.confirm(
-        `¿Eliminar la respuesta de prueba de ${userName}? Se borrará de la nube para que puedas volver a probar.`
-      )
-    ) {
-      return;
-    }
+  const handleDeleteResponse = (userId: string, userName: string) => {
+    // Open in-app modal to ask for confirmation before deleting
+    setConfirmDeleteResponse({ userId, name: userName });
+  };
+
+  const executeDeleteResponse = async () => {
+    if (!confirmDeleteResponse) return;
+    const { userId, name } = confirmDeleteResponse;
 
     try {
       setDeletingResponseUserId(userId);
@@ -281,8 +282,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, userResponse: null } : u))
       );
-      setSuccessMessage(`Respuesta de ${userName} eliminada de la nube.`);
+      setSuccessMessage(`Respuesta de ${name} eliminada.`);
       setTimeout(() => setSuccessMessage(null), 3500);
+      setConfirmDeleteResponse(null);
     } catch (err: any) {
       setErrorMessage(err.message || 'Error al eliminar la respuesta.');
     } finally {
@@ -402,21 +404,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-[#E8E2D9] mb-6 shadow-2xs">
+      <div className="flex overflow-x-auto sm:flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-[#E8E2D9] mb-6 shadow-2xs no-scrollbar">
         <button
           type="button"
           onClick={() => setActiveTab('responses')}
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'responses'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span>Respuestas de Usuarios</span>
+          <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+          <span className="whitespace-nowrap">Respuestas</span>
           {responses.length > 0 && (
             <span
-              className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full ${
+              className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full shrink-0 ${
                 activeTab === 'responses'
                   ? 'bg-white/25 text-white'
                   : 'bg-[#2C2926] text-white'
@@ -430,66 +432,66 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('users')}
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'users'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
-          <Users className="w-3.5 h-3.5" />
-          <span>Usuarios y Credenciales</span>
+          <Users className="w-3.5 h-3.5 shrink-0" />
+          <span className="whitespace-nowrap">Usuarios y Credenciales</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('texts')}
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'texts'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
-          <FileText className="w-3.5 h-3.5" />
-          <span>Textos Exactos</span>
+          <FileText className="w-3.5 h-3.5 shrink-0" />
+          <span className="whitespace-nowrap">Textos Exactos</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('profiling')}
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'profiling'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
-          <Search className="w-3.5 h-3.5" />
-          <span>Perfilamiento</span>
+          <Search className="w-3.5 h-3.5 shrink-0" />
+          <span className="whitespace-nowrap">Perfilamiento</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('styles')}
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'styles'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
-          <Palette className="w-3.5 h-3.5" />
-          <span>Colores y Estilo</span>
+          <Palette className="w-3.5 h-3.5 shrink-0" />
+          <span className="whitespace-nowrap">Colores y Estilo</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('flowers')}
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'flowers'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Flores e Instrucciones</span>
+          <Sparkles className="w-3.5 h-3.5 shrink-0" />
+          <span className="whitespace-nowrap">Flores e Instrucciones</span>
         </button>
       </div>
 
@@ -497,14 +499,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           TAB 1: RESPUESTAS PRIVADAS DE USUARIOS (RONALD ONLY)
           ======================================================== */}
       {activeTab === 'responses' && (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-6 sm:p-8 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#F0EAE1]">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-4 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#F0EAE1]">
             <div>
               <h2 className="font-serif-display text-xl sm:text-2xl text-[#2C2926]">
                 Respuestas Personales Recibidas
               </h2>
               <p className="text-xs text-[#8C847B] mt-0.5">
-                Buzón confidencial visible exclusivamente para Ronald. Ningún usuario puede ver respuestas ajenas.
+                Buzón confidencial visible exclusivamente para Ronald.
               </p>
             </div>
             <span className="text-xs text-[#8C847B] font-mono">
@@ -513,7 +515,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           {responses.length === 0 ? (
-            <div className="py-16 text-center">
+            <div className="py-14 text-center">
               <div className="w-12 h-12 rounded-full bg-[#FAF8F5] border border-[#E8E2D9] flex items-center justify-center text-[#8C847B] mx-auto mb-3">
                 <MessageSquare className="w-5 h-5 stroke-[1.4]" />
               </div>
@@ -521,16 +523,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Aún no hay respuestas enviadas
               </h3>
               <p className="text-xs text-[#8C847B] max-w-md mx-auto leading-relaxed">
-                Cuando Jhon, Isabella, Shaday, Genesis, Andrea, Isaias o Hannia finalicen su experiencia y envíen su respuesta personal, se mostrarán aquí con su identificación y fecha exacta.
+                Cuando los usuarios finalicen su experiencia y envíen su respuesta personal, se mostrarán aquí con su identificación y fecha exacta.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[#F0EAE1] mt-4">
+            <div className="divide-y divide-[#F0EAE1] mt-2">
               {responses.map((item, idx) => (
-                <div key={idx} className="py-6 first:pt-2 last:pb-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div key={idx} className="py-5 first:pt-3 last:pb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3">
                     <div className="flex items-center space-x-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E8DFC8] flex items-center justify-center text-[#2C2926] font-semibold text-xs">
+                      <div className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E8DFC8] flex items-center justify-center text-[#2C2926] font-semibold text-xs shrink-0">
                         {item.name.charAt(0)}
                       </div>
                       <div>
@@ -543,7 +545,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-3 text-xs text-[#8C847B]">
+                    <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#8C847B]">
                       <span className="inline-flex items-center space-x-1">
                         <Clock className="w-3.5 h-3.5 text-[#937C67]" />
                         <span>
@@ -562,17 +564,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           setSelectedUserId(item.userId);
                           setActiveTab('texts');
                         }}
-                        className="text-[11px] text-[#937C67] hover:text-[#2C2926] hover:underline underline-offset-2"
+                        className="text-[11px] text-[#937C67] hover:text-[#2C2926] hover:underline underline-offset-2 cursor-pointer"
                       >
-                        Ver configuración
+                        Configuración
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleDeleteResponse(item.userId, item.name)}
                         disabled={deletingResponseUserId === item.userId}
-                        className="inline-flex items-center space-x-1 text-[11px] text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md border border-red-200 transition-colors disabled:opacity-50 cursor-pointer"
-                        title="Eliminar respuesta para pruebas"
+                        className="inline-flex items-center space-x-1 text-[11px] text-red-600 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-md border border-red-200 transition-colors disabled:opacity-50 cursor-pointer"
+                        title="Eliminar respuesta"
                       >
                         <Trash2 className="w-3 h-3" />
                         <span>Borrar</span>
@@ -580,7 +582,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-sm text-[#2C2926] leading-relaxed whitespace-pre-wrap font-serif">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-sm text-[#2C2926] leading-relaxed whitespace-pre-wrap font-serif break-words">
                     {item.response.text}
                   </div>
                 </div>
@@ -594,8 +596,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           TAB 2: USUARIOS Y CREDENCIALES
           ======================================================== */}
       {activeTab === 'users' && (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-6 sm:p-8 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#F0EAE1]">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-4 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#F0EAE1]">
             <div>
               <h2 className="font-serif-display text-xl sm:text-2xl text-[#2C2926]">
                 Gestión de Usuarios y Contraseñas
@@ -605,22 +607,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <div className="relative">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="relative w-full sm:w-auto">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#8C847B]" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Buscar usuario..."
-                  className="pl-8 pr-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] w-36 sm:w-48 focus:outline-hidden"
+                  className="w-full sm:w-44 pl-8 pr-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] focus:outline-hidden"
                 />
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowNewUserModal(true)}
-                className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-[#2C2926] text-white text-xs font-medium hover:bg-[#1A1817] transition-colors"
+                className="inline-flex items-center justify-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#2C2926] text-white text-xs font-medium hover:bg-[#1A1817] transition-colors cursor-pointer shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Nuevo Usuario</span>
@@ -628,16 +630,101 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
-          <div className="overflow-x-auto mt-4">
+          {/* MOBILE VIEW (CARD LIST - NO HORIZONTAL SCROLL) */}
+          <div className="block md:hidden space-y-3 mt-4">
+            {filteredUsers.map((u) => {
+              const isAdmin = u.id === 'ronald';
+              return (
+                <div
+                  key={u.id}
+                  className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] space-y-3 shadow-2xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2.5">
+                      <div className="w-8 h-8 rounded-full bg-white border border-[#E8DFC8] flex items-center justify-center text-[#2C2926] font-semibold text-xs shrink-0">
+                        {u.name.charAt(0)}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-[#2C2926]">{u.name}</h4>
+                        <span className="text-[11px] text-[#736C65] font-mono">@{u.username}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1.5">
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                          isAdmin ? 'bg-[#2C2926] text-[#FAF8F5]' : 'bg-[#F2EDE5] text-[#736C65]'
+                        }`}
+                      >
+                        {isAdmin ? 'Admin' : 'Usuario'}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={isAdmin}
+                        onClick={() => handleToggleUserStatus(u)}
+                        className={`inline-flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded-md ${
+                          u.isActive ? 'text-[#15803D] bg-[#DCFCE7]' : 'text-[#902A24] bg-[#FDF2F0]'
+                        } ${isAdmin ? 'opacity-80' : 'cursor-pointer'}`}
+                      >
+                        {u.isActive ? 'Activo' : 'Inactivo'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-white border border-[#EDE6DB] flex items-center justify-between text-xs">
+                    <span className="text-[#8C847B]">Contraseña:</span>
+                    <span className="font-mono font-medium text-[#2C2926] bg-[#FAF8F5] px-2.5 py-0.5 rounded-md border border-[#E8E2D9]">
+                      {u.passwordPlain}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1 border-t border-[#F0EAE1]">
+                    {onSelectUserToPreview && (
+                      <button
+                        type="button"
+                        onClick={() => onSelectUserToPreview(u.username, u.passwordPlain)}
+                        className="flex-1 py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-white border border-[#E2DBD2] flex items-center justify-center space-x-1 hover:bg-[#F2ECE4] transition-colors cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-[#937C67]" />
+                        <span>Ver</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedUserId(u.id);
+                        setActiveTab('texts');
+                      }}
+                      className="flex-1 py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-[#F2EDE5] hover:bg-[#EAE2D6] border border-[#E2DBD2] flex items-center justify-center space-x-1 transition-colors cursor-pointer"
+                    >
+                      <span>Configurar</span>
+                    </button>
+                    {!isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteUser(u.id, u.name)}
+                        className="p-2 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors cursor-pointer"
+                        title="Eliminar usuario"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* DESKTOP VIEW (CLEAN DATA TABLE) */}
+          <div className="hidden md:block overflow-x-auto mt-4 rounded-xl border border-[#F0EAE1]">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-[#F0EAE1] text-[#8C847B] uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-3">Nombre</th>
-                  <th className="py-3 px-3">Usuario</th>
-                  <th className="py-3 px-3">Contraseña</th>
-                  <th className="py-3 px-3">Rol</th>
-                  <th className="py-3 px-3">Estado</th>
-                  <th className="py-3 px-3 text-right">Acciones</th>
+                <tr className="border-b border-[#F0EAE1] bg-[#FAF8F5] text-[#8C847B] uppercase tracking-wider text-[10px]">
+                  <th className="py-3 px-3.5">Nombre</th>
+                  <th className="py-3 px-3.5">Usuario</th>
+                  <th className="py-3 px-3.5">Contraseña</th>
+                  <th className="py-3 px-3.5">Rol</th>
+                  <th className="py-3 px-3.5">Estado</th>
+                  <th className="py-3 px-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F5EFE7]">
@@ -645,16 +732,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   const isAdmin = u.id === 'ronald';
                   return (
                     <tr key={u.id} className="hover:bg-[#FAF8F5]/80 transition-colors">
-                      <td className="py-3.5 px-3 font-medium text-[#2C2926]">
+                      <td className="py-3.5 px-3.5 font-medium text-[#2C2926]">
                         {u.name}
                       </td>
-                      <td className="py-3.5 px-3 font-mono text-[#736C65]">
+                      <td className="py-3.5 px-3.5 font-mono text-[#736C65]">
                         {u.username}
                       </td>
-                      <td className="py-3.5 px-3 font-mono text-[#2C2926] bg-[#FAF8F5] rounded-md inline-block my-2">
-                        {u.passwordPlain}
+                      <td className="py-3.5 px-3.5 font-mono text-[#2C2926]">
+                        <span className="bg-[#FAF8F5] px-2.5 py-1 rounded-md border border-[#E8E2D9] inline-block">
+                          {u.passwordPlain}
+                        </span>
                       </td>
-                      <td className="py-3.5 px-3">
+                      <td className="py-3.5 px-3.5">
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                             isAdmin
@@ -665,7 +754,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {isAdmin ? 'Administrador' : 'Usuario'}
                         </span>
                       </td>
-                      <td className="py-3.5 px-3">
+                      <td className="py-3.5 px-3.5">
                         <button
                           type="button"
                           disabled={isAdmin}
@@ -690,13 +779,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           )}
                         </button>
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3.5 text-right">
                         <div className="inline-flex items-center space-x-1.5">
                           {onSelectUserToPreview && (
                             <button
                               type="button"
                               onClick={() => onSelectUserToPreview(u.username, u.passwordPlain)}
-                              className="p-1.5 text-[#736C65] hover:text-[#2C2926] hover:bg-[#F2ECE4] rounded-lg transition-colors"
+                              className="p-1.5 text-[#736C65] hover:text-[#2C2926] hover:bg-[#F2ECE4] rounded-lg transition-colors cursor-pointer"
                               title={`Probar experiencia como ${u.name}`}
                             >
                               <Eye className="w-3.5 h-3.5" />
@@ -708,7 +797,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               setSelectedUserId(u.id);
                               setActiveTab('texts');
                             }}
-                            className="text-[11px] text-[#2C2926] bg-[#F2EDE5] hover:bg-[#EAE2D6] px-2.5 py-1 rounded-lg transition-colors"
+                            className="text-[11px] text-[#2C2926] bg-[#F2EDE5] hover:bg-[#EAE2D6] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                           >
                             Editar
                           </button>
@@ -716,7 +805,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <button
                               type="button"
                               onClick={() => handleDeleteUser(u.id, u.name)}
-                              className="p-1.5 text-[#902A24] hover:bg-[#FDF2F0] rounded-lg transition-colors"
+                              className="p-1.5 text-[#902A24] hover:bg-[#FDF2F0] rounded-lg transition-colors cursor-pointer"
                               title="Eliminar usuario"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -738,8 +827,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ======================================================== */}
       {['texts', 'profiling', 'styles', 'flowers'].includes(activeTab) && (
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] overflow-hidden shadow-xs flex flex-col md:flex-row">
-          {/* User selection sidebar */}
-          <div className="w-full md:w-60 border-b md:border-b-0 md:border-r border-[#E8E2D9] bg-[#FAF8F5] p-4">
+          {/* User selection: MOBILE HORIZONTAL SCROLLER */}
+          <div className="block md:hidden border-b border-[#E8E2D9] bg-[#FAF8F5] p-3">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8C847B] block mb-2 px-1">
+              Seleccionar Usuario ({users.length})
+            </span>
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+              {users.map((u) => {
+                const isSelected = u.id === selectedUserId;
+                const hasPendingText = !u.personalText || u.personalText.trim() === '';
+                return (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => setSelectedUserId(u.id)}
+                    className={`shrink-0 px-3 py-2 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
+                        : 'bg-white text-[#4A443D] border border-[#E8E2D9] hover:bg-[#F0EAE1]'
+                    }`}
+                  >
+                    <span>{u.name}</span>
+                    {hasPendingText && u.id !== 'ronald' && (
+                      <span
+                        className={`text-[9px] px-1 py-0.2 rounded-full ${
+                          isSelected ? 'bg-white/20 text-white' : 'bg-[#EAE3D8] text-[#8C847B]'
+                        }`}
+                      >
+                        •
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* User selection: DESKTOP VERTICAL SIDEBAR */}
+          <div className="hidden md:block w-60 border-r border-[#E8E2D9] bg-[#FAF8F5] p-4 shrink-0">
             <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8C847B] block mb-2 px-2">
               Seleccionar Usuario
             </span>
@@ -752,7 +877,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     key={u.id}
                     type="button"
                     onClick={() => setSelectedUserId(u.id)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all ${
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-[#2C2926] text-[#FAF8F5] font-medium shadow-2xs'
                         : 'text-[#4A443D] hover:bg-[#F0EAE1]'
@@ -775,29 +900,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           {/* Configuration form for selected user */}
-          <div className="flex-1 p-6 sm:p-8">
+          <div className="flex-1 p-4 sm:p-8">
             {selectedUser ? (
               <div className="space-y-6 max-w-2xl">
                 {/* Header for user */}
-                <div className="flex items-center justify-between pb-4 border-b border-[#F0EAE1]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#F0EAE1]">
                   <div>
-                    <h3 className="font-serif-display text-2xl text-[#2C2926]">
+                    <h3 className="font-serif-display text-xl sm:text-2xl text-[#2C2926]">
                       {selectedUser.name}
                     </h3>
                     <p className="text-xs text-[#8C847B]">
-                      Usuario ID: <code className="font-mono text-[#2C2926]">{selectedUser.username}</code>
+                      Usuario: <code className="font-mono text-[#2C2926]">@{selectedUser.username}</code>
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center">
                     {onSelectUserToPreview && (
                       <button
                         type="button"
                         onClick={() => onSelectUserToPreview(selectedUser.username, selectedUser.passwordPlain)}
-                        className="inline-flex items-center space-x-1 text-xs text-[#2C2926] bg-[#F5F1EB] hover:bg-[#EBE5DC] px-3 py-1.5 rounded-xl border border-[#E2DBD2] transition-colors"
+                        className="w-full sm:w-auto inline-flex items-center justify-center space-x-1 text-xs text-[#2C2926] bg-[#F5F1EB] hover:bg-[#EBE5DC] px-3.5 py-2 rounded-xl border border-[#E2DBD2] transition-colors cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#937C67]" />
-                        <span>Probar vista como {selectedUser.name}</span>
+                        <span>Ver como {selectedUser.name}</span>
                       </button>
                     )}
                   </div>
@@ -961,7 +1086,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     type="button"
                     onClick={handleSaveSelectedUser}
                     disabled={isSaving}
-                    className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-[#2C2926] hover:bg-[#1A1817] text-[#FAF8F5] text-xs font-medium shadow-xs transition-all disabled:opacity-50"
+                    className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-2.5 rounded-xl bg-[#2C2926] hover:bg-[#1A1817] text-[#FAF8F5] text-xs font-medium shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {isSaving ? (
                       <span>Guardando...</span>
@@ -976,9 +1101,52 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             ) : (
               <div className="text-center py-16 text-xs text-[#8C847B]">
-                Selecciona un usuario de la lista izquierda para editar su información.
+                Selecciona un usuario de la lista superior para editar su información.
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Delete Response Confirmation Modal */}
+      {confirmDeleteResponse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm border border-[#E8E2D9] shadow-xl space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-serif-display text-lg text-[#2C2926]">
+                  ¿Eliminar respuesta?
+                </h4>
+                <p className="text-xs text-[#8C847B]">
+                  Usuario: {confirmDeleteResponse.name}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#736C65] leading-relaxed bg-[#FAF8F5] p-3 rounded-xl border border-[#E8E2D9]">
+              Esta acción es exclusiva del administrador. Se borrará permanentemente la respuesta para permitir pruebas o reinicios.
+            </p>
+
+            <div className="pt-2 flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteResponse(null)}
+                className="px-3.5 py-2 rounded-xl text-xs text-[#736C65] hover:bg-[#FAF8F5] transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={executeDeleteResponse}
+                disabled={deletingResponseUserId !== null}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {deletingResponseUserId ? 'Borrando...' : 'Eliminar Respuesta'}
+              </button>
+            </div>
           </div>
         </div>
       )}

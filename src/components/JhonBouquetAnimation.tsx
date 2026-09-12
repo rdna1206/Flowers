@@ -4,6 +4,7 @@ import { ArrowRight, RotateCcw, BookOpen, MessageSquare, Sparkles } from 'lucide
 
 interface JhonBouquetAnimationProps {
   mode?: 'formation' | 'result';
+  onProceedToReading?: () => void;
   onProceedToResponse?: () => void;
   onBackToReading?: () => void;
   onReplayFormation?: () => void;
@@ -11,14 +12,24 @@ interface JhonBouquetAnimationProps {
 
 type AssemblyStep =
   | 'wrap'
-  | 'stems-base'
-  | 'yellow-base-blooms'
-  | 'signature-bloom'
+  | 'stems'
+  | 'leaves'
+  | 'base-bloom-1'
+  | 'base-bloom-2'
+  | 'base-bloom-3'
+  | 'base-bloom-4'
+  | 'base-bloom-5'
+  | 'proto-aura'
+  | 'proto-outer'
+  | 'proto-mid'
+  | 'proto-inner'
+  | 'proto-core'
   | 'golden-ribbon'
   | 'bouquet-complete';
 
 export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
   mode = 'formation',
+  onProceedToReading,
   onProceedToResponse,
   onBackToReading,
   onReplayFormation,
@@ -36,15 +47,24 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
     setStep('wrap');
     setIsCompleted(false);
 
-    // Precise, disciplined, elegant assembly timing
-    const t1 = setTimeout(() => setStep('stems-base'), 1800); // Matte wrap placed & emerald stems emerge
-    const t2 = setTimeout(() => setStep('yellow-base-blooms'), 4500); // 5 Golden-yellow #FBBF24 base flowers arrange
-    const t3 = setTimeout(() => setStep('signature-bloom'), 8000); // Grande Protagonist Flower unfurls
-    const t4 = setTimeout(() => setStep('golden-ribbon'), 11500); // Gold silk ribbon tied
-    const t5 = setTimeout(() => {
+    // Ultra-detailed, sequential, cinematic master choreography for Jhon (~21 seconds)
+    const t1 = setTimeout(() => setStep('stems'), 2200);           // 1. Origami wrap folds -> Emerald stems emerge
+    const t2 = setTimeout(() => setStep('leaves'), 4400);          // 2. Protective forest leaves roll open
+    const t3 = setTimeout(() => setStep('base-bloom-1'), 6400);    // 3. Flower 1 (Back-Left) opens
+    const t4 = setTimeout(() => setStep('base-bloom-2'), 8200);    // 4. Flower 2 (Back-Right) unfolds needle petals
+    const t5 = setTimeout(() => setStep('base-bloom-3'), 9900);    // 5. Flower 3 (Far-Left) blooms
+    const t6 = setTimeout(() => setStep('base-bloom-4'), 11500);   // 6. Flower 4 (Far-Right) layers settle
+    const t7 = setTimeout(() => setStep('base-bloom-5'), 13000);   // 7. Flower 5 (Front-Center) unfolds grand rose
+    const t8 = setTimeout(() => setStep('proto-aura'), 14500);     // 8. Protagonist radial aura awakens
+    const t9 = setTimeout(() => setStep('proto-outer'), 16000);    // 9. Tier 1 outer cobalt-gold petals unfold
+    const t10 = setTimeout(() => setStep('proto-mid'), 17500);     // 10. Tier 2 intermediate petals rotate open
+    const t11 = setTimeout(() => setStep('proto-inner'), 18800);   // 11. Tier 3 inner corolla blossoms
+    const t12 = setTimeout(() => setStep('proto-core'), 19900);    // 12. Sapphire starlight jewel core ignites
+    const t13 = setTimeout(() => setStep('golden-ribbon'), 21000); // 13. Gold silk ribbon ties & cascades
+    const t14 = setTimeout(() => {
       setStep('bouquet-complete');
       setIsCompleted(true);
-    }, 14000); // Full atmospheric harmony
+    }, 22500);                                                     // 14. Full living atmospheric harmony
 
     return () => {
       clearTimeout(t1);
@@ -52,6 +72,15 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
       clearTimeout(t3);
       clearTimeout(t4);
       clearTimeout(t5);
+      clearTimeout(t6);
+      clearTimeout(t7);
+      clearTimeout(t8);
+      clearTimeout(t9);
+      clearTimeout(t10);
+      clearTimeout(t11);
+      clearTimeout(t12);
+      clearTimeout(t13);
+      clearTimeout(t14);
     };
   }, [mode]);
 
@@ -61,22 +90,40 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
     }
     setIsCompleted(false);
     setStep('wrap');
-    setTimeout(() => setStep('stems-base'), 1800);
-    setTimeout(() => setStep('yellow-base-blooms'), 4500);
-    setTimeout(() => setStep('signature-bloom'), 8000);
-    setTimeout(() => setStep('golden-ribbon'), 11500);
+    setTimeout(() => setStep('stems'), 2200);
+    setTimeout(() => setStep('leaves'), 4400);
+    setTimeout(() => setStep('base-bloom-1'), 6400);
+    setTimeout(() => setStep('base-bloom-2'), 8200);
+    setTimeout(() => setStep('base-bloom-3'), 9900);
+    setTimeout(() => setStep('base-bloom-4'), 11500);
+    setTimeout(() => setStep('base-bloom-5'), 13000);
+    setTimeout(() => setStep('proto-aura'), 14500);
+    setTimeout(() => setStep('proto-outer'), 16000);
+    setTimeout(() => setStep('proto-mid'), 17500);
+    setTimeout(() => setStep('proto-inner'), 18800);
+    setTimeout(() => setStep('proto-core'), 19900);
+    setTimeout(() => setStep('golden-ribbon'), 21000);
     setTimeout(() => {
       setStep('bouquet-complete');
       setIsCompleted(true);
-    }, 14000);
+    }, 22500);
   };
 
   const isStepAtLeast = (target: AssemblyStep) => {
     const order: AssemblyStep[] = [
       'wrap',
-      'stems-base',
-      'yellow-base-blooms',
-      'signature-bloom',
+      'stems',
+      'leaves',
+      'base-bloom-1',
+      'base-bloom-2',
+      'base-bloom-3',
+      'base-bloom-4',
+      'base-bloom-5',
+      'proto-aura',
+      'proto-outer',
+      'proto-mid',
+      'proto-inner',
+      'proto-core',
       'golden-ribbon',
       'bouquet-complete',
     ];
@@ -287,7 +334,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
             {/* =========================================================
                 STEP 2: NATURAL STEMS STRUCTURE
                ========================================================= */}
-            {isStepAtLeast('stems-base') && (
+            {isStepAtLeast('stems') && (
               <g id="jhon-stems-structure">
                 {/* Stem 1 - Far Left Base Flower */}
                 <motion.path
@@ -298,7 +345,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                 />
                 {/* Stem 2 - Back Left Base Flower */}
                 <motion.path
@@ -309,7 +356,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 />
                 {/* Stem 3 - Back Right Base Flower */}
                 <motion.path
@@ -320,7 +367,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 />
                 {/* Stem 4 - Far Right Base Flower */}
                 <motion.path
@@ -331,7 +378,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 />
                 {/* Stem 5 - Front Center Base Flower */}
                 <motion.path
@@ -342,7 +389,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 />
                 {/* Central Main Stem for Protagonist Bloom */}
                 <motion.path
@@ -353,45 +400,51 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.4, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 />
 
                 {/* Deep Forest Protective Leaves */}
-                <motion.path
-                  d="M 180 340 Q 125 330 105 290 Q 155 310 180 340 Z"
-                  fill="#064E3B"
-                  stroke="#10B981"
-                  strokeWidth="0.8"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 1, delay: 0.6 }}
-                />
-                <motion.path
-                  d="M 240 335 Q 295 325 315 285 Q 265 305 240 335 Z"
-                  fill="#064E3B"
-                  stroke="#10B981"
-                  strokeWidth="0.8"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 1, delay: 0.7 }}
-                />
+                {isStepAtLeast('leaves') && (
+                  <g id="jhon-leaves-layer">
+                    <motion.path
+                      d="M 180 340 Q 125 330 105 290 Q 155 310 180 340 Z"
+                      fill="#064E3B"
+                      stroke="#10B981"
+                      strokeWidth="0.8"
+                      initial={{ scale: 0, opacity: 0, rotate: -20 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ transformOrigin: '180px 340px' }}
+                    />
+                    <motion.path
+                      d="M 240 335 Q 295 325 315 285 Q 265 305 240 335 Z"
+                      fill="#064E3B"
+                      stroke="#10B981"
+                      strokeWidth="0.8"
+                      initial={{ scale: 0, opacity: 0, rotate: 20 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      transition={{ duration: 1.4, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ transformOrigin: '240px 335px' }}
+                    />
+                  </g>
+                )}
               </g>
             )}
 
             {/* =========================================================
-                STEP 3: THE 5 GOLDEN YELLOW BASE FLOWERS (#FBBF24)
+                STEP 3: THE 5 GOLDEN YELLOW BASE FLOWERS (#FBBF24) - SEQUENTIAL
                ========================================================= */}
-            {isStepAtLeast('yellow-base-blooms') && (
-              <g id="jhon-5-yellow-base-flowers" filter="url(#jhonDropShadow3D)">
-                {/* -------------------------------------------------------
-                    BASE FLOWER 1 (Back-Left: Golden Sunflower/Rose #FBBF24)
-                    Center at (150, 215), tilted -18 deg
-                   ------------------------------------------------------- */}
+            <g id="jhon-5-yellow-base-flowers" filter="url(#jhonDropShadow3D)">
+              {/* -------------------------------------------------------
+                  BASE FLOWER 1 (Back-Left: Golden Sunflower/Rose #FBBF24)
+                  Center at (150, 215), tilted -18 deg
+                 ------------------------------------------------------- */}
+              {isStepAtLeast('base-bloom-1') && (
                 <motion.g
                   id="jhon-base-flower-1"
-                  initial={{ scale: 0, rotate: -35, opacity: 0 }}
+                  initial={{ scale: 0, rotate: -45, opacity: 0 }}
                   animate={{ scale: 1, rotate: -18, opacity: 1 }}
-                  transition={{ duration: 1.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                   style={{ transformOrigin: '150px 215px' }}
                 >
                   {/* Outer Layer: 12 Petals */}
@@ -429,16 +482,18 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   <circle cx="148" cy="213" r="1.5" fill="#FEF08A" />
                   <circle cx="152" cy="217" r="1.3" fill="#FEF08A" />
                 </motion.g>
+              )}
 
-                {/* -------------------------------------------------------
-                    BASE FLOWER 2 (Back-Right: Golden Chrysanthemum #FBBF24)
-                    Center at (270, 215), tilted +18 deg
-                   ------------------------------------------------------- */}
+              {/* -------------------------------------------------------
+                  BASE FLOWER 2 (Back-Right: Golden Chrysanthemum #FBBF24)
+                  Center at (270, 215), tilted +18 deg
+                 ------------------------------------------------------- */}
+              {isStepAtLeast('base-bloom-2') && (
                 <motion.g
                   id="jhon-base-flower-2"
-                  initial={{ scale: 0, rotate: 35, opacity: 0 }}
+                  initial={{ scale: 0, rotate: 45, opacity: 0 }}
                   animate={{ scale: 1, rotate: 18, opacity: 1 }}
-                  transition={{ duration: 1.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                   style={{ transformOrigin: '270px 215px' }}
                 >
                   {/* 16 Radiating Needle Petals */}
@@ -460,16 +515,18 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   <circle cx="270" cy="215" r="8" fill="#F59E0B" />
                   <circle cx="270" cy="215" r="4" fill="#FEF08A" />
                 </motion.g>
+              )}
 
-                {/* -------------------------------------------------------
-                    BASE FLOWER 3 (Flank Left: Golden Ranunculus Cup #FBBF24)
-                    Center at (120, 280), tilted -30 deg
-                   ------------------------------------------------------- */}
+              {/* -------------------------------------------------------
+                  BASE FLOWER 3 (Flank Left: Golden Ranunculus Cup #FBBF24)
+                  Center at (120, 280), tilted -30 deg
+                 ------------------------------------------------------- */}
+              {isStepAtLeast('base-bloom-3') && (
                 <motion.g
                   id="jhon-base-flower-3"
                   initial={{ scale: 0, x: -30, opacity: 0 }}
                   animate={{ scale: 1, x: 0, opacity: 1 }}
-                  transition={{ duration: 1.4, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
                   style={{ transformOrigin: '120px 280px' }}
                 >
                   {/* 6 Curved Shell Petals */}
@@ -497,16 +554,18 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   <circle cx="120" cy="280" r="10" fill="#F59E0B" />
                   <circle cx="120" cy="280" r="5" fill="#FEF9C3" />
                 </motion.g>
+              )}
 
-                {/* -------------------------------------------------------
-                    BASE FLOWER 4 (Flank Right: Golden Anemone / Lily #FBBF24)
-                    Center at (300, 280), tilted +30 deg
-                   ------------------------------------------------------- */}
+              {/* -------------------------------------------------------
+                  BASE FLOWER 4 (Flank Right: Golden Anemone / Lily #FBBF24)
+                  Center at (300, 280), tilted +30 deg
+                 ------------------------------------------------------- */}
+              {isStepAtLeast('base-bloom-4') && (
                 <motion.g
                   id="jhon-base-flower-4"
                   initial={{ scale: 0, x: 30, opacity: 0 }}
                   animate={{ scale: 1, x: 0, opacity: 1 }}
-                  transition={{ duration: 1.4, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
                   style={{ transformOrigin: '300px 280px' }}
                 >
                   {/* 6 Arched Petals */}
@@ -528,16 +587,18 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   <circle cx="300" cy="280" r="9" fill="#F59E0B" />
                   <circle cx="300" cy="280" r="5" fill="#FEF08A" />
                 </motion.g>
+              )}
 
-                {/* -------------------------------------------------------
-                    BASE FLOWER 5 (Front Center: Grand Golden Rose #FBBF24)
-                    Center at (210, 295), straight anchor
-                   ------------------------------------------------------- */}
+              {/* -------------------------------------------------------
+                  BASE FLOWER 5 (Front Center: Grand Golden Rose #FBBF24)
+                  Center at (210, 295), straight anchor
+                 ------------------------------------------------------- */}
+              {isStepAtLeast('base-bloom-5') && (
                 <motion.g
                   id="jhon-base-flower-5"
                   initial={{ scale: 0, y: 30, opacity: 0 }}
                   animate={{ scale: 1, y: 0, opacity: 1 }}
-                  transition={{ duration: 1.5, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                   style={{ transformOrigin: '210px 295px' }}
                 >
                   {/* Outer Layer: 5 Large Swirling Rose Petals */}
@@ -566,8 +627,8 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                   <circle cx="210" cy="295" r="10" fill="#F59E0B" />
                   <circle cx="210" cy="295" r="5" fill="#FEF9C3" />
                 </motion.g>
-              </g>
-            )}
+              )}
+            </g>
 
             {/* =========================================================
                 STEP 4: LA FLOR CENTRAL PROTAGONISTA (GRANDE Y DIFERENTE)
@@ -575,29 +636,26 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                 - Centro luminoso azul brillante con halo cálido
                 - Posicionada con majestuosidad en el eje focal superior (210, 145)
                ========================================================= */}
-            {isStepAtLeast('signature-bloom') && (
+            {isStepAtLeast('proto-aura') && (
               <motion.g
                 id="jhon-protagonist-bloom"
-                initial={{ scale: 0, y: -60, opacity: 0 }}
-                animate={{
-                  scale: [0, 1.12, 1],
-                  y: 0,
-                  opacity: 1,
-                }}
-                transition={{
-                  scale: { duration: 2.0, ease: [0.16, 1, 0.3, 1] },
-                  opacity: { duration: 1.2 },
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.2 }}
                 style={{ transformOrigin: '210px 145px' }}
                 filter="url(#jhonDropShadow3D)"
               >
                 {/* Volumetric Radial Ambient Aura for the Protagonist Bloom */}
-                <circle
+                <motion.circle
                   cx="210"
                   cy="145"
                   r="90"
                   fill="url(#jhonCenterAura)"
                   className="pointer-events-none"
+                  initial={{ scale: 0.2, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 0.9 }}
+                  transition={{ duration: 1.8, ease: 'easeOut' }}
+                  style={{ transformOrigin: '210px 145px' }}
                 />
 
                 {/* Rotating Geometric Energy Halo (Precision & Concentration) */}
@@ -631,124 +689,164 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
 
                 {/* TIER 1: OUTER LAYER OF GRAND PETALS (10 Petals)
                     Base: Yellow Gold #FBBF24 -> Tip: Deep Blue #1E3A8A */}
-                {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((deg, i) => (
-                  <g key={`proto-outer-${i}`} transform={`rotate(${deg} 210 145)`}>
-                    {/* Lanceolate Petal with 3D Sculpted Curvature */}
-                    <path
-                      d="M 210 145 C 188 112, 182 64, 210 18 C 238 64, 232 112, 210 145 Z"
-                      fill="url(#jhonProtagonistPetalVertical)"
-                      stroke="#0F172A"
-                      strokeWidth="1.2"
-                    />
-                    {/* Central Lightning Crystalline Vein */}
-                    <path
-                      d="M 210 145 L 210 26"
-                      stroke="#93C5FD"
-                      strokeWidth="1.2"
-                      strokeOpacity="0.75"
-                    />
-                    {/* Glowing Deep Blue Edge Accent */}
-                    <circle cx="210" cy="22" r="2.2" fill="#60A5FA" />
-                  </g>
-                ))}
+                {isStepAtLeast('proto-outer') && (
+                  <motion.g
+                    id="jhon-proto-outer-tier"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ transformOrigin: '210px 145px' }}
+                  >
+                    {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((deg, i) => (
+                      <g key={`proto-outer-${i}`} transform={`rotate(${deg} 210 145)`}>
+                        {/* Lanceolate Petal with 3D Sculpted Curvature */}
+                        <path
+                          d="M 210 145 C 188 112, 182 64, 210 18 C 238 64, 232 112, 210 145 Z"
+                          fill="url(#jhonProtagonistPetalVertical)"
+                          stroke="#0F172A"
+                          strokeWidth="1.2"
+                        />
+                        {/* Central Lightning Crystalline Vein */}
+                        <path
+                          d="M 210 145 L 210 26"
+                          stroke="#93C5FD"
+                          strokeWidth="1.2"
+                          strokeOpacity="0.75"
+                        />
+                        {/* Glowing Deep Blue Edge Accent */}
+                        <circle cx="210" cy="22" r="2.2" fill="#60A5FA" />
+                      </g>
+                    ))}
+                  </motion.g>
+                )}
 
                 {/* TIER 2: INTERMEDIATE LAYER (10 Petals offset by 18 deg)
                     Base: Yellow Gold #FBBF24 -> Mid: Radiant Gold -> Tip: Rich Deep Blue #1E3A8A */}
-                {[18, 54, 90, 126, 162, 198, 234, 270, 306, 342].map((deg, i) => (
-                  <g key={`proto-mid-${i}`} transform={`rotate(${deg} 210 145)`}>
-                    <path
-                      d="M 210 145 C 194 122, 192 84, 210 42 C 228 84, 226 122, 210 145 Z"
-                      fill="url(#jhonProtagonistPetalAngled)"
-                      stroke="#1E3A8A"
-                      strokeWidth="0.9"
-                      opacity="0.95"
-                    />
-                    {/* Subtle Golden-Yellow Inner Rib */}
-                    <path
-                      d="M 210 145 L 210 52"
-                      stroke="#FDE047"
-                      strokeWidth="0.9"
-                      strokeOpacity="0.6"
-                    />
-                  </g>
-                ))}
+                {isStepAtLeast('proto-mid') && (
+                  <motion.g
+                    id="jhon-proto-mid-tier"
+                    initial={{ scale: 0, rotate: -25, opacity: 0 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                    transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ transformOrigin: '210px 145px' }}
+                  >
+                    {[18, 54, 90, 126, 162, 198, 234, 270, 306, 342].map((deg, i) => (
+                      <g key={`proto-mid-${i}`} transform={`rotate(${deg} 210 145)`}>
+                        <path
+                          d="M 210 145 C 194 122, 192 84, 210 42 C 228 84, 226 122, 210 145 Z"
+                          fill="url(#jhonProtagonistPetalAngled)"
+                          stroke="#1E3A8A"
+                          strokeWidth="0.9"
+                          opacity="0.95"
+                        />
+                        {/* Subtle Golden-Yellow Inner Rib */}
+                        <path
+                          d="M 210 145 L 210 52"
+                          stroke="#FDE047"
+                          strokeWidth="0.9"
+                          strokeOpacity="0.6"
+                        />
+                      </g>
+                    ))}
+                  </motion.g>
+                )}
 
                 {/* TIER 3: INNER COROLLA (8 Petals embracing the luminous center) */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
-                  <g key={`proto-inner-${i}`} transform={`rotate(${deg + 10} 210 145)`}>
-                    <path
-                      d="M 210 145 C 198 130, 198 106, 210 70 C 222 106, 222 130, 210 145 Z"
-                      fill="url(#jhonProtagonistPetalVertical)"
-                      stroke="#3B82F6"
-                      strokeWidth="0.8"
-                    />
-                  </g>
-                ))}
+                {isStepAtLeast('proto-inner') && (
+                  <motion.g
+                    id="jhon-proto-inner-tier"
+                    initial={{ scale: 0, rotate: 20, opacity: 0 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                    transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ transformOrigin: '210px 145px' }}
+                  >
+                    {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
+                      <g key={`proto-inner-${i}`} transform={`rotate(${deg + 10} 210 145)`}>
+                        <path
+                          d="M 210 145 C 198 130, 198 106, 210 70 C 222 106, 222 130, 210 145 Z"
+                          fill="url(#jhonProtagonistPetalVertical)"
+                          stroke="#3B82F6"
+                          strokeWidth="0.8"
+                        />
+                      </g>
+                    ))}
+                  </motion.g>
+                )}
 
                 {/* =========================================================
-                    CENTRO LUMINOSO AZUL BRILLANTE CON HALO CÁLIDO
+                    CENTRO LUMINOSO AZUL BRILLANTE CON HALO CÁLIDO Y ESTAMBRES
                    ========================================================= */}
-                {/* 1. Warm Golden Halo (Surrounding the luminous blue core) */}
-                <circle
-                  cx="210"
-                  cy="145"
-                  r="26"
-                  fill="url(#jhonWarmHalo)"
-                  opacity="0.85"
-                />
+                {isStepAtLeast('proto-core') && (
+                  <motion.g
+                    id="jhon-proto-core-elements"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ transformOrigin: '210px 145px' }}
+                  >
+                    {/* 1. Warm Golden Halo (Surrounding the luminous blue core) */}
+                    <circle
+                      cx="210"
+                      cy="145"
+                      r="26"
+                      fill="url(#jhonWarmHalo)"
+                      opacity="0.85"
+                    />
 
-                {/* 2. Deep Blue Receptacle Ring */}
-                <circle cx="210" cy="145" r="18" fill="#0A192F" stroke="#1E3A8A" strokeWidth="1.5" />
+                    {/* 2. Deep Blue Receptacle Ring */}
+                    <circle cx="210" cy="145" r="18" fill="#0A192F" stroke="#1E3A8A" strokeWidth="1.5" />
 
-                {/* 3. Luminous Brilliant Blue Core with Specular Glow */}
-                <circle
-                  cx="210"
-                  cy="145"
-                  r="13"
-                  fill="#1E40AF"
-                  filter="url(#jhonCenterGlowFilter)"
-                />
-                <circle
-                  cx="210"
-                  cy="145"
-                  r="9"
-                  fill="#38BDF8"
-                />
-                <circle
-                  cx="210"
-                  cy="145"
-                  r="5"
-                  fill="#93C5FD"
-                />
+                    {/* 3. Luminous Brilliant Blue Core with Specular Glow */}
+                    <circle
+                      cx="210"
+                      cy="145"
+                      r="13"
+                      fill="#1E40AF"
+                      filter="url(#jhonCenterGlowFilter)"
+                    />
+                    <circle
+                      cx="210"
+                      cy="145"
+                      r="9"
+                      fill="#38BDF8"
+                    />
+                    <circle
+                      cx="210"
+                      cy="145"
+                      r="5"
+                      fill="#93C5FD"
+                    />
 
-                {/* 4. Pulsing Pure White Starlight Core (Precision & Focus) */}
-                <motion.circle
-                  cx="210"
-                  cy="145"
-                  r="3.2"
-                  fill="#FFFFFF"
-                  animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.85, 1, 0.85],
-                  }}
-                  transition={{
-                    duration: 2.2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
+                    {/* 4. Pulsing Pure White Starlight Core (Precision & Focus) */}
+                    <motion.circle
+                      cx="210"
+                      cy="145"
+                      r="3.2"
+                      fill="#FFFFFF"
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.85, 1, 0.85],
+                      }}
+                      transition={{
+                        duration: 2.2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                    />
 
-                {/* Radiant Sparkles Orbiting the Center */}
-                <motion.g
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
-                  style={{ transformOrigin: '210px 145px' }}
-                >
-                  <circle cx="210" cy="123" r="1.5" fill="#FDE047" />
-                  <circle cx="232" cy="145" r="1.6" fill="#67E8F9" />
-                  <circle cx="210" cy="167" r="1.5" fill="#FDE047" />
-                  <circle cx="188" cy="145" r="1.6" fill="#67E8F9" />
-                </motion.g>
+                    {/* Radiant Sparkles Orbiting the Center */}
+                    <motion.g
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+                      style={{ transformOrigin: '210px 145px' }}
+                    >
+                      <circle cx="210" cy="123" r="1.5" fill="#FDE047" />
+                      <circle cx="232" cy="145" r="1.6" fill="#67E8F9" />
+                      <circle cx="210" cy="167" r="1.5" fill="#FDE047" />
+                      <circle cx="188" cy="145" r="1.6" fill="#67E8F9" />
+                    </motion.g>
+                  </motion.g>
+                )}
               </motion.g>
             )}
 
@@ -885,51 +983,42 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
           </svg>
         </div>
 
-        {/* Action Controls */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3 w-full px-4">
+        {/* Tarjeta de lectura con el botón 'Leer' (Exclusivo para Jhon) */}
+        <div className="mt-8 flex items-center justify-center w-full px-4">
           {isCompleted && (
-            <>
-              {/* Enter User Response */}
+            <motion.div
+              id="tarjeta-lectura-jhon"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-md p-4 sm:p-5 rounded-2xl border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+              style={{
+                backgroundColor: 'rgba(10, 25, 47, 0.92)',
+                borderColor: 'rgba(59, 130, 246, 0.35)',
+              }}
+            >
+              <div className="flex items-center space-x-3.5 text-left w-full sm:w-auto">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border bg-[#1E3A8A]/50 border-[#3B82F6]/50 text-[#FBBF24]">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-serif font-medium text-[#FAF8F5]">Texto Personal</h4>
+                  <p className="text-xs text-[#94A3B8]">Palabras dedicadas por Ronald</p>
+                </div>
+              </div>
               <motion.button
-                id="btn-jhon-enter-response"
+                id="btn-jhon-read-text"
                 type="button"
-                onClick={onProceedToResponse}
-                initial={{ opacity: 0, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#FBBF24] hover:from-[#2563EB] hover:to-[#FDE047] text-[#FFFFFF] hover:text-[#0A192F] text-xs font-semibold tracking-wider uppercase shadow-[0_0_25px_rgba(30,58,138,0.5)] transition-all hover:scale-102 cursor-pointer"
+                onClick={onProceedToReading || onProceedToResponse}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#FBBF24] hover:from-[#2563EB] hover:to-[#FDE047] text-[#FFFFFF] hover:text-[#0A192F] text-xs font-semibold tracking-wider uppercase shadow-[0_0_20px_rgba(30,58,138,0.5)] transition-all cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4 text-inherit" />
-                <span>Mi respuesta</span>
+                <BookOpen className="w-4 h-4 text-inherit" />
+                <span>Leer</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.2]" />
               </motion.button>
-
-              {/* View Personal Message from Admin */}
-              {onBackToReading && (
-                <button
-                  id="btn-jhon-view-message"
-                  type="button"
-                  onClick={onBackToReading}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#1E3A8A]/60 hover:border-[#60A5FA] bg-[#0A192F]/80 hover:bg-[#1E293B] text-[#93C5FD] hover:text-[#FFFFFF] text-xs transition-colors cursor-pointer"
-                  title="Mensaje"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Mensaje</span>
-                </button>
-              )}
-
-              {/* Replay Bouquet Assembly */}
-              <button
-                id="btn-jhon-replay-bouquet"
-                type="button"
-                onClick={handleReplay}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#1E3A8A]/60 hover:border-[#FBBF24] bg-[#0A192F]/80 hover:bg-[#1E293B] text-[#FBBF24] hover:text-[#FFFFFF] text-xs transition-colors cursor-pointer"
-                title="Volver a armar"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Volver a armar</span>
-              </button>
-            </>
+            </motion.div>
           )}
         </div>
       </div>

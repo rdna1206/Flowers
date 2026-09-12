@@ -332,7 +332,7 @@ export const FlowerFormulation: React.FC<FlowerFormulationProps> = ({
                 className="text-xs font-semibold uppercase tracking-widest mb-2"
                 style={{ color: secondaryColor }}
               >
-                Sinergia Floral
+                Armonía
               </h3>
               <p className="text-sm leading-relaxed" style={{ color: bodyTextColor }}>
                 {formulation.synergy}
@@ -371,7 +371,7 @@ export const FlowerFormulation: React.FC<FlowerFormulationProps> = ({
               style={{ backgroundColor: primaryColor }}
             >
               <MessageSquare className="w-4 h-4" style={{ color: accentColor }} />
-              <span>Escribir mi Respuesta Personal</span>
+              <span>Mi respuesta</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

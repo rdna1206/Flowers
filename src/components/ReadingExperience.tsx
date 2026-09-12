@@ -114,7 +114,7 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
                 }}
               >
                 <Flower2 className="w-4 h-4" style={{ color: accentColor }} />
-                <span>Ver ramo</span>
+                <span>Volver a la flor</span>
               </button>
 
               {onProceedToResponse && (
@@ -126,42 +126,48 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
                   style={{ backgroundColor: primaryColor }}
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Mi respuesta</span>
+                  <span>Terminar lectura y responder</span>
                   <ArrowRight className="w-4 h-4 text-white/70" />
                 </button>
               )}
             </div>
           </div>
         ) : (
-          /* When text is empty by default, clean options without dummy text */
-          <div className="text-center py-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              id="btn-proceed-direct-to-flower"
-              type="button"
-              onClick={onProceedToFlowers}
-              className="inline-flex items-center space-x-2 px-7 py-3.5 rounded-full text-white text-sm font-medium shadow-md hover:shadow-lg transition-all hover:opacity-95 cursor-pointer"
-              style={{ backgroundColor: primaryColor }}
-            >
-              <Flower2 className="w-4 h-4" style={{ color: accentColor }} />
-              <span>Ver ramo</span>
-            </button>
-
-            {onProceedToResponse && (
+          /* When text is empty by default, indicate clearly without inventing any text */
+          <div className="text-center py-10 px-4">
+            <p className="text-sm sm:text-base font-serif italic mb-8 opacity-80" style={{ color: textColor }}>
+              Aún no hay texto configurado para esta persona.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
-                id="btn-proceed-direct-to-response"
+                id="btn-proceed-direct-to-flower"
                 type="button"
-                onClick={onProceedToResponse}
-                className="inline-flex items-center space-x-2 px-6 py-3.5 rounded-full border text-sm font-medium transition-colors cursor-pointer"
+                onClick={onProceedToFlowers}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-full border text-xs sm:text-sm font-medium transition-colors cursor-pointer"
                 style={{
                   borderColor: borderColor,
                   color: textColor,
                   backgroundColor: subCardBg,
                 }}
               >
-                <MessageSquare className="w-4 h-4" />
-                <span>Mi respuesta</span>
+                <Flower2 className="w-4 h-4" style={{ color: accentColor }} />
+                <span>Volver a la flor</span>
               </button>
-            )}
+
+              {onProceedToResponse && (
+                <button
+                  id="btn-proceed-direct-to-response"
+                  type="button"
+                  onClick={onProceedToResponse}
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3.5 rounded-full text-white text-xs sm:text-sm font-medium shadow-md hover:shadow-lg transition-all hover:opacity-95 cursor-pointer"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Mi respuesta</span>
+                  <ArrowRight className="w-4 h-4 text-white/70" />
+                </button>
+              )}
+            </div>
           </div>
         )}
       </motion.div>

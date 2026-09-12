@@ -153,9 +153,18 @@ app.get('/api/user/experience', requireAuth, (req, res) => {
 
 // POST /api/user/response
 // Users submit their own personal response to their experience
-// PRIVACY: Only saved to the authenticated user; users can never see others' responses
+// PRIVACY & IMMUTABILITY: Only saved to the authenticated user once. Permanent lock after submission.
 app.post('/api/user/response', requireAuth, (req, res) => {
   const user = (req as any).user;
+
+  // STRICT IMMUTABILITY CHECK:
+  if (user.userResponse && user.userResponse.text && user.userResponse.text.trim().length > 0) {
+    res.status(403).json({
+      error: 'Tu respuesta ya fue enviada y se encuentra bloqueada de forma permanente. No es posible modificarla ni reemplazarla.',
+    });
+    return;
+  }
+
   const { responseText } = req.body;
   if (!responseText || typeof responseText !== 'string' || !responseText.trim()) {
     res.status(400).json({ error: 'Por favor escribe un mensaje antes de enviar tu respuesta.' });
@@ -309,6 +318,20 @@ app.delete('/api/admin/user/:id', requireAdmin, (req, res) => {
     return;
   }
   res.json({ success: true, message: 'Usuario eliminado correctamente.' });
+});
+
+// DELETE /api/admin/response/:userId
+// Ronald is the only authorized role to delete user responses
+app.delete('/api/admin/response/:userId', requireAdmin, (req, res) => {
+  const { userId } = req.params;
+  const user = getUserById(userId);
+  if (!user) {
+    res.status(404).json({ error: 'Usuario no encontrado.' });
+    return;
+  }
+
+  updateUser(userId, { userResponse: null });
+  res.json({ success: true, message: `Respuesta de ${user.name} eliminada.` });
 });
 
 // ==========================================

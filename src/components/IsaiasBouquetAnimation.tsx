@@ -4,6 +4,7 @@ import { ArrowRight, RotateCcw, BookOpen, MessageSquare } from 'lucide-react';
 
 interface IsaiasBouquetAnimationProps {
   mode?: 'formation' | 'result';
+  onProceedToReading?: () => void;
   onProceedToResponse?: () => void;
   onBackToReading?: () => void;
   onReplayFormation?: () => void;
@@ -19,6 +20,7 @@ type AssemblyStep =
 
 export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
   mode = 'formation',
+  onProceedToReading,
   onProceedToResponse,
   onBackToReading,
   onReplayFormation,
@@ -731,51 +733,42 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
           </svg>
         </div>
 
-        {/* Action Controls */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
+        {/* Tarjeta de lectura con el botón 'Leer' (Exclusivo para Isaías) */}
+        <div className="mt-8 flex items-center justify-center w-full px-4">
           {isCompleted && (
-            <>
-              {/* Enter User Response */}
+            <motion.div
+              id="tarjeta-lectura-isaias"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-md p-4 sm:p-5 rounded-2xl border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+              style={{
+                backgroundColor: 'rgba(3, 14, 33, 0.92)',
+                borderColor: 'rgba(0, 229, 255, 0.35)',
+              }}
+            >
+              <div className="flex items-center space-x-3.5 text-left w-full sm:w-auto">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border bg-[#0077B6]/50 border-[#00B4D8]/50 text-[#00E5FF]">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-serif font-medium text-[#FAF8F5]">Texto Personal</h4>
+                  <p className="text-xs text-[#90E0EF]">Palabras dedicadas por Ronald</p>
+                </div>
+              </div>
               <motion.button
-                id="btn-isaias-enter-response"
+                id="btn-isaias-read-text"
                 type="button"
-                onClick={onProceedToResponse}
-                initial={{ opacity: 0, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#0077B6] via-[#00B4D8] to-[#00E5FF] hover:from-[#00B4D8] hover:to-[#90E0EF] text-[#030914] text-xs font-semibold tracking-wider uppercase shadow-[0_0_24px_rgba(0,229,255,0.4)] transition-all hover:scale-102 cursor-pointer"
+                onClick={onProceedToReading || onProceedToResponse}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#0077B6] via-[#00B4D8] to-[#00E5FF] hover:from-[#00B4D8] hover:to-[#90E0EF] text-[#030914] text-xs font-semibold tracking-wider uppercase shadow-[0_0_20px_rgba(0,229,255,0.45)] transition-all cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4 text-[#030914]" />
-                <span>Mi respuesta</span>
+                <BookOpen className="w-4 h-4 text-inherit" />
+                <span>Leer</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.2]" />
               </motion.button>
-
-              {/* View Personal Message from Admin */}
-              {onBackToReading && (
-                <button
-                  id="btn-isaias-view-message"
-                  type="button"
-                  onClick={onBackToReading}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#0077B6]/40 hover:border-[#00B4D8] bg-[#07172B]/50 hover:bg-[#0C2442] text-[#90E0EF] hover:text-[#FFFFFF] text-xs transition-colors cursor-pointer"
-                  title="Mensaje"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>Mensaje</span>
-                </button>
-              )}
-
-              {/* Replay Bouquet Assembly */}
-              <button
-                id="btn-isaias-replay-bouquet"
-                type="button"
-                onClick={handleReplay}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#0077B6]/50 hover:border-[#00E5FF] bg-[#07172B]/70 hover:bg-[#0C2442] text-[#90E0EF] hover:text-[#FFFFFF] text-xs transition-colors cursor-pointer"
-                title="Volver a armar"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Volver a armar</span>
-              </button>
-            </>
+            </motion.div>
           )}
         </div>
       </div>

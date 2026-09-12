@@ -4,6 +4,7 @@ import { ArrowRight, RotateCcw, BookOpen, MessageSquare } from 'lucide-react';
 
 interface LucianaBouquetAnimationProps {
   mode?: 'formation' | 'result';
+  onProceedToReading?: () => void;
   onProceedToResponse?: () => void;
   onBackToReading?: () => void;
   onReplayFormation?: () => void;
@@ -19,6 +20,7 @@ type AssemblyStep =
 
 export const LucianaBouquetAnimation: React.FC<LucianaBouquetAnimationProps> = ({
   mode = 'formation',
+  onProceedToReading,
   onProceedToResponse,
   onBackToReading,
   onReplayFormation,
@@ -38,15 +40,15 @@ export const LucianaBouquetAnimation: React.FC<LucianaBouquetAnimationProps> = (
     setStep('stems-wrap');
     setIsCompleted(false);
 
-    // Luciana's bespoke assembly sequence: Dark stems + Yellow foundation + Mystic Imperial Flower (Black, Electric Purple, Gold, White)
-    const t1 = setTimeout(() => setStep('yellow-flanks'), 2200);
-    const t2 = setTimeout(() => setStep('yellow-upper'), 4800);
-    const t3 = setTimeout(() => setStep('signature-mystic'), 7400);
-    const t4 = setTimeout(() => setStep('yellow-center-accents'), 10000);
+    // Luciana's bespoke assembly sequence: Dark stems + Yellow foundation + Mystic Imperial Flower
+    const t1 = setTimeout(() => setStep('yellow-flanks'), 2700);
+    const t2 = setTimeout(() => setStep('yellow-upper'), 5400);
+    const t3 = setTimeout(() => setStep('signature-mystic'), 8100);
+    const t4 = setTimeout(() => setStep('yellow-center-accents'), 10800);
     const t5 = setTimeout(() => {
       setStep('bouquet-complete');
       setIsCompleted(true);
-    }, 12800);
+    }, 13500);
 
     return () => {
       clearTimeout(t1);
@@ -63,14 +65,14 @@ export const LucianaBouquetAnimation: React.FC<LucianaBouquetAnimationProps> = (
     }
     setIsCompleted(false);
     setStep('stems-wrap');
-    setTimeout(() => setStep('yellow-flanks'), 2200);
-    setTimeout(() => setStep('yellow-upper'), 4800);
-    setTimeout(() => setStep('signature-mystic'), 7400);
-    setTimeout(() => setStep('yellow-center-accents'), 10000);
+    setTimeout(() => setStep('yellow-flanks'), 2700);
+    setTimeout(() => setStep('yellow-upper'), 5400);
+    setTimeout(() => setStep('signature-mystic'), 8100);
+    setTimeout(() => setStep('yellow-center-accents'), 10800);
     setTimeout(() => {
       setStep('bouquet-complete');
       setIsCompleted(true);
-    }, 12800);
+    }, 13500);
   };
 
   const isStepAtLeast = (target: AssemblyStep) => {
@@ -760,51 +762,42 @@ export const LucianaBouquetAnimation: React.FC<LucianaBouquetAnimationProps> = (
           </svg>
         </div>
 
-        {/* Action Controls */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
+        {/* Tarjeta de lectura con el botón 'Leer' (Exclusivo para Luciana) */}
+        <div className="mt-8 flex items-center justify-center w-full px-4">
           {isCompleted && (
-            <>
-              {/* Enter User Response */}
+            <motion.div
+              id="tarjeta-lectura-luciana"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-md p-4 sm:p-5 rounded-2xl border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+              style={{
+                backgroundColor: 'rgba(15, 12, 24, 0.92)',
+                borderColor: 'rgba(147, 51, 234, 0.35)',
+              }}
+            >
+              <div className="flex items-center space-x-3.5 text-left w-full sm:w-auto">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border bg-[#9333EA]/40 border-[#7E22CE]/40 text-[#F59E0B]">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-serif font-medium text-[#FAF8F5]">Texto Personal</h4>
+                  <p className="text-xs text-[#E9D5FF]">Palabras dedicadas por Ronald</p>
+                </div>
+              </div>
               <motion.button
-                id="btn-luciana-enter-response"
+                id="btn-luciana-read-text"
                 type="button"
-                onClick={onProceedToResponse}
-                initial={{ opacity: 0, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7E22CE] to-[#D97706] hover:from-[#7E22CE] hover:to-[#B45309] text-white text-xs font-semibold tracking-wider uppercase shadow-[0_0_24px_rgba(147,51,234,0.35)] transition-all hover:scale-102 cursor-pointer"
+                onClick={onProceedToReading || onProceedToResponse}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-7 py-3 rounded-full bg-gradient-to-r from-[#9333EA] via-[#7E22CE] to-[#D97706] hover:from-[#7E22CE] hover:to-[#B45309] text-white text-xs font-semibold tracking-wider uppercase shadow-[0_0_20px_rgba(147,51,234,0.45)] transition-all cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4 text-white" />
-                <span>Mi respuesta</span>
+                <BookOpen className="w-4 h-4 text-inherit" />
+                <span>Leer</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.2]" />
               </motion.button>
-
-              {/* View Personal Message from Admin */}
-              {onBackToReading && (
-                <button
-                  id="btn-luciana-view-message"
-                  type="button"
-                  onClick={onBackToReading}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#9333EA]/30 hover:border-[#9333EA] bg-[#FAF5FF]/10 hover:bg-[#FAF5FF]/20 text-[#D8B4FE] text-xs transition-colors cursor-pointer"
-                  title="Mensaje"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-[#D8B4FE]" />
-                  <span>Mensaje</span>
-                </button>
-              )}
-
-              {/* Replay Bouquet Assembly */}
-              <button
-                id="btn-luciana-replay-bouquet"
-                type="button"
-                onClick={handleReplay}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full border border-[#7E22CE]/40 hover:border-[#9333EA] bg-[#17082E]/70 hover:bg-[#2E1065]/80 text-[#D8B4FE] text-xs transition-colors cursor-pointer"
-                title="Volver a armar"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Volver a armar</span>
-              </button>
-            </>
+            </motion.div>
           )}
         </div>
       </div>
