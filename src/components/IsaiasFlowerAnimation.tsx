@@ -121,22 +121,6 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
     }, 13800);
   };
 
-  // Subtle phase narratives (water, contrast, expressive depth, mystery)
-  const getPhaseDescription = () => {
-    switch (phase) {
-      case 'drop':
-        return 'Una gota pura en la quietud nocturna: calma en la superficie...';
-      case 'currents':
-        return 'Corrientes gemelas de agua: fluidez, reflejos ágiles y dirección...';
-      case 'shields':
-        return 'Arcos protectores de luz: precisión, instinto y equilibrio sereno...';
-      case 'petals':
-        return 'Los pétalos azul zafiro y cian se abren revelando la inquietud viva...';
-      case 'bloom':
-        return 'Flor Acuática de Reflejos. Misterio, agua viva, contrastes y energía en movimiento.';
-    }
-  };
-
   return (
     <div
       id="isaias-flower-animation-container"
@@ -154,19 +138,6 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
 
       {/* Main Botanical Canvas Area */}
       <div className="relative z-10 w-full max-w-lg flex flex-col items-center">
-        {/* Top subtle indicator badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-4 inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full border border-[#0077B6]/40 bg-[#07172B]/80 backdrop-blur-md shadow-xs"
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-          <span className="text-[11px] font-mono tracking-widest text-[#90E0EF] uppercase">
-            Floración Acuática Personalizada
-          </span>
-        </motion.div>
-
         {/* The Flower Stage: SVG Canvas */}
         <div className="relative w-[340px] h-[400px] sm:w-[390px] sm:h-[430px] flex items-center justify-center">
           <svg
@@ -243,22 +214,21 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
             </defs>
 
             {/* =========================================================
-                STAGE 1: WATER DROP & CONCENTRIC WAVES (Base en y=385)
+                STAGE 1: SCULPTED OBSIDIAN-GOLD WATER PEDESTAL & RIPPLES (Base en y=385)
                ========================================================= */}
             <g id="water-base-stage">
-              {/* Concentric Water Waves (Ondas concéntricas de Piscis) */}
-              {[42, 30, 18].map((radius, wIdx) => (
+              {/* Concentric Water Waves */}
+              {[48, 32, 20].map((radius, wIdx) => (
                 <motion.ellipse
                   key={`wave-${wIdx}`}
                   cx="200"
-                  cy="385"
+                  cy="388"
                   rx={radius * 1.8}
                   ry={radius * 0.45}
                   fill="none"
                   stroke="#00E5FF"
-                  strokeWidth="1"
-                  strokeOpacity="0.4"
-                  strokeDasharray={wIdx === 1 ? '3 3' : 'none'}
+                  strokeWidth="1.2"
+                  strokeOpacity="0.45"
                   initial={{ scale: 0.3, opacity: 0 }}
                   animate={{
                     scale: [0.8, 1.35, 1.8],
@@ -273,33 +243,49 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
                 />
               ))}
 
+              {/* Tiered Obsidian & Chiseled Gold Pedestal Footing */}
+              <ellipse
+                cx="200"
+                cy="392"
+                rx="62"
+                ry="14"
+                fill="#0A0F1D"
+                stroke="#FACC15"
+                strokeWidth="1.5"
+              />
+              <ellipse
+                cx="200"
+                cy="386"
+                rx="48"
+                ry="10"
+                fill="#0F172A"
+                stroke="#EAB308"
+                strokeWidth="1.2"
+              />
+              <ellipse
+                cx="200"
+                cy="383"
+                rx="30"
+                ry="6.5"
+                fill="#00E5FF"
+                stroke="#FFFFFF"
+                strokeWidth="0.8"
+                opacity="0.85"
+              />
+
               {/* Drop descent & contact point */}
               <motion.circle
                 cx="200"
-                cy="385"
+                cy="383"
                 r="6"
                 fill="url(#isaiasCyanAccent)"
                 initial={{ cy: 220, opacity: 0, scale: 0.5 }}
                 animate={{
-                  cy: phase === 'drop' ? [220, 385] : 385,
+                  cy: phase === 'drop' ? [220, 383] : 383,
                   opacity: 1,
                   scale: phase === 'drop' ? [0.6, 1.2, 0.9] : 0.8,
                 }}
                 transition={{ duration: 1.8, ease: 'easeIn' }}
-              />
-
-              {/* Empty Coin Halo (Humor sutil: "Casi nunca tiene plata") */}
-              <motion.circle
-                cx="235"
-                cy="390"
-                r="6"
-                fill="none"
-                stroke="#67E8F9"
-                strokeWidth="0.75"
-                strokeDasharray="2 2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: phase === 'bloom' ? [0.2, 0.5, 0.2] : 0 }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               />
             </g>
 
@@ -640,9 +626,9 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
                 <circle cx="200" cy="160" r="14" fill="#0077B6" />
                 <circle cx="200" cy="160" r="11" fill="#023E8A" stroke="#00E5FF" strokeWidth="0.8" />
 
-                {/* Exclusive Aquatic Botanical "25" Core for Isaías */}
+                {/* Exclusive Aquatic Botanical "24" Core for Isaías */}
                 <motion.g
-                  id="isaias-exclusive-25-core"
+                  id="isaias-exclusive-24-core"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{
                     scale: phase === 'bloom' || isFullyBloomed ? 1 : 0,
@@ -671,7 +657,7 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
                     fill="#06284F"
                   />
 
-                  {/* Perfectly centered 25 within the aquatic flower nucleus */}
+                  {/* Perfectly centered 24 within the aquatic flower nucleus */}
                   <text
                     x="200"
                     y="160.5"
@@ -687,7 +673,7 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
                       filter: 'drop-shadow(0 0 2.5px rgba(0, 229, 255, 0.75))',
                     }}
                   >
-                    25
+                    24
                   </text>
 
                   {/* Micro water glint highlight */}
@@ -733,23 +719,9 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
           </svg>
         </div>
 
-        {/* Phase Narrative & Symbolic Connection to Isaías */}
-        <div className="mt-4 text-center max-w-sm px-4">
-          <motion.p
-            key={phase}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.6 }}
-            className="text-xs sm:text-sm font-sans tracking-wide text-[#90E0EF] font-light leading-relaxed min-h-[44px]"
-          >
-            {getPhaseDescription()}
-          </motion.p>
-        </div>
-
         {/* Controls & Transition once fully bloomed */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
-          {isFullyBloomed ? (
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
+          {isFullyBloomed && (
             <>
               {/* Primary Action to Next Step: "Mi respuesta" */}
               <motion.button
@@ -792,20 +764,8 @@ export const IsaiasFlowerAnimation: React.FC<IsaiasFlowerAnimationProps> = ({
                 </button>
               )}
             </>
-          ) : (
-            <div className="flex items-center space-x-2 text-[11px] text-[#48CAE4] font-mono tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-ping" />
-              <span>Formando flor acuática de Isaías...</span>
-            </div>
           )}
         </div>
-
-        {/* Auto transition subtle notice for formation mode */}
-        {mode === 'formation' && isFullyBloomed && secondsRemaining > 0 && (
-          <p className="mt-3 text-[11px] text-[#48CAE4]/80 font-mono tracking-widest">
-            Transición automática en {secondsRemaining}s...
-          </p>
-        )}
       </div>
     </div>
   );
