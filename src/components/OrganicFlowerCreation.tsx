@@ -11,6 +11,7 @@ import { LucianaBouquetAnimation } from './LucianaBouquetAnimation';
 import { StanleyBouquetAnimation } from './StanleyBouquetAnimation';
 import { DileidysBouquetAnimation } from './DileidysBouquetAnimation';
 import { LeiryBouquetAnimation } from './LeiryBouquetAnimation';
+import { CarlosBouquetAnimation } from './CarlosBouquetAnimation';
 import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 
 interface OrganicFlowerCreationProps {
@@ -41,6 +42,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   const isStanley = experience.id === 'stanley' || experience.username?.toLowerCase() === 'stanley';
   const isDileidys = experience.id === 'dileidys' || experience.username?.toLowerCase() === 'dileidys';
   const isLeiry = experience.id?.toLowerCase() === 'leiry' || experience.username?.toLowerCase() === 'leiry' || experience.name?.toLowerCase().includes('leiry');
+  const isCarlos = experience.id?.toLowerCase() === 'carlos' || experience.username?.toLowerCase() === 'carlos' || experience.name?.toLowerCase().includes('carlos');
 
   // Jhon's Bespoke Handcrafted Bouquet of Yellow Blooms & Signature Cobalt/Thunder/Shadow Flower
   if (isJhon) {
@@ -176,6 +178,19 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   if (isLeiry) {
     return (
       <LeiryBouquetAnimation
+        mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
+        onProceedToResponse={onProceedToResponse}
+        onBackToReading={onBackToReading}
+        onReplayFormation={onReplayFormation}
+      />
+    );
+  }
+
+  // Carlos's Bespoke Handcrafted Bouquet: Ave del Paraíso Astral (Strelitzia Celestial in Azul Rey, Azul Noche, Negro y Ámbar)
+  if (isCarlos) {
+    return (
+      <CarlosBouquetAnimation
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}

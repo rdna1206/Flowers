@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, RotateCcw, BookOpen } from 'lucide-react';
+import { SaveFlowerButton } from './SaveFlowerButton';
 
 interface IsaiasBouquetAnimationProps {
   mode?: 'formation' | 'result';
@@ -152,6 +153,8 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
           className="relative w-[340px] h-[480px] sm:w-[420px] sm:h-[520px] flex items-center justify-center cursor-pointer group"
         >
           <svg
+            id="isaias-bouquet-svg"
+            data-flower-stage="true"
             viewBox="0 0 400 500"
             className="w-full h-full overflow-visible drop-shadow-[0_0_50px_rgba(0,180,216,0.4)]"
           >
@@ -1208,7 +1211,7 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
         </div>
 
         {/* Minimalist Action Controls: Clean & Direct */}
-        <div className="mt-8 flex items-center justify-center space-x-3 w-full px-4">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 w-full px-4">
           {isCompleted && (
             <>
               <motion.button
@@ -1224,6 +1227,15 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
               >
                 <RotateCcw className="w-4 h-4" />
               </motion.button>
+
+              {/* Guardar Flor Button */}
+              <SaveFlowerButton
+                userName="Isaias"
+                stageContainerId="isaias-bouquet-container"
+                animationDurationMs={19600}
+                onReplayAnimation={handleReplay}
+                ambientGlow="rgba(6, 182, 212, 0.28)"
+              />
 
               <motion.button
                 id="btn-isaias-read-text"

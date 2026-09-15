@@ -57,6 +57,7 @@ const DEFAULT_PASSWORDS: Record<string, string> = {
   stanley: '123456',
   dileidys: '123456',
   leiry: '123456',
+  carlos: '123456',
 };
 
 /**
@@ -131,6 +132,40 @@ export async function ensureCloudDatabaseSeeded(): Promise<void> {
       });
       await Promise.all(batchPromises);
       console.log('✅ Base de datos sembrada con', INITIAL_USERS.length, 'usuarios.');
+    } else {
+      // Sync any newly added users (like Carlos) that do not exist yet in Firestore
+      const existingIds = new Set(snap.docs.map((d) => d.id.toLowerCase()));
+      const syncPromises: Promise<any>[] = [];
+      for (const user of INITIAL_USERS) {
+        const cleanId = user.id.toLowerCase();
+        if (!existingIds.has(cleanId)) {
+          syncPromises.push(
+            setDoc(doc(db, USERS_COLLECTION, cleanId), {
+              ...user,
+              id: cleanId,
+              createdAt: user.createdAt || new Date().toISOString(),
+              updatedAt: user.updatedAt || new Date().toISOString(),
+            })
+          );
+          const defaultPass = DEFAULT_PASSWORDS[cleanId] || '123456';
+          syncPromises.push(
+            hashPassword(defaultPass).then((initialHash) =>
+              setDoc(
+                doc(db, CREDENTIALS_COLLECTION, cleanId),
+                {
+                  hash: initialHash,
+                  updatedAt: new Date().toISOString(),
+                },
+                { merge: true }
+              )
+            )
+          );
+        }
+      }
+      if (syncPromises.length > 0) {
+        await Promise.all(syncPromises);
+        console.log('✅ Nuevos perfiles sincronizados en Firestore.');
+      }
     }
   } catch (err) {
     console.warn('⚠️ No se pudo verificar la siembra inicial en la nube:', err);

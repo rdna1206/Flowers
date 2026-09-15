@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, RotateCcw, BookOpen, MessageSquare } from 'lucide-react';
+import { SaveFlowerButton } from './SaveFlowerButton';
 
 interface HanniaBouquetAnimationProps {
   mode?: 'formation' | 'result';
@@ -103,6 +104,8 @@ export const HanniaBouquetAnimation: React.FC<HanniaBouquetAnimationProps> = ({
       <div className="relative z-10 w-full max-w-lg flex flex-col items-center justify-center">
         <div className="relative w-[340px] h-[400px] sm:w-[420px] sm:h-[480px] flex items-center justify-center">
           <svg
+            id="hannia-bouquet-svg"
+            data-flower-stage="true"
             viewBox="0 0 500 500"
             className="w-full h-full overflow-visible drop-shadow-[0_4px_30px_rgba(236,72,153,0.18)]"
           >
@@ -760,24 +763,51 @@ export const HanniaBouquetAnimation: React.FC<HanniaBouquetAnimationProps> = ({
           </svg>
         </div>
 
-        {/* Acción directa y minimalista 'Leer' */}
-        <div className="mt-8 flex items-center justify-center w-full px-4">
+        {/* Acciones directas y elegantes */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 w-full px-4">
           {isCompleted && (
-            <motion.button
-              id="btn-hannia-read-text"
-              type="button"
-              onClick={onProceedToReading || onProceedToResponse}
-              initial={{ opacity: 0, y: 14, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center justify-center space-x-2.5 px-8 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#FAF8F5] text-xs font-semibold tracking-widest uppercase shadow-[0_0_25px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all cursor-pointer"
-            >
-              <BookOpen className="w-4 h-4 text-[#F472B6]" />
-              <span>Leer</span>
-              <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
-            </motion.button>
+            <>
+              {/* Replay Formation Button */}
+              <motion.button
+                id="btn-hannia-replay-formation"
+                type="button"
+                onClick={handleReplay}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ duration: 0.4 }}
+                title="Repetir animación"
+                className="inline-flex items-center justify-center p-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#F472B6] shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4 text-[#F472B6]" />
+              </motion.button>
+
+              {/* Guardar Flor Button */}
+              <SaveFlowerButton
+                userName="Hannia"
+                stageContainerId="hannia-bouquet-container"
+                animationDurationMs={12700}
+                onReplayAnimation={handleReplay}
+                ambientGlow="rgba(244, 114, 182, 0.28)"
+              />
+
+              <motion.button
+                id="btn-hannia-read-text"
+                type="button"
+                onClick={onProceedToReading || onProceedToResponse}
+                initial={{ opacity: 0, y: 14, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="inline-flex items-center justify-center space-x-2.5 px-8 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#FAF8F5] text-xs font-semibold tracking-widest uppercase shadow-[0_0_25px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all cursor-pointer"
+              >
+                <BookOpen className="w-4 h-4 text-[#F472B6]" />
+                <span>Leer</span>
+                <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
+              </motion.button>
+            </>
           )}
         </div>
       </div>

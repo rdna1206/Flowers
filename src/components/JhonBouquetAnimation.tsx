@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, RotateCcw, BookOpen, MessageSquare, Sparkles } from 'lucide-react';
+import { SaveFlowerButton } from './SaveFlowerButton';
 
 interface JhonBouquetAnimationProps {
   mode?: 'formation' | 'result';
@@ -212,6 +213,8 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
         {/* Bouquet Stage SVG */}
         <div className="relative w-[350px] h-[450px] sm:w-[410px] sm:h-[490px] flex items-center justify-center">
           <svg
+            id="jhon-bouquet-svg"
+            data-flower-stage="true"
             viewBox="0 0 420 500"
             className="w-full h-full overflow-visible drop-shadow-[0_15px_45px_rgba(0,0,0,0.85)]"
           >
@@ -1014,24 +1017,52 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
           </svg>
         </div>
 
-        {/* Acción directa y minimalista 'Leer' */}
-        <div className="mt-8 flex items-center justify-center w-full px-4">
+        {/* Acciones directas y elegantes */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 w-full px-4">
           {isCompleted && (
-            <motion.button
-              id="btn-jhon-read-text"
-              type="button"
-              onClick={onProceedToReading || onProceedToResponse}
-              initial={{ opacity: 0, y: 14, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center justify-center space-x-2.5 px-8 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#FAF8F5] text-xs font-semibold tracking-widest uppercase shadow-[0_0_25px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all cursor-pointer"
-            >
-              <BookOpen className="w-4 h-4 text-[#FBBF24]" />
-              <span>Leer</span>
-              <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
-            </motion.button>
+            <>
+              {/* Replay Formation Button */}
+              <motion.button
+                id="btn-jhon-replay-formation"
+                type="button"
+                onClick={handleReplay}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ duration: 0.4 }}
+                title="Repetir animación"
+                className="inline-flex items-center justify-center p-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#93C5FD] shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4 text-[#FBBF24]" />
+              </motion.button>
+
+              {/* Guardar Flor Button */}
+              <SaveFlowerButton
+                userName="Jhon"
+                stageContainerId="jhon-bouquet-container"
+                animationDurationMs={21000}
+                onReplayAnimation={handleReplay}
+                ambientGlow="rgba(59, 130, 246, 0.28)"
+              />
+
+              {/* Direct Read Button */}
+              <motion.button
+                id="btn-jhon-read-text"
+                type="button"
+                onClick={onProceedToReading || onProceedToResponse}
+                initial={{ opacity: 0, y: 14, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="inline-flex items-center justify-center space-x-2.5 px-8 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-white/20 text-[#FAF8F5] text-xs font-semibold tracking-widest uppercase shadow-[0_0_25px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all cursor-pointer"
+              >
+                <BookOpen className="w-4 h-4 text-[#FBBF24]" />
+                <span>Leer</span>
+                <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
+              </motion.button>
+            </>
           )}
         </div>
       </div>
