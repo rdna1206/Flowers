@@ -70,6 +70,7 @@ export function findFlowerSvg(containerId?: string, fallbackElement?: SVGSVGElem
   const selectors = [
     '#active-flower-svg-stage',
     '[data-flower-stage="true"]',
+    '#keicy-bouquet-svg',
     '#carlos-bouquet-svg',
     '#jhon-bouquet-svg',
     '#isaias-bouquet-svg',

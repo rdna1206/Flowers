@@ -58,6 +58,7 @@ const DEFAULT_PASSWORDS: Record<string, string> = {
   dileidys: '123456',
   leiry: '123456',
   carlos: '123456',
+  keicy: '123456',
 };
 
 /**
