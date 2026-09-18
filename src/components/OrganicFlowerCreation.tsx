@@ -13,6 +13,7 @@ import { DileidysBouquetAnimation } from './DileidysBouquetAnimation';
 import { LeiryBouquetAnimation } from './LeiryBouquetAnimation';
 import { CarlosBouquetAnimation } from './CarlosBouquetAnimation';
 import { KeicyBouquetAnimation } from './KeicyBouquetAnimation';
+import { PaulaBouquetAnimation } from './PaulaBouquetAnimation';
 import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 
 interface OrganicFlowerCreationProps {
@@ -45,6 +46,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   const isLeiry = experience.id?.toLowerCase() === 'leiry' || experience.username?.toLowerCase() === 'leiry' || experience.name?.toLowerCase().includes('leiry');
   const isCarlos = experience.id?.toLowerCase() === 'carlos' || experience.username?.toLowerCase() === 'carlos' || experience.name?.toLowerCase().includes('carlos');
   const isKeicy = experience.id?.toLowerCase() === 'keicy' || experience.username?.toLowerCase() === 'keicy' || experience.name?.toLowerCase().includes('keicy');
+  const isPaula = experience.id?.toLowerCase() === 'paula' || experience.username?.toLowerCase() === 'paula' || experience.name?.toLowerCase().includes('paula');
 
   // Jhon's Bespoke Handcrafted Bouquet of Yellow Blooms & Signature Cobalt/Thunder/Shadow Flower
   if (isJhon) {
@@ -206,6 +208,19 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   if (isKeicy) {
     return (
       <KeicyBouquetAnimation
+        mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
+        onProceedToResponse={onProceedToResponse}
+        onBackToReading={onBackToReading}
+        onReplayFormation={onReplayFormation}
+      />
+    );
+  }
+
+  // Paula's Bespoke Handcrafted Bouquet: Abundant Yellow Blooms with Signature Corola Escarlata y Cáliz Imperial (Rosa, Lila y Rojo)
+  if (isPaula) {
+    return (
+      <PaulaBouquetAnimation
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
