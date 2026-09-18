@@ -14,6 +14,7 @@ import { LeiryBouquetAnimation } from './LeiryBouquetAnimation';
 import { CarlosBouquetAnimation } from './CarlosBouquetAnimation';
 import { KeicyBouquetAnimation } from './KeicyBouquetAnimation';
 import { PaulaBouquetAnimation } from './PaulaBouquetAnimation';
+import { AnelimBouquetAnimation } from './AnelimBouquetAnimation';
 import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 
 interface OrganicFlowerCreationProps {
@@ -47,6 +48,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   const isCarlos = experience.id?.toLowerCase() === 'carlos' || experience.username?.toLowerCase() === 'carlos' || experience.name?.toLowerCase().includes('carlos');
   const isKeicy = experience.id?.toLowerCase() === 'keicy' || experience.username?.toLowerCase() === 'keicy' || experience.name?.toLowerCase().includes('keicy');
   const isPaula = experience.id?.toLowerCase() === 'paula' || experience.username?.toLowerCase() === 'paula' || experience.name?.toLowerCase().includes('paula');
+  const isAnelim = experience.id?.toLowerCase() === 'anelim' || experience.username?.toLowerCase() === 'anelim' || experience.name?.toLowerCase().includes('anelim');
 
   // Jhon's Bespoke Handcrafted Bouquet of Yellow Blooms & Signature Cobalt/Thunder/Shadow Flower
   if (isJhon) {
@@ -221,6 +223,19 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   if (isPaula) {
     return (
       <PaulaBouquetAnimation
+        mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
+        onProceedToResponse={onProceedToResponse}
+        onBackToReading={onBackToReading}
+        onReplayFormation={onReplayFormation}
+      />
+    );
+  }
+
+  // Anelim's Bespoke Handcrafted Bouquet: Abundant Yellow Blooms with Signature Corola Flamígera Astral (Rojo y Rosa)
+  if (isAnelim) {
+    return (
+      <AnelimBouquetAnimation
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
