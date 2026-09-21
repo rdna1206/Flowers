@@ -68,6 +68,7 @@ const DEFAULT_PASSWORDS: Record<string, string> = {
   keicy: '123456',
   paula: 'Paula',
   anelim: 'anelim',
+  gabriel: 'gabriel',
 };
 
 /**

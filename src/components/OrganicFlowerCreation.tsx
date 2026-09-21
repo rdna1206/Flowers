@@ -15,6 +15,7 @@ import { CarlosBouquetAnimation } from './CarlosBouquetAnimation';
 import { KeicyBouquetAnimation } from './KeicyBouquetAnimation';
 import { PaulaBouquetAnimation } from './PaulaBouquetAnimation';
 import { AnelimBouquetAnimation } from './AnelimBouquetAnimation';
+import { GabrielBouquetAnimation } from './GabrielBouquetAnimation';
 import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 
 interface OrganicFlowerCreationProps {
@@ -49,6 +50,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   const isKeicy = experience.id?.toLowerCase() === 'keicy' || experience.username?.toLowerCase() === 'keicy' || experience.name?.toLowerCase().includes('keicy');
   const isPaula = experience.id?.toLowerCase() === 'paula' || experience.username?.toLowerCase() === 'paula' || experience.name?.toLowerCase().includes('paula');
   const isAnelim = experience.id?.toLowerCase() === 'anelim' || experience.username?.toLowerCase() === 'anelim' || experience.name?.toLowerCase().includes('anelim');
+  const isGabriel = experience.id?.toLowerCase() === 'gabriel' || experience.username?.toLowerCase() === 'gabriel' || experience.name?.toLowerCase().includes('gabriel');
 
   // Jhon's Bespoke Handcrafted Bouquet of Yellow Blooms & Signature Cobalt/Thunder/Shadow Flower
   if (isJhon) {
@@ -237,6 +239,19 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   if (isAnelim) {
     return (
       <AnelimBouquetAnimation
+        mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
+        onProceedToResponse={onProceedToResponse}
+        onBackToReading={onBackToReading}
+        onReplayFormation={onReplayFormation}
+      />
+    );
+  }
+
+  // Gabriel's Bespoke Handcrafted Bouquet: Abundant Yellow Blooms & Signature Blue-Black Flower with Number 13
+  if (isGabriel) {
+    return (
+      <GabrielBouquetAnimation
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
