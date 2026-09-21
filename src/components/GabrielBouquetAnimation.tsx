@@ -15,10 +15,11 @@ type AssemblyStep =
   | 'aurora-glow'
   | 'yellow-stems-and-leaves'
   | 'yellow-blooms-opening'
-  | 'blue-black-pedicel-ascent'
+  | 'blue-black-aura-awakens'
   | 'blue-black-outer-unfold'
   | 'blue-black-mid-unfold'
   | 'blue-black-inner-unfold'
+  | 'blue-black-corona-unfold'
   | 'number-13-reveal'
   | 'bouquet-complete';
 
@@ -47,16 +48,17 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
 
     const timers = [
       setTimeout(() => setStep('yellow-stems-and-leaves'), 1600),
-      setTimeout(() => setStep('yellow-blooms-opening'), 3600),
-      setTimeout(() => setStep('blue-black-pedicel-ascent'), 6000),
-      setTimeout(() => setStep('blue-black-outer-unfold'), 8000),
-      setTimeout(() => setStep('blue-black-mid-unfold'), 9800),
-      setTimeout(() => setStep('blue-black-inner-unfold'), 11400),
-      setTimeout(() => setStep('number-13-reveal'), 13000),
+      setTimeout(() => setStep('yellow-blooms-opening'), 3400),
+      setTimeout(() => setStep('blue-black-aura-awakens'), 5600),
+      setTimeout(() => setStep('blue-black-outer-unfold'), 7400),
+      setTimeout(() => setStep('blue-black-mid-unfold'), 9200),
+      setTimeout(() => setStep('blue-black-inner-unfold'), 10800),
+      setTimeout(() => setStep('blue-black-corona-unfold'), 12200),
+      setTimeout(() => setStep('number-13-reveal'), 13600),
       setTimeout(() => {
         setStep('bouquet-complete');
         setIsCompleted(true);
-      }, 14500),
+      }, 15200),
     ];
 
     timerRefs.current = timers;
@@ -88,10 +90,11 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
       'aurora-glow',
       'yellow-stems-and-leaves',
       'yellow-blooms-opening',
-      'blue-black-pedicel-ascent',
+      'blue-black-aura-awakens',
       'blue-black-outer-unfold',
       'blue-black-mid-unfold',
       'blue-black-inner-unfold',
+      'blue-black-corona-unfold',
       'number-13-reveal',
       'bouquet-complete',
     ];
@@ -104,18 +107,18 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
       className="relative z-10 w-full min-h-[85vh] flex flex-col items-center justify-center py-6 sm:py-10 px-3 sm:px-6 overflow-hidden transition-all duration-1000 select-none"
       style={{
         background:
-          'radial-gradient(circle at 50% 38%, rgba(37, 99, 235, 0.25) 0%, rgba(250, 204, 21, 0.14) 40%, rgba(8, 12, 20, 0.98) 85%)',
+          'radial-gradient(circle at 50% 38%, rgba(37, 99, 235, 0.28) 0%, rgba(250, 204, 21, 0.14) 42%, rgba(8, 12, 20, 0.98) 85%)',
       }}
     >
-      {/* Background Ambient Particles */}
+      {/* Background Ambient Particles & Atmospheric Volumetric Glow */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           animate={{
             scale: [1, 1.15, 1],
-            opacity: [0.3, 0.5, 0.3],
+            opacity: [0.35, 0.55, 0.35],
           }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] rounded-full blur-[90px] bg-blue-600/20 pointer-events-none"
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] rounded-full blur-[95px] bg-blue-600/25 pointer-events-none"
         />
         <motion.div
           animate={{
@@ -132,20 +135,27 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
         <div className="relative w-full flex items-center justify-center">
           <svg
             viewBox="0 0 400 520"
-            className="w-full h-auto max-w-[360px] sm:max-w-[420px] drop-shadow-[0_15px_35px_rgba(0,0,0,0.8)]"
+            className="w-full h-auto max-w-[360px] sm:max-w-[420px] drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)]"
             style={{ overflow: 'visible' }}
           >
             <defs>
-              {/* Filters */}
-              <filter id="gabrielGlow13" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="2.5" result="blur" />
+              {/* =========================================================
+                  LIGHTING, SHADOW & GLOW FILTERS
+                 ========================================================= */}
+              <filter id="gabrielGlow13" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
+              <filter id="gabrielDropShadow3D" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#000000" floodOpacity="0.9" />
+              </filter>
               <filter id="gabrielPetalShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.6" />
+                <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#020617" floodOpacity="0.85" />
               </filter>
 
-              {/* Gradients for Yellow Blooms */}
+              {/* =========================================================
+                  YELLOW BLOOMS GRADIENTS
+                 ========================================================= */}
               <radialGradient id="gabrielYellowSunburst" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="#FEF08A" />
                 <stop offset="50%" stopColor="#FACC15" />
@@ -165,43 +175,60 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                 <stop offset="100%" stopColor="#78350F" />
               </radialGradient>
 
-              {/* Gradients for Blue & Black Special Flower */}
-              <linearGradient id="gabrielBlackPetal" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1E293B" />
-                <stop offset="40%" stopColor="#0F172A" />
-                <stop offset="85%" stopColor="#020617" />
-                <stop offset="100%" stopColor="#000000" />
-              </linearGradient>
+              {/* =========================================================
+                  GABRIEL'S SIGNATURE BLUE & BLACK SPECIAL FLOWER GRADIENTS
+                 ========================================================= */}
+              {/* Volumetric Radial Aura for Special Flower Core */}
+              <radialGradient id="gabrielBlueBlackAura" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.9" />
+                <stop offset="35%" stopColor="#1E40AF" stopOpacity="0.65" />
+                <stop offset="70%" stopColor="#0F172A" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#020617" stopOpacity="0" />
+              </radialGradient>
 
-              <linearGradient id="gabrielMidnightBluePetal" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#2563EB" />
-                <stop offset="50%" stopColor="#1E3A8A" />
-                <stop offset="90%" stopColor="#0F172A" />
+              {/* Tier 1 Outer Petal: Obsidian Black Base -> Cobalt Blue Body -> Sapphire Highlight -> Midnight Tip */}
+              <linearGradient id="gabrielOuterPetalGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+                <stop offset="0%" stopColor="#020617" />
+                <stop offset="25%" stopColor="#0F172A" />
+                <stop offset="55%" stopColor="#1D4ED8" />
+                <stop offset="82%" stopColor="#3B82F6" />
                 <stop offset="100%" stopColor="#020617" />
               </linearGradient>
 
-              <linearGradient id="gabrielCobaltSapphire" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#60A5FA" />
-                <stop offset="45%" stopColor="#3B82F6" />
-                <stop offset="80%" stopColor="#1D4ED8" />
+              {/* Tier 2 Mid Petal: Jet Black Accent -> Rich Cobalt -> Electric Azure */}
+              <linearGradient id="gabrielMidPetalGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#000000" />
+                <stop offset="30%" stopColor="#1E40AF" />
+                <stop offset="65%" stopColor="#2563EB" />
+                <stop offset="90%" stopColor="#60A5FA" />
                 <stop offset="100%" stopColor="#0F172A" />
               </linearGradient>
 
-              <radialGradient id="gabrielAzureSilkInner" cx="50%" cy="30%" r="70%">
+              {/* Tier 3 Inner Petal: Soft Silk Azure Radial Glow */}
+              <radialGradient id="gabrielInnerPetalGrad" cx="50%" cy="30%" r="75%">
                 <stop offset="0%" stopColor="#93C5FD" />
-                <stop offset="50%" stopColor="#3B82F6" />
-                <stop offset="90%" stopColor="#1E40AF" />
+                <stop offset="45%" stopColor="#3B82F6" />
+                <stop offset="80%" stopColor="#1E40AF" />
                 <stop offset="100%" stopColor="#020617" />
               </radialGradient>
 
-              <radialGradient id="gabrielCoreReceptacle" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#1E3A8A" />
-                <stop offset="45%" stopColor="#0F172A" />
-                <stop offset="85%" stopColor="#020617" />
+              {/* Tier 4 Corona Petal: Deep Sapphire to Jet Black */}
+              <linearGradient id="gabrielCoronaPetalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#60A5FA" />
+                <stop offset="50%" stopColor="#1D4ED8" />
+                <stop offset="100%" stopColor="#020617" />
+              </linearGradient>
+
+              {/* Core Receptacle Disc */}
+              <radialGradient id="gabrielCoreDisc" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#0F172A" />
+                <stop offset="60%" stopColor="#020617" />
                 <stop offset="100%" stopColor="#000000" />
               </radialGradient>
 
-              {/* Foliage & Wrap Gradients */}
+              {/* =========================================================
+                  FOLIAGE & WRAP GRADIENTS
+                 ========================================================= */}
               <linearGradient id="gabrielLeafEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#10B981" />
                 <stop offset="60%" stopColor="#047857" />
@@ -254,7 +281,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
               </g>
             )}
 
-            {/* Layer 3: Abundant Prominent Yellow Flowers */}
+            {/* Layer 3: Abundant Prominent Yellow Flowers (Protagonistas del Ramo) */}
             {isStepAtLeast('yellow-blooms-opening') && (
               <g id="gabriel-yellow-blooms">
                 {/* Yellow Bloom #1 - Top Left (cx: 135, cy: 160) */}
@@ -385,170 +412,266 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
               </g>
             )}
 
-            {/* Layer 4: CENTRAL SPECIAL FLOWER (AZUL Y NEGRO CON EL NÚMERO 13) */}
-            {isStepAtLeast('blue-black-pedicel-ascent') && (
-              <g id="gabriel-special-blue-black-flower">
-                {/* Special Stem */}
-                <path
-                  d="M 200,480 Q 200,340 200,220"
-                  stroke="#1D4ED8"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  fill="none"
-                />
+            {/* =========================================================
+                GABRIEL'S HIGHLY DETAILED & IMPOSING SPECIAL BLUE-BLACK FLOWER
+                - Anchored gracefully at (200, 205)
+                - Pure Blue & Black palette with multi-layered depth & contrast
+                - Integrated number 13 strictly in its exact center receptacle
+               ========================================================= */}
+            <g id="gabriel-special-blue-black-flower">
+              {/* Special Stem */}
+              <path
+                d="M 200,480 Q 200,340 200,205"
+                stroke="#1E3A8A"
+                strokeWidth="6.5"
+                strokeLinecap="round"
+                fill="none"
+              />
 
-                {/* Central Flower Group centered at (200, 220) */}
-                <g transform="translate(200, 220)">
-                  {/* Layer 1: Outer Obsidian Black & Midnight Blue Petals (8 Petals) */}
-                  {isStepAtLeast('blue-black-outer-unfold') && (
-                    <g id="special-outer-black-layer">
-                      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-                        <motion.g
-                          key={`blk-petal-${i}`}
-                          transform={`rotate(${angle})`}
-                          initial={{ scale: 0, rotate: -20, opacity: 0 }}
-                          animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                          transition={{ duration: 1.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                        >
-                          <path
-                            d="M 0,0 C -22,-45 -28,-75 0,-92 C 28,-75 22,-45 0,0 Z"
-                            fill="url(#gabrielBlackPetal)"
-                            stroke="#1E3A8A"
-                            strokeWidth="1.2"
-                            filter="url(#gabrielPetalShadow)"
-                          />
-                          <path
-                            d="M 0,0 C -12,-40 -15,-65 0,-82 C 15,-65 12,-40 0,0 Z"
-                            fill="url(#gabrielMidnightBluePetal)"
-                            opacity="0.65"
-                          />
-                        </motion.g>
-                      ))}
-                    </g>
-                  )}
+              {/* Central Flower Group centered at (200, 205) */}
+              <g transform="translate(200, 205)" filter="url(#gabrielDropShadow3D)">
 
-                  {/* Layer 2: Mid Cobalt & Sapphire Blue Petals (8 Petals Offset) */}
-                  {isStepAtLeast('blue-black-mid-unfold') && (
-                    <g id="special-mid-cobalt-layer">
-                      {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map((angle, i) => (
-                        <motion.g
-                          key={`mid-cobalt-${i}`}
-                          transform={`rotate(${angle})`}
-                          initial={{ scale: 0, rotate: 25, opacity: 0 }}
-                          animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                          transition={{ duration: 1.3, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                        >
-                          <path
-                            d="M 0,0 C -18,-35 -22,-60 0,-74 C 22,-60 18,-35 0,0 Z"
-                            fill="url(#gabrielCobaltSapphire)"
-                            stroke="#60A5FA"
-                            strokeWidth="1"
-                            filter="url(#gabrielPetalShadow)"
-                          />
-                          <path
-                            d="M 0,-10 C -8,-32 -10,-48 0,-60 C 10,-48 8,-32 0,-10 Z"
-                            fill="#0F172A"
-                            opacity="0.5"
-                          />
-                        </motion.g>
-                      ))}
-                    </g>
-                  )}
+                {/* 1. Volumetric Ambient Aura & Rotating Energy Rings */}
+                {isStepAtLeast('blue-black-aura-awakens') && (
+                  <g id="special-aura-layer">
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="105"
+                      fill="url(#gabrielBlueBlackAura)"
+                      className="pointer-events-none"
+                      initial={{ scale: 0.2, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 0.95 }}
+                      transition={{ duration: 1.8, ease: 'easeOut' }}
+                    />
+                    {/* Outer Rotating Dashed Ring */}
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="82"
+                      fill="none"
+                      stroke="#60A5FA"
+                      strokeWidth="1.2"
+                      strokeOpacity="0.5"
+                      strokeDasharray="4 8"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+                    />
+                    {/* Inner Counter-Rotating Dashed Ring */}
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="68"
+                      fill="none"
+                      stroke="#1E40AF"
+                      strokeWidth="1"
+                      strokeOpacity="0.4"
+                      strokeDasharray="2 6"
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 17, repeat: Infinity, ease: 'linear' }}
+                    />
+                  </g>
+                )}
 
-                  {/* Layer 3: Inner Azure & Silk Blue Petals (8 Petals) */}
-                  {isStepAtLeast('blue-black-inner-unfold') && (
-                    <g id="special-inner-azure-layer">
-                      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-                        <motion.g
-                          key={`inner-azure-${i}`}
-                          transform={`rotate(${angle})`}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 1.2, delay: i * 0.06 }}
-                        >
-                          <path
-                            d="M 0,0 C -14,-25 -16,-45 0,-54 C 16,-45 14,-25 0,0 Z"
-                            fill="url(#gabrielAzureSilkInner)"
-                            stroke="#93C5FD"
-                            strokeWidth="0.8"
-                          />
-                        </motion.g>
-                      ))}
-                    </g>
-                  )}
-
-                  {/* Layer 4: Receptacle Core & Integrated Number 13 */}
-                  {isStepAtLeast('number-13-reveal') && (
-                    <g id="special-flower-core-13">
-                      {/* Outer Ring */}
-                      <motion.circle
-                        cx="0"
-                        cy="0"
-                        r="26"
-                        fill="url(#gabrielCoreReceptacle)"
-                        stroke="#3B82F6"
-                        strokeWidth="2"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                      />
-
-                      {/* Inner Golden-Blue Ring */}
-                      <motion.circle
-                        cx="0"
-                        cy="0"
-                        r="19"
-                        fill="#020617"
-                        stroke="#FDE047"
-                        strokeWidth="1.2"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                      />
-
-                      {/* Glowing Pistil Dots */}
-                      {[0, 45, 90, 135, 180, 225, 270, 315].map((ang, k) => (
-                        <circle
-                          key={`dot-${k}`}
-                          cx={15 * Math.cos((ang * Math.PI) / 180)}
-                          cy={15 * Math.sin((ang * Math.PI) / 180)}
-                          r="1.5"
-                          fill="#60A5FA"
-                        />
-                      ))}
-
-                      {/* Integrated Number 13 strictly in the exact center */}
-                      <motion.text
-                        x="0"
-                        y="1"
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        fill="#FEF08A"
-                        fontSize="15"
-                        fontWeight="bold"
-                        fontFamily="Playfair Display, Georgia, serif"
-                        letterSpacing="1px"
-                        filter="url(#gabrielGlow13)"
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.9, delay: 0.4 }}
+                {/* TIER 1: OUTER LAYER - 12 GRAND LANCEOLATE PETALS (Grand Envergadura) */}
+                {isStepAtLeast('blue-black-outer-unfold') && (
+                  <g id="special-tier1-outer">
+                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
+                      <motion.g
+                        key={`t1-p-${i}`}
+                        transform={`rotate(${deg})`}
+                        initial={{ scale: 0, rotate: -25, opacity: 0 }}
+                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                        transition={{ duration: 1.6, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                       >
-                        13
-                      </motion.text>
-                    </g>
-                  )}
-                </g>
-              </g>
-            )}
+                        {/* Main Sculpted Outer Petal */}
+                        <path
+                          d="M 0,0 C -26,-35 -30,-80 0,-98 C 30,-80 26,-35 0,0 Z"
+                          fill="url(#gabrielOuterPetalGrad)"
+                          stroke="#020617"
+                          strokeWidth="1.2"
+                          filter="url(#gabrielPetalShadow)"
+                        />
+                        {/* Shadow Accent for 3D Overlap Depth */}
+                        <path
+                          d="M 0,0 C -26,-35 -30,-80 0,-98 C -10,-60 -5,-30 0,0 Z"
+                          fill="#000000"
+                          opacity="0.38"
+                        />
+                        {/* Lightning Crystalline Central Vein */}
+                        <path
+                          d="M 0,0 L 0,-88"
+                          stroke="#60A5FA"
+                          strokeWidth="1.2"
+                          strokeOpacity="0.85"
+                        />
+                        {/* Sapphire Highlight Tip Bead */}
+                        <circle cx="0" cy="-94" r="2.2" fill="#93C5FD" />
+                      </motion.g>
+                    ))}
+                  </g>
+                )}
 
-            {/* Subtle Magic Sparkles */}
+                {/* TIER 2: MID LAYER - 12 CURVED PETALS (Offset by 15 deg) */}
+                {isStepAtLeast('blue-black-mid-unfold') && (
+                  <g id="special-tier2-mid">
+                    {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg, i) => (
+                      <motion.g
+                        key={`t2-p-${i}`}
+                        transform={`rotate(${deg})`}
+                        initial={{ scale: 0, rotate: 20, opacity: 0 }}
+                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                        transition={{ duration: 1.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <path
+                          d="M 0,0 C -22,-28 -25,-64 0,-78 C 25,-64 22,-28 0,0 Z"
+                          fill="url(#gabrielMidPetalGrad)"
+                          stroke="#1E3A8A"
+                          strokeWidth="1"
+                          filter="url(#gabrielPetalShadow)"
+                        />
+                        {/* Inner Shadow Core */}
+                        <path
+                          d="M 0,0 C -12,-20 -15,-50 0,-62 C 15,-50 12,-20 0,0 Z"
+                          fill="#020617"
+                          opacity="0.4"
+                        />
+                        {/* Central Blue Rib */}
+                        <path
+                          d="M 0,0 L 0,-68"
+                          stroke="#93C5FD"
+                          strokeWidth="1"
+                          strokeOpacity="0.75"
+                        />
+                      </motion.g>
+                    ))}
+                  </g>
+                )}
+
+                {/* TIER 3: INNER COROLLA - 10 SILK AZURE PETALS (Offset by 18 deg) */}
+                {isStepAtLeast('blue-black-inner-unfold') && (
+                  <g id="special-tier3-inner">
+                    {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((deg, i) => (
+                      <motion.g
+                        key={`t3-p-${i}`}
+                        transform={`rotate(${deg + 18})`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 1.4, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <path
+                          d="M 0,0 C -18,-20 -20,-48 0,-58 C 20,-48 18,-20 0,0 Z"
+                          fill="url(#gabrielInnerPetalGrad)"
+                          stroke="#3B82F6"
+                          strokeWidth="0.9"
+                        />
+                      </motion.g>
+                    ))}
+                  </g>
+                )}
+
+                {/* TIER 4: CORONA OF FILAMENTS & MINI CALYX PETALS */}
+                {isStepAtLeast('blue-black-corona-unfold') && (
+                  <g id="special-tier4-corona">
+                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
+                      <motion.g
+                        key={`t4-c-${i}`}
+                        transform={`rotate(${deg + 7.5})`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 1.2, delay: i * 0.04 }}
+                      >
+                        {/* Mini Crown Petal */}
+                        <path
+                          d="M 0,0 C -10,-12 -10,-32 0,-38 C 10,-32 10,-12 0,0 Z"
+                          fill="url(#gabrielCoronaPetalGrad)"
+                          stroke="#60A5FA"
+                          strokeWidth="0.8"
+                        />
+                        {/* Stamen Filament Line */}
+                        <line x1="0" y1="0" x2="0" y2="-32" stroke="#38BDF8" strokeWidth="1" opacity="0.85" />
+                        {/* Filament Anther Pearl */}
+                        <circle cx="0" cy="-32" r="2" fill="#60A5FA" stroke="#020617" strokeWidth="0.5" />
+                      </motion.g>
+                    ))}
+                  </g>
+                )}
+
+                {/* RECEPTACLE CORE WITH THE INTEGRATED NUMBER 13 STRICTLY IN THE EXACT CENTER */}
+                {isStepAtLeast('number-13-reveal') && (
+                  <g id="special-flower-core-13">
+                    {/* Outer Obsidian Receptacle Ring */}
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="26"
+                      fill="#020617"
+                      stroke="#1D4ED8"
+                      strokeWidth="2.2"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                    />
+
+                    {/* Concentric Sapphire & Jet Black Disc */}
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="20"
+                      fill="url(#gabrielCoreDisc)"
+                      stroke="#3B82F6"
+                      strokeWidth="1.2"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, delay: 0.2 }}
+                    />
+
+                    {/* Inner Fine Accent Ring */}
+                    <circle cx="0" cy="0" r="15" fill="#000000" stroke="#60A5FA" strokeWidth="0.8" />
+
+                    {/* Glowing Pistil Dots framing the exact center */}
+                    {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((ang, k) => (
+                      <circle
+                        key={`pistil-dot-${k}`}
+                        cx={13.5 * Math.cos((ang * Math.PI) / 180)}
+                        cy={13.5 * Math.sin((ang * Math.PI) / 180)}
+                        r="1.4"
+                        fill="#38BDF8"
+                      />
+                    ))}
+
+                    {/* Integrated Number 13 strictly in the exact center */}
+                    <motion.text
+                      x="0"
+                      y="1"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fill="#93C5FD"
+                      fontSize="16"
+                      fontWeight="bold"
+                      fontFamily="Playfair Display, Georgia, serif"
+                      letterSpacing="1px"
+                      filter="url(#gabrielGlow13)"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.9, delay: 0.35 }}
+                    >
+                      13
+                    </motion.text>
+                  </g>
+                )}
+
+              </g>
+            </g>
+
+            {/* Subtle Magic Sparkles around completed bouquet */}
             {isCompleted && (
               <g id="gabriel-sparkles">
                 <circle cx="160" cy="140" r="2" fill="#FEF08A" filter="url(#gabrielGlow13)" />
                 <circle cx="240" cy="140" r="2.2" fill="#93C5FD" filter="url(#gabrielGlow13)" />
                 <circle cx="110" cy="220" r="1.8" fill="#FDE047" filter="url(#gabrielGlow13)" />
                 <circle cx="290" cy="220" r="2" fill="#60A5FA" filter="url(#gabrielGlow13)" />
-                <circle cx="200" cy="120" r="2.5" fill="#FEF08A" filter="url(#gabrielGlow13)" />
+                <circle cx="200" cy="100" r="2.5" fill="#93C5FD" filter="url(#gabrielGlow13)" />
               </g>
             )}
           </svg>
@@ -578,9 +701,9 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
               <SaveFlowerButton
                 userName="Gabriel"
                 stageContainerId="gabriel-bouquet-container"
-                animationDurationMs={14500}
+                animationDurationMs={15200}
                 onReplayAnimation={handleReplay}
-                ambientGlow="rgba(37, 99, 235, 0.25)"
+                ambientGlow="rgba(37, 99, 235, 0.28)"
               />
 
               {/* Leer Button */}
