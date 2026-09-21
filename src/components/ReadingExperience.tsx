@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Flower2, ArrowRight, MessageSquare } from 'lucide-react';
 import { api } from '../lib/api';
+import { NeoRoneoPlayer } from './NeoRoneoPlayer';
 import type { UserExperienceData } from '../types';
 
 interface ReadingExperienceProps {
@@ -102,6 +103,16 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
           borderColor: borderColor,
         }}
       >
+        {/* Optional Music Player (e.g., Neo Roneo for Isaías) */}
+        {(experience.audioUrl || experience.id === 'isaias' || experience.username?.toLowerCase() === 'isaias') && (
+          <div className="mb-6 -mt-2">
+            <NeoRoneoPlayer
+              audioUrl={experience.audioUrl || '/audio/neo_roneo.mp3'}
+              isDarkTheme={isDarkTheme}
+            />
+          </div>
+        )}
+
         {hasText ? (
           <div>
             {/* The EXACT text from Ronald, strictly preserving all formatting, line breaks, spaces */}

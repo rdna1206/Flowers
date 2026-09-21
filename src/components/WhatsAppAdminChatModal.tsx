@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, X, CheckCheck, Trash2, AlertTriangle, Sparkles, MessageSquare } from 'lucide-react';
+import { Send, X, CheckCheck, Trash2, AlertTriangle, Sparkles, MessageSquare, Music } from 'lucide-react';
 import { api } from '../lib/api';
+import { NeoRoneoPlayer } from './NeoRoneoPlayer';
 import type { ChatMessage, UserRecord } from '../types';
 
 interface WhatsAppAdminChatModalProps {
@@ -21,9 +22,17 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
   const [isClearing, setIsClearing] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null);
+  const [showAudioPlayer, setShowAudioPlayer] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const hasAudio = Boolean(
+    user?.audioUrl ||
+    user?.id?.toLowerCase() === 'isaias' ||
+    user?.username?.toLowerCase() === 'isaias'
+  );
+  const effectiveAudioUrl = user?.audioUrl || '/audio/neo_roneo.mp3';
 
   // Personalized theme extraction from the user's custom flower profile
   const theme = user?.theme || {};
@@ -210,8 +219,23 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
               </div>
             </div>
 
-            {/* Actions: Clear Chat (for testing) + Close */}
+            {/* Actions: Audio Player Toggle + Clear Chat + Close */}
             <div className="flex items-center space-x-1.5">
+              {hasAudio && (
+                <button
+                  type="button"
+                  onClick={() => setShowAudioPlayer(!showAudioPlayer)}
+                  className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                    showAudioPlayer
+                      ? 'bg-[#00E5FF]/20 text-[#00E5FF] border-[#00E5FF]/50 shadow-[0_0_10px_rgba(0,229,255,0.3)]'
+                      : 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border-white/10'
+                  }`}
+                  title={showAudioPlayer ? 'Ocultar reproductor de música' : 'Mostrar reproductor NEO RONEO'}
+                >
+                  <Music className="w-4 h-4" />
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setShowClearConfirm(true)}
@@ -232,6 +256,13 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
               </button>
             </div>
           </div>
+
+          {/* Optional Audio Player Bar in Chat (Neo Roneo) */}
+          {hasAudio && showAudioPlayer && (
+            <div className="px-3 pt-2 pb-1 bg-[#09111D] border-b border-white/10 shrink-0">
+              <NeoRoneoPlayer audioUrl={effectiveAudioUrl} isDarkTheme={true} />
+            </div>
+          )}
 
           {/* Confirm Clear Chat Modal Banner */}
           {showClearConfirm && (
