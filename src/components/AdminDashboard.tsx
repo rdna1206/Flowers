@@ -27,6 +27,7 @@ import {
 import { api } from '../lib/api';
 import { subscribeToAdminAllUsers } from '../lib/firebase';
 import type { UserRecord, UserTheme, AdminUserResponseItem } from '../types';
+import { AdminChatSection } from './AdminChatSection';
 
 interface AdminDashboardProps {
   onSelectUserToPreview?: (username: string, passwordPlain?: string) => void;
@@ -34,7 +35,7 @@ interface AdminDashboardProps {
   isDarkTheme?: boolean;
 }
 
-type AdminTab = 'responses' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
+type AdminTab = 'responses' | 'chats' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSelectUserToPreview,
@@ -496,6 +497,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           type="button"
+          onClick={() => setActiveTab('chats')}
+          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
+            activeTab === 'chats'
+              ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
+              : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5 shrink-0 text-[#0284C7]" />
+          <span className="whitespace-nowrap">Chats en Tiempo Real</span>
+          <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-[#E0F2FE] text-[#0284C7] shrink-0">
+            Isaias
+          </span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('users')}
           className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'users'
@@ -627,6 +644,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         type="button"
                         onClick={() => {
                           setSelectedUserId(item.userId);
+                          setActiveTab('chats');
+                        }}
+                        className="inline-flex items-center space-x-1 text-[11px] text-[#0284C7] hover:bg-[#E0F2FE] px-2.5 py-1 rounded-md border border-[#BAE6FD] transition-colors cursor-pointer font-medium"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        <span>Chat en Vivo</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedUserId(item.userId);
                           setActiveTab('texts');
                         }}
                         className="text-[11px] text-[#937C67] hover:text-[#2C2926] hover:underline underline-offset-2 cursor-pointer"
@@ -655,6 +684,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* ========================================================
+          TAB: CHATS EN TIEMPO REAL (RONALD EXCLUSIVE)
+          ======================================================== */}
+      {activeTab === 'chats' && (
+        <AdminChatSection
+          users={users}
+          onSelectUserToPreview={(username) => {
+            if (onSelectUserToPreview) {
+              onSelectUserToPreview(username);
+            }
+          }}
+          onRefreshUsers={loadData}
+        />
       )}
 
       {/* ========================================================

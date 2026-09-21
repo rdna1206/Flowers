@@ -26,5 +26,13 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow read, write: if true;
     }
+
+    // 5. Chats and Messages Collection (Real-time conversation between user and admin)
+    match /chats/{chatId} {
+      allow read, write: if true;
+      match /messages/{messageId} {
+        allow read, write: if true;
+      }
+    }
   }
 }

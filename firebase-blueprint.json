@@ -48,6 +48,39 @@
         "submittedAt": { "type": "string" }
       },
       "required": ["userId", "name", "username", "response", "submittedAt"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "Chat session between user and admin",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "lastMessageText": { "type": "string" },
+        "lastMessageAt": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "userId"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Message inside a chat session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chatId": { "type": "string" },
+        "userId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderRole": { "type": "string", "enum": ["user", "admin"] },
+        "text": { "type": "string" },
+        "isOriginalResponse": { "type": "boolean" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "chatId", "senderId", "senderRole", "text", "createdAt"]
     }
   },
   "firestore": {
@@ -62,6 +95,14 @@
     "/responses/{responseId}": {
       "schema": { "$ref": "#/entities/UserResponse" },
       "description": "User submitted responses"
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/Chat" },
+      "description": "Chat metadata and summary"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Individual chat messages within a conversation"
     }
   }
 }

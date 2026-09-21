@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Send, CheckCircle2, Lock, Flower2, BookOpen } from 'lucide-react';
+import { Send, CheckCircle2, Lock, Flower2, BookOpen, MessageSquare } from 'lucide-react';
 import type { UserExperienceData, UserResponse } from '../types';
 
 interface UserResponseViewProps {
@@ -8,6 +8,7 @@ interface UserResponseViewProps {
   onSubmitResponse: (text: string) => Promise<UserResponse | null>;
   onBackToFlowers: () => void;
   onBackToReading: () => void;
+  onProceedToChat?: () => void;
 }
 
 export const UserResponseView: React.FC<UserResponseViewProps> = ({
@@ -15,6 +16,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   onSubmitResponse,
   onBackToFlowers,
   onBackToReading,
+  onProceedToChat,
 }) => {
   const isJhon = experience.id === 'jhon' || experience.username?.toLowerCase() === 'jhon';
   const theme = experience.theme || {};
@@ -58,6 +60,10 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       const res = await onSubmitResponse(responseText.trim());
       if (res) {
         setSubmittedResponse(res);
+        if (experience.id === 'isaias' && onProceedToChat) {
+          onProceedToChat();
+          return;
+        }
         setSuccessToast(true);
         setTimeout(() => setSuccessToast(false), 4500);
       }
@@ -208,6 +214,17 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Releer</span>
               </button>
+
+              {experience.id === 'isaias' && onProceedToChat && (
+                <button
+                  type="button"
+                  onClick={onProceedToChat}
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-xs py-2.5 px-5 rounded-full border border-[#00E5FF]/50 bg-[#0284C7]/20 hover:bg-[#0284C7]/40 text-[#00E5FF] transition-all cursor-pointer font-semibold shadow-[0_0_15px_rgba(0,229,255,0.2)]"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Conversación con Ronald</span>
+                </button>
+              )}
             </div>
           </div>
         ) : (

@@ -16,12 +16,16 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
+  query,
+  orderBy,
   Firestore,
 } from 'firebase/firestore';
 import type {
   UserRecord,
   UserResponse,
   UserSummary,
+  ChatMessage,
+  ChatSummary,
 } from '../types';
 import { INITIAL_USERS } from '../data/initialUsers';
 
@@ -43,6 +47,8 @@ export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseI
 const USERS_COLLECTION = 'users';
 const CREDENTIALS_COLLECTION = 'credentials';
 const RESPONSES_COLLECTION = 'responses';
+const CHATS_COLLECTION = 'chats';
+const MESSAGES_COLLECTION = 'messages';
 
 const DEFAULT_PASSWORDS: Record<string, string> = {
   ronald: '1146534949',
@@ -378,9 +384,187 @@ export async function submitAuthenticatedUserResponse(
       submittedAt: userResponse.submittedAt,
     });
 
+    // 3. Initialize real-time chat with original response as message #1
+    await initUserChatWithOriginalResponse(user, userResponse.text, userResponse.submittedAt);
+
     return userResponse;
   } catch (err) {
     handleFirestoreError(err, 'update', `${USERS_COLLECTION}/${user.id}`);
+  }
+}
+
+/**
+ * Initialize or sync user's chat with their original response (IMMUTABLE message #1)
+ */
+export async function initUserChatWithOriginalResponse(
+  user: UserRecord,
+  responseText: string,
+  submittedAt: string
+): Promise<void> {
+  const normId = user.id.toLowerCase();
+  const chatRef = doc(db, CHATS_COLLECTION, normId);
+  const msgRef = doc(db, CHATS_COLLECTION, normId, MESSAGES_COLLECTION, 'original_response');
+
+  try {
+    // Check if original response message already exists (Idempotent: prevents duplicate)
+    const msgSnap = await getDoc(msgRef);
+    if (!msgSnap.exists()) {
+      const originalMsg: ChatMessage = {
+        id: 'original_response',
+        chatId: normId,
+        userId: normId,
+        senderId: normId,
+        senderName: user.name,
+        senderRole: 'user',
+        text: responseText.trim(),
+        isOriginalResponse: true,
+        read: false,
+        createdAt: submittedAt,
+      };
+      await setDoc(msgRef, originalMsg);
+    }
+
+    // Set or merge chat header doc
+    await setDoc(
+      chatRef,
+      {
+        id: normId,
+        userId: normId,
+        userName: user.name,
+        lastMessageText: responseText.trim(),
+        lastMessageAt: submittedAt,
+        createdAt: submittedAt,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn('Could not initialize chat document in Firestore:', err);
+  }
+}
+
+/**
+ * Ensures chat has original response if user already submitted one earlier
+ */
+export async function ensureChatInitialized(user: UserRecord): Promise<void> {
+  if (user.userResponse && user.userResponse.text) {
+    await initUserChatWithOriginalResponse(user, user.userResponse.text, user.userResponse.submittedAt);
+  }
+}
+
+/**
+ * Send a new real-time message in Firestore
+ */
+export async function sendChatMessage(
+  chatId: string,
+  message: {
+    senderId: string;
+    senderName: string;
+    senderRole: 'user' | 'admin';
+    text: string;
+  }
+): Promise<ChatMessage> {
+  const normChatId = chatId.trim().toLowerCase();
+  const msgId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  const now = new Date().toISOString();
+
+  const newMsg: ChatMessage = {
+    id: msgId,
+    chatId: normChatId,
+    userId: normChatId,
+    senderId: message.senderId,
+    senderName: message.senderName,
+    senderRole: message.senderRole,
+    text: message.text.trim(),
+    isOriginalResponse: false,
+    read: false,
+    createdAt: now,
+  };
+
+  try {
+    const msgRef = doc(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION, msgId);
+    await setDoc(msgRef, newMsg);
+
+    // Update parent chat summary for real-time list
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    await setDoc(
+      chatRef,
+      {
+        id: normChatId,
+        userId: normChatId,
+        lastMessageText: newMsg.text,
+        lastMessageAt: now,
+        updatedAt: now,
+      },
+      { merge: true }
+    );
+
+    return newMsg;
+  } catch (err) {
+    handleFirestoreError(err, 'create', `${CHATS_COLLECTION}/${normChatId}/${MESSAGES_COLLECTION}/${msgId}`);
+  }
+}
+
+/**
+ * Real-time subscription to a single conversation's messages
+ */
+export function subscribeToChatMessages(
+  chatId: string,
+  onUpdate: (messages: ChatMessage[]) => void,
+  onError?: (err: Error) => void
+): () => void {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const messagesRef = collection(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION);
+    const q = query(messagesRef, orderBy('createdAt', 'asc'));
+
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const msgs: ChatMessage[] = [];
+        snapshot.forEach((docSnap) => {
+          msgs.push(docSnap.data() as ChatMessage);
+        });
+        onUpdate(msgs);
+      },
+      (err) => {
+        console.warn(`Error in chat snapshot for ${normChatId}:`, err);
+        if (onError) onError(err);
+      }
+    );
+  } catch (err: any) {
+    console.warn(`Setup error in chat snapshot for ${normChatId}:`, err);
+    return () => {};
+  }
+}
+
+/**
+ * Real-time subscription to all conversations for Ronald
+ */
+export function subscribeToAllChats(
+  onUpdate: (chats: ChatSummary[]) => void,
+  onError?: (err: Error) => void
+): () => void {
+  try {
+    const chatsRef = collection(db, CHATS_COLLECTION);
+    return onSnapshot(
+      chatsRef,
+      (snapshot) => {
+        const list: ChatSummary[] = [];
+        snapshot.forEach((docSnap) => {
+          list.push(docSnap.data() as ChatSummary);
+        });
+        list.sort((a, b) => (b.lastMessageAt || b.updatedAt || '').localeCompare(a.lastMessageAt || a.updatedAt || ''));
+        onUpdate(list);
+      },
+      (err) => {
+        console.warn('Error in all chats snapshot:', err);
+        if (onError) onError(err);
+      }
+    );
+  } catch (err) {
+    console.warn('Setup error in all chats snapshot:', err);
+    return () => {};
   }
 }
 

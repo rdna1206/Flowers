@@ -56,6 +56,7 @@ export interface UserRecord {
   flowerConfig: FlowerConfig;
   generatedFormulation: FlowerFormulation | null;
   userResponse?: UserResponse | null;
+  audioUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -78,6 +79,33 @@ export interface UserExperienceData {
   flowerConfig?: FlowerConfig;
   savedFormulation: FlowerFormulation | null;
   userResponse?: UserResponse | null;
+  audioUrl?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  userId: string;
+  senderId: string;
+  senderName: string;
+  senderRole: 'user' | 'admin';
+  text: string;
+  isOriginalResponse?: boolean;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface ChatSummary {
+  id: string;
+  userId: string;
+  userName: string;
+  lastMessageText?: string;
+  lastMessageAt?: string;
+  unreadCountForAdmin?: number;
+  unreadCountForUser?: number;
+  originalResponse?: UserResponse | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminUserResponseItem {

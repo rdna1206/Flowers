@@ -217,6 +217,7 @@ export const INITIAL_USERS: UserRecord[] = [
     },
     generatedFormulation: null,
     userResponse: null,
+    audioUrl: '/audio/neo_roneo.mp3',
     createdAt: '2026-09-11T00:00:00.000Z',
     updatedAt: '2026-09-11T00:00:00.000Z',
   },

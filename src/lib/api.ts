@@ -5,6 +5,8 @@ import type {
   UserRecord,
   UserResponse,
   AdminUserResponseItem,
+  ChatMessage,
+  ChatSummary,
 } from '../types';
 import {
   auth,
@@ -20,6 +22,10 @@ import {
   deleteAdminResponseDoc,
   deleteAdminUserDoc,
   ensureCloudDatabaseSeeded,
+  sendChatMessage,
+  subscribeToChatMessages,
+  subscribeToAllChats,
+  ensureChatInitialized,
 } from './firebase';
 
 const TOKEN_KEY = 'floral_session_token';
@@ -62,6 +68,7 @@ function toUserExperienceData(user: UserRecord): UserExperienceData {
     flowerConfig: user.flowerConfig,
     savedFormulation: user.generatedFormulation,
     userResponse: user.userResponse,
+    audioUrl: user.audioUrl || (user.id.toLowerCase() === 'isaias' ? '/audio/neo_roneo.mp3' : undefined),
   };
 }
 
@@ -343,5 +350,58 @@ export const api = {
   async deleteAdminUser(id: string): Promise<{ success: boolean }> {
     await deleteAdminUserDoc(id);
     return { success: true };
+  },
+
+  // --------------------------------------------------------------------------
+  // REAL-TIME CHAT APIS
+  // --------------------------------------------------------------------------
+
+  /**
+   * Send a real-time message in a chat
+   */
+  async sendChatMessage(
+    chatId: string,
+    text: string,
+    senderRole: 'user' | 'admin',
+    senderId: string,
+    senderName: string
+  ): Promise<ChatMessage> {
+    return await sendChatMessage(chatId, {
+      senderId,
+      senderName,
+      senderRole,
+      text,
+    });
+  },
+
+  /**
+   * Subscribe to messages in a conversation
+   */
+  subscribeToChat(
+    chatId: string,
+    onUpdate: (messages: ChatMessage[]) => void,
+    onError?: (err: Error) => void
+  ): () => void {
+    return subscribeToChatMessages(chatId, onUpdate, onError);
+  },
+
+  /**
+   * Subscribe to all chats list (for Admin)
+   */
+  subscribeToAllChats(
+    onUpdate: (chats: ChatSummary[]) => void,
+    onError?: (err: Error) => void
+  ): () => void {
+    return subscribeToAllChats(onUpdate, onError);
+  },
+
+  /**
+   * Ensure user's chat is initialized with original response
+   */
+  async ensureUserChatInitialized(userId: string): Promise<void> {
+    const userDoc = await getAuthenticatedUserDoc(userId);
+    if (userDoc) {
+      await ensureChatInitialized(userDoc);
+    }
   },
 };

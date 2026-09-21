@@ -14,6 +14,7 @@ import { ReadingExperience } from './components/ReadingExperience';
 import { OrganicFlowerCreation } from './components/OrganicFlowerCreation';
 import { UserResponseView } from './components/UserResponseView';
 import { AdminDashboard } from './components/AdminDashboard';
+import { IsaiasChatView } from './components/IsaiasChatView';
 
 type AppStep =
   | 'login'
@@ -21,6 +22,7 @@ type AppStep =
   | 'flower-formation'
   | 'flower-result'
   | 'response'
+  | 'chat'
   | 'admin';
 
 export default function App() {
@@ -228,6 +230,7 @@ export default function App() {
                 mode="formation"
                 onProceedToReading={handleProceedToReading}
                 onProceedToResponse={() => setCurrentStep('response')}
+                onProceedToChat={() => setCurrentStep('chat')}
                 onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
@@ -240,6 +243,7 @@ export default function App() {
                 mode="result"
                 onProceedToReading={handleProceedToReading}
                 onProceedToResponse={() => setCurrentStep('response')}
+                onProceedToChat={() => setCurrentStep('chat')}
                 onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
@@ -252,6 +256,16 @@ export default function App() {
                 onSubmitResponse={handleSubmitResponse}
                 onBackToFlowers={() => setCurrentStep('flower-result')}
                 onBackToReading={() => setCurrentStep('reading')}
+                onProceedToChat={() => setCurrentStep('chat')}
+              />
+            )}
+
+            {/* Step 6: CHAT EN TIEMPO REAL (Exclusivo de Isaías con Ronald, bidireccional y persistente) */}
+            {currentStep === 'chat' && experience && (
+              <IsaiasChatView
+                experience={experience}
+                onBackToFlowers={() => setCurrentStep('flower-result')}
+                onBackToReading={handleProceedToReading}
               />
             )}
           </>
