@@ -188,7 +188,6 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
       <LeiryBouquetAnimation
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
-        onProceedToResponse={onProceedToResponse}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
       />

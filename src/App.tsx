@@ -219,7 +219,12 @@ export default function App() {
               <ReadingExperience
                 experience={experience}
                 onProceedToFlowers={() => setCurrentStep('flower-result')}
-                onProceedToResponse={() => setCurrentStep('response')}
+                onProceedToResponse={
+                  experience.id?.toLowerCase() === 'leiry' ||
+                  experience.username?.toLowerCase() === 'leiry'
+                    ? undefined
+                    : () => setCurrentStep('response')
+                }
               />
             )}
 
@@ -229,7 +234,12 @@ export default function App() {
                 experience={experience}
                 mode="formation"
                 onProceedToReading={handleProceedToReading}
-                onProceedToResponse={() => setCurrentStep('response')}
+                onProceedToResponse={
+                  experience.id?.toLowerCase() === 'leiry' ||
+                  experience.username?.toLowerCase() === 'leiry'
+                    ? undefined
+                    : () => setCurrentStep('response')
+                }
                 onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
@@ -241,21 +251,29 @@ export default function App() {
                 experience={experience}
                 mode="result"
                 onProceedToReading={handleProceedToReading}
-                onProceedToResponse={() => setCurrentStep('response')}
+                onProceedToResponse={
+                  experience.id?.toLowerCase() === 'leiry' ||
+                  experience.username?.toLowerCase() === 'leiry'
+                    ? undefined
+                    : () => setCurrentStep('response')
+                }
                 onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
             )}
 
             {/* Step 5: "Mi respuesta" (Strictly named "Mi respuesta", saved to Ronald only) */}
-            {currentStep === 'response' && experience && (
-              <UserResponseView
-                experience={experience}
-                onSubmitResponse={handleSubmitResponse}
-                onBackToFlowers={() => setCurrentStep('flower-result')}
-                onBackToReading={() => setCurrentStep('reading')}
-              />
-            )}
+            {currentStep === 'response' &&
+              experience &&
+              experience.id?.toLowerCase() !== 'leiry' &&
+              experience.username?.toLowerCase() !== 'leiry' && (
+                <UserResponseView
+                  experience={experience}
+                  onSubmitResponse={handleSubmitResponse}
+                  onBackToFlowers={() => setCurrentStep('flower-result')}
+                  onBackToReading={() => setCurrentStep('reading')}
+                />
+              )}
           </>
         )}
       </main>

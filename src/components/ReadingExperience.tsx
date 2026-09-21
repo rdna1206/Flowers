@@ -145,7 +145,7 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
                 <span>Volver a la flor</span>
               </button>
 
-              {onProceedToResponse && (
+              {!isLeiry && onProceedToResponse && (
                 <button
                   id="btn-proceed-to-response"
                   type="button"
@@ -182,7 +182,7 @@ export const ReadingExperience: React.FC<ReadingExperienceProps> = ({
                 <span>Volver a la flor</span>
               </button>
 
-              {onProceedToResponse && (
+              {!isLeiry && onProceedToResponse && (
                 <button
                   id="btn-proceed-direct-to-response"
                   type="button"

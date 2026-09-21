@@ -691,6 +691,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 setClearingChatUserId(u.id);
                                 try {
                                   await api.clearChatHistory(u.id);
+                                  setUsers((prev) =>
+                                    prev.map((usr) =>
+                                      usr.id.toLowerCase() === u.id.toLowerCase()
+                                        ? { ...usr, userResponse: null }
+                                        : usr
+                                    )
+                                  );
+                                  setChatSummaries((prev) =>
+                                    prev.map((c) =>
+                                      c.userId?.toLowerCase() === u.id.toLowerCase() ||
+                                      c.id?.toLowerCase() === u.id.toLowerCase()
+                                        ? { ...c, lastMessageText: '', lastMessageAt: '' }
+                                        : c
+                                    )
+                                  );
                                   setSuccessMessage(`Mensajes de prueba con ${u.name} borrados.`);
                                   setTimeout(() => setSuccessMessage(null), 3000);
                                 } catch (err: any) {

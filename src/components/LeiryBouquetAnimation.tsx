@@ -6,7 +6,6 @@ import { SaveFlowerButton } from './SaveFlowerButton';
 interface LeiryBouquetAnimationProps {
   mode?: 'formation' | 'result';
   onProceedToReading?: () => void;
-  onProceedToResponse?: () => void;
   onBackToReading?: () => void;
   onReplayFormation?: () => void;
 }
@@ -22,7 +21,6 @@ type AssemblyStep =
 export const LeiryBouquetAnimation: React.FC<LeiryBouquetAnimationProps> = ({
   mode = 'formation',
   onProceedToReading,
-  onProceedToResponse,
   onBackToReading,
   onReplayFormation,
 }) => {
@@ -519,7 +517,7 @@ export const LeiryBouquetAnimation: React.FC<LeiryBouquetAnimationProps> = ({
               <motion.button
                 id="btn-leiry-read-text"
                 type="button"
-                onClick={onProceedToReading || onProceedToResponse}
+                onClick={onProceedToReading}
                 initial={{ opacity: 0, y: 14, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 whileHover={{ scale: 1.05 }}

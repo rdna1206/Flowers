@@ -528,11 +528,28 @@ export async function deleteChatMessage(chatId: string, messageId: string): Prom
         updatedAt: new Date().toISOString(),
       });
     } else {
-      await updateDoc(chatRef, {
-        lastMessageText: '',
-        lastMessageAt: '',
-        updatedAt: new Date().toISOString(),
-      });
+      await setDoc(
+        chatRef,
+        {
+          id: normChatId,
+          userId: normChatId,
+          lastMessageText: '',
+          lastMessageAt: '',
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      // If no messages left at all, wipe userResponse so it doesn't resurrect
+      try {
+        const userRef = doc(db, USERS_COLLECTION, normChatId);
+        await updateDoc(userRef, {
+          userResponse: null,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch {
+        // ignore
+      }
     }
   } catch (err) {
     handleFirestoreError(err, 'delete', `${CHATS_COLLECTION}/${normChatId}/${MESSAGES_COLLECTION}/${messageId}`);
@@ -545,6 +562,7 @@ export async function deleteChatMessage(chatId: string, messageId: string): Prom
 export async function clearChatHistory(chatId: string): Promise<void> {
   const normChatId = chatId.trim().toLowerCase();
   try {
+    // 1. Delete all chat messages
     const messagesRef = collection(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION);
     const snap = await getDocs(messagesRef);
     const deletePromises: Promise<void>[] = [];
@@ -553,12 +571,41 @@ export async function clearChatHistory(chatId: string): Promise<void> {
     });
     await Promise.all(deletePromises);
 
+    // 2. Clear chat document summary
     const chatRef = doc(db, CHATS_COLLECTION, normChatId);
-    await updateDoc(chatRef, {
-      lastMessageText: '',
-      lastMessageAt: '',
+    await setDoc(
+      chatRef,
+      {
+        id: normChatId,
+        userId: normChatId,
+        lastMessageText: '',
+        lastMessageAt: '',
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+
+    // 3. Clear userResponse on users collection
+    const userRef = doc(db, USERS_COLLECTION, normChatId);
+    await updateDoc(userRef, {
+      userResponse: null,
       updatedAt: new Date().toISOString(),
     });
+
+    // 4. Delete any matching response in responses collection
+    try {
+      const respSnap = await getDocs(collection(db, RESPONSES_COLLECTION));
+      const respDeletes: Promise<void>[] = [];
+      respSnap.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.userId === normChatId || docSnap.id === normChatId) {
+          respDeletes.push(deleteDoc(docSnap.ref));
+        }
+      });
+      await Promise.all(respDeletes);
+    } catch {
+      // ignore
+    }
   } catch (err) {
     handleFirestoreError(err, 'delete', `${CHATS_COLLECTION}/${normChatId}`);
   }
