@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, RotateCcw, BookOpen, MessageSquare } from 'lucide-react';
 import { SaveFlowerButton } from './SaveFlowerButton';
-import { NeoRoneoPlayer } from './NeoRoneoPlayer';
 
 interface IsaiasBouquetAnimationProps {
   mode?: 'formation' | 'result';
@@ -188,11 +187,6 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
 
       {/* Main Container */}
       <div className="relative z-10 w-full max-w-lg flex flex-col items-center">
-        {/* Exclusive Music Player for Isaias: NEO RONEO */}
-        <div className="w-full mb-1">
-          <NeoRoneoPlayer audioUrl={audioUrl} />
-        </div>
-
         {/* Botanical Canvas SVG */}
         <div
           onClick={handleTouch}
