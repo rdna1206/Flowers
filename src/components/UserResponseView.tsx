@@ -215,14 +215,20 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                 <span>Releer</span>
               </button>
 
-              {experience.id === 'isaias' && onProceedToChat && (
+              {(experience.id === 'isaias' || experience.id === 'jhon') && onProceedToChat && (
                 <button
                   type="button"
                   onClick={onProceedToChat}
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-xs py-2.5 px-5 rounded-full border border-[#00E5FF]/50 bg-[#0284C7]/20 hover:bg-[#0284C7]/40 text-[#00E5FF] transition-all cursor-pointer font-semibold shadow-[0_0_15px_rgba(0,229,255,0.2)]"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-xs py-2.5 px-4 rounded-full border transition-all cursor-pointer font-medium"
+                  style={{
+                    borderColor: borderColor,
+                    color: textColor,
+                    backgroundColor: innerCardBg,
+                  }}
+                  title="Chat con Ronald"
                 >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>Conversación con Ronald</span>
+                  <MessageSquare className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                  <span>Chat</span>
                 </button>
               )}
             </div>

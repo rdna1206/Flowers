@@ -7,6 +7,7 @@ interface JhonBouquetAnimationProps {
   mode?: 'formation' | 'result';
   onProceedToReading?: () => void;
   onProceedToResponse?: () => void;
+  onProceedToChat?: () => void;
   onBackToReading?: () => void;
   onReplayFormation?: () => void;
 }
@@ -32,6 +33,7 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
   mode = 'formation',
   onProceedToReading,
   onProceedToResponse,
+  onProceedToChat,
   onBackToReading,
   onReplayFormation,
 }) => {
@@ -1062,6 +1064,24 @@ export const JhonBouquetAnimation: React.FC<JhonBouquetAnimationProps> = ({
                 <span>Leer</span>
                 <ArrowRight className="w-4 h-4 text-white/70 stroke-[2.2]" />
               </motion.button>
+
+              {/* Chat Button */}
+              {onProceedToChat && (
+                <motion.button
+                  id="btn-jhon-chat"
+                  type="button"
+                  onClick={onProceedToChat}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-full bg-[#18181B]/90 hover:bg-[#27272A] border border-[#60A5FA]/40 text-[#93C5FD] text-xs font-semibold tracking-widest uppercase shadow-[0_0_20px_rgba(59,130,246,0.25)] backdrop-blur-md transition-all cursor-pointer"
+                  title="Chat con Ronald"
+                >
+                  <MessageSquare className="w-4 h-4 text-[#60A5FA]" />
+                  <span>Chat</span>
+                </motion.button>
+              )}
             </>
           )}
         </div>

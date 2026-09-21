@@ -59,6 +59,7 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
+        onProceedToChat={onProceedToChat}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
       />

@@ -7,6 +7,22 @@ interface NeoRoneoPlayerProps {
   isDarkTheme?: boolean;
 }
 
+const resolveAudioPath = (rawUrl?: string): string => {
+  if (!rawUrl) return './audio/neo_roneo.mp3';
+  if (
+    rawUrl.startsWith('http://') ||
+    rawUrl.startsWith('https://') ||
+    rawUrl.startsWith('data:') ||
+    rawUrl.startsWith('blob:')
+  ) {
+    return rawUrl;
+  }
+  const clean = rawUrl.replace(/^\/+/, '');
+  const base = (import.meta as any).env?.BASE_URL || './';
+  const prefix = base.endsWith('/') ? base : `${base}/`;
+  return `${prefix}${clean}`;
+};
+
 export const NeoRoneoPlayer: React.FC<NeoRoneoPlayerProps> = ({
   audioUrl = '/audio/neo_roneo.mp3',
 }) => {
@@ -18,6 +34,8 @@ export const NeoRoneoPlayer: React.FC<NeoRoneoPlayerProps> = ({
   const [volume, setVolume] = useState(0.8);
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasError, setHasError] = useState(false);
+
+  const resolvedUrl = resolveAudioPath(audioUrl);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -33,13 +51,22 @@ export const NeoRoneoPlayer: React.FC<NeoRoneoPlayerProps> = ({
     };
 
     const handleEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
+      // Loop if loop prop didn't automatically loop
+      audio.currentTime = 0;
+      audio.play().catch(() => {
+        setIsPlaying(false);
+      });
     };
 
     const handleError = () => {
-      setHasError(true);
-      setIsPlaying(false);
+      // Try fallback to relative path if not already attempted
+      if (audio.src !== './audio/neo_roneo.mp3' && !audio.src.endsWith('/audio/neo_roneo.mp3')) {
+        audio.src = './audio/neo_roneo.mp3';
+        audio.load();
+      } else {
+        setHasError(true);
+        setIsPlaying(false);
+      }
     };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
@@ -53,7 +80,7 @@ export const NeoRoneoPlayer: React.FC<NeoRoneoPlayerProps> = ({
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [audioUrl]);
+  }, [resolvedUrl]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -63,15 +90,28 @@ export const NeoRoneoPlayer: React.FC<NeoRoneoPlayerProps> = ({
       audio.pause();
       setIsPlaying(false);
     } else {
+      if (!audio.src || audio.src === window.location.href) {
+        audio.src = resolvedUrl;
+      }
       audio
         .play()
         .then(() => {
           setIsPlaying(true);
           setHasError(false);
         })
-        .catch((err) => {
-          console.warn('Playback request prevented or waiting for interaction:', err);
-          setIsPlaying(false);
+        .catch(() => {
+          // If first try failed, try relative path
+          audio.src = './audio/neo_roneo.mp3';
+          audio
+            .play()
+            .then(() => {
+              setIsPlaying(true);
+              setHasError(false);
+            })
+            .catch((err) => {
+              console.warn('Playback error:', err);
+              setIsPlaying(false);
+            });
         });
     }
   };
@@ -126,12 +166,18 @@ export const NeoRoneoPlayer: React.FC<NeoRoneoPlayerProps> = ({
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className="relative z-30 w-full max-w-md mx-auto px-3 py-2"
     >
-      {/* Hidden native audio element */}
+      {/* Native audio element with fallback sources */}
       <audio
         ref={audioRef}
-        src={audioUrl}
-        preload="metadata"
-      />
+        preload="auto"
+        playsInline
+        loop
+      >
+        <source src={resolvedUrl} type="audio/mpeg" />
+        <source src="./audio/neo_roneo.mp3" type="audio/mpeg" />
+        <source src="audio/neo_roneo.mp3" type="audio/mpeg" />
+        <source src="/audio/neo_roneo.mp3" type="audio/mpeg" />
+      </audio>
 
       <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-[#071427]/90 via-[#0A1B36]/90 to-[#071427]/90 border border-[#00E5FF]/30 shadow-[0_4px_24px_rgba(0,229,255,0.15)] backdrop-blur-md px-3.5 py-2.5 sm:px-4 sm:py-3 transition-all">
         {/* Glow ambient background highlight */}

@@ -27,7 +27,7 @@ import {
 import { api } from '../lib/api';
 import { subscribeToAdminAllUsers } from '../lib/firebase';
 import type { UserRecord, UserTheme, AdminUserResponseItem } from '../types';
-import { AdminChatSection } from './AdminChatSection';
+import { WhatsAppAdminChatModal } from './WhatsAppAdminChatModal';
 
 interface AdminDashboardProps {
   onSelectUserToPreview?: (username: string, passwordPlain?: string) => void;
@@ -35,7 +35,7 @@ interface AdminDashboardProps {
   isDarkTheme?: boolean;
 }
 
-type AdminTab = 'responses' | 'chats' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
+type AdminTab = 'responses' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSelectUserToPreview,
@@ -47,6 +47,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [responses, setResponses] = useState<AdminUserResponseItem[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('jhon');
   const [searchTerm, setSearchTerm] = useState('');
+  const [chatModalUser, setChatModalUser] = useState<UserRecord | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -497,22 +498,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           type="button"
-          onClick={() => setActiveTab('chats')}
-          className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
-            activeTab === 'chats'
-              ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
-              : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
-          }`}
-        >
-          <MessageSquare className="w-3.5 h-3.5 shrink-0 text-[#0284C7]" />
-          <span className="whitespace-nowrap">Chats en Tiempo Real</span>
-          <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-[#E0F2FE] text-[#0284C7] shrink-0">
-            Isaias
-          </span>
-        </button>
-
-        <button
-          type="button"
           onClick={() => setActiveTab('users')}
           className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
             activeTab === 'users'
@@ -687,22 +672,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* ========================================================
-          TAB: CHATS EN TIEMPO REAL (RONALD EXCLUSIVE)
-          ======================================================== */}
-      {activeTab === 'chats' && (
-        <AdminChatSection
-          users={users}
-          onSelectUserToPreview={(username) => {
-            if (onSelectUserToPreview) {
-              onSelectUserToPreview(username);
-            }
-          }}
-          onRefreshUsers={loadData}
-        />
-      )}
-
-      {/* ========================================================
-          TAB 2: USUARIOS Y CREDENCIALES
+          TAB: USUARIOS Y CREDENCIALES
           ======================================================== */}
       {activeTab === 'users' && (
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-4 sm:p-8 shadow-xs">
@@ -755,7 +725,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
                       <div>
                         <h4 className="text-sm font-semibold text-[#2C2926]">{u.name}</h4>
-                        <span className="text-[11px] text-[#736C65] font-mono">@{u.username}</span>
+                        <span className="text-[11px] text-[#736C65] font-mono">{u.username}</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-1.5">
@@ -809,6 +779,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       >
                         <Eye className="w-3.5 h-3.5 text-[#937C67]" />
                         <span>Ver</span>
+                      </button>
+                    )}
+                    {(u.id === 'isaias' || u.id === 'jhon') && (
+                      <button
+                        type="button"
+                        onClick={() => setChatModalUser(u)}
+                        className="py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-white border border-[#E2DBD2] flex items-center justify-center space-x-1 hover:bg-[#F2ECE4] transition-colors cursor-pointer"
+                        title={`Abrir chat con ${u.name}`}
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-[#008069]" />
+                        <span>Chat</span>
                       </button>
                     )}
                     <button
@@ -929,6 +910,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               title={`Probar experiencia como ${u.name}`}
                             >
                               <Eye className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {(u.id === 'isaias' || u.id === 'jhon') && (
+                            <button
+                              type="button"
+                              onClick={() => setChatModalUser(u)}
+                              className="inline-flex items-center space-x-1 text-[11px] text-[#2C2926] font-medium bg-white hover:bg-[#F2ECE4] px-2.5 py-1 rounded-lg border border-[#E2DBD2] transition-colors cursor-pointer"
+                              title={`Abrir chat con ${u.name}`}
+                            >
+                              <MessageSquare className="w-3.5 h-3.5 text-[#008069]" />
+                              <span>Chat</span>
                             </button>
                           )}
                           <button
@@ -1565,6 +1557,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         </div>
       )}
+
+      {/* WhatsApp Clean Admin Chat Modal */}
+      <WhatsAppAdminChatModal
+        user={chatModalUser}
+        isOpen={Boolean(chatModalUser)}
+        onClose={() => setChatModalUser(null)}
+      />
     </div>
   );
 };

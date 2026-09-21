@@ -14,7 +14,7 @@ import { ReadingExperience } from './components/ReadingExperience';
 import { OrganicFlowerCreation } from './components/OrganicFlowerCreation';
 import { UserResponseView } from './components/UserResponseView';
 import { AdminDashboard } from './components/AdminDashboard';
-import { IsaiasChatView } from './components/IsaiasChatView';
+import { WhatsAppUserChatView } from './components/WhatsAppUserChatView';
 
 type AppStep =
   | 'login'
@@ -260,9 +260,9 @@ export default function App() {
               />
             )}
 
-            {/* Step 6: CHAT EN TIEMPO REAL (Exclusivo de Isaías con Ronald, bidireccional y persistente) */}
+            {/* Step 6: Chat en tiempo real con Ronald (Disponible para Isaías y Jhon) */}
             {currentStep === 'chat' && experience && (
-              <IsaiasChatView
+              <WhatsAppUserChatView
                 experience={experience}
                 onBackToFlowers={() => setCurrentStep('flower-result')}
                 onBackToReading={handleProceedToReading}
