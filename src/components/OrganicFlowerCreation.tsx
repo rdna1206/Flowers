@@ -22,7 +22,6 @@ interface OrganicFlowerCreationProps {
   mode: 'formation' | 'result';
   onProceedToReading?: () => void;
   onProceedToResponse: () => void;
-  onProceedToChat?: () => void;
   onBackToReading: () => void;
   onReplayFormation: () => void;
 }
@@ -32,7 +31,6 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   mode,
   onProceedToReading,
   onProceedToResponse,
-  onProceedToChat,
   onBackToReading,
   onReplayFormation,
 }) => {
@@ -59,7 +57,6 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
-        onProceedToChat={onProceedToChat}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
       />
@@ -75,7 +72,6 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
         hasSubmittedResponse={Boolean(experience.userResponse?.text)}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}
-        onProceedToChat={onProceedToChat}
         onBackToReading={onBackToReading}
         onReplayFormation={onReplayFormation}
       />

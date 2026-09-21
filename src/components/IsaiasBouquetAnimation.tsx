@@ -2028,23 +2028,6 @@ export const IsaiasBouquetAnimation: React.FC<IsaiasBouquetAnimationProps> = ({
                 <span>Leer</span>
                 <ArrowRight className="w-4 h-4 text-white stroke-[2.2] group-hover:translate-x-1 transition-transform" />
               </motion.button>
-
-              {onProceedToChat && (
-                <motion.button
-                  id="btn-isaias-chat"
-                  type="button"
-                  onClick={onProceedToChat}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-full bg-[#0284C7]/25 hover:bg-[#0284C7]/40 border border-[#00E5FF]/40 text-[#00E5FF] text-xs font-semibold tracking-widest uppercase shadow-[0_0_20px_rgba(0,229,255,0.25)] backdrop-blur-md transition-all cursor-pointer"
-                  title="Chat con Ronald"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Chat</span>
-                </motion.button>
-              )}
             </>
           )}
         </div>

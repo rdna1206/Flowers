@@ -23,6 +23,8 @@ import {
   deleteAdminUserDoc,
   ensureCloudDatabaseSeeded,
   sendChatMessage,
+  deleteChatMessage,
+  clearChatHistory,
   subscribeToChatMessages,
   subscribeToAllChats,
   ensureChatInitialized,
@@ -393,6 +395,20 @@ export const api = {
     onError?: (err: Error) => void
   ): () => void {
     return subscribeToAllChats(onUpdate, onError);
+  },
+
+  /**
+   * Delete a specific chat message (Ronald only)
+   */
+  async deleteChatMessage(chatId: string, messageId: string): Promise<void> {
+    await deleteChatMessage(chatId, messageId);
+  },
+
+  /**
+   * Clear all messages in a chat (Ronald only)
+   */
+  async clearChatHistory(chatId: string): Promise<void> {
+    await clearChatHistory(chatId);
   },
 
   /**

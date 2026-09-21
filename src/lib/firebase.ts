@@ -18,6 +18,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  limit,
   Firestore,
 } from 'firebase/firestore';
 import type {
@@ -502,6 +503,64 @@ export async function sendChatMessage(
     return newMsg;
   } catch (err) {
     handleFirestoreError(err, 'create', `${CHATS_COLLECTION}/${normChatId}/${MESSAGES_COLLECTION}/${msgId}`);
+  }
+}
+
+/**
+ * Delete a specific message from a conversation (Ronald only)
+ */
+export async function deleteChatMessage(chatId: string, messageId: string): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const msgRef = doc(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION, messageId);
+    await deleteDoc(msgRef);
+
+    // Refresh parent chat last message preview
+    const messagesRef = collection(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION);
+    const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(1));
+    const snap = await getDocs(q);
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    if (!snap.empty) {
+      const lastMsg = snap.docs[0].data() as ChatMessage;
+      await updateDoc(chatRef, {
+        lastMessageText: lastMsg.text,
+        lastMessageAt: lastMsg.createdAt,
+        updatedAt: new Date().toISOString(),
+      });
+    } else {
+      await updateDoc(chatRef, {
+        lastMessageText: '',
+        lastMessageAt: '',
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    handleFirestoreError(err, 'delete', `${CHATS_COLLECTION}/${normChatId}/${MESSAGES_COLLECTION}/${messageId}`);
+  }
+}
+
+/**
+ * Clear all messages from a conversation for testing/reset (Ronald only)
+ */
+export async function clearChatHistory(chatId: string): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const messagesRef = collection(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION);
+    const snap = await getDocs(messagesRef);
+    const deletePromises: Promise<void>[] = [];
+    snap.forEach((d) => {
+      deletePromises.push(deleteDoc(d.ref));
+    });
+    await Promise.all(deletePromises);
+
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    await updateDoc(chatRef, {
+      lastMessageText: '',
+      lastMessageAt: '',
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    handleFirestoreError(err, 'delete', `${CHATS_COLLECTION}/${normChatId}`);
   }
 }
 

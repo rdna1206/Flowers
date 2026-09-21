@@ -23,10 +23,11 @@ import {
   X,
   Check,
   Cloud,
+  Send,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { subscribeToAdminAllUsers } from '../lib/firebase';
-import type { UserRecord, UserTheme, AdminUserResponseItem } from '../types';
+import type { UserRecord, UserTheme, AdminUserResponseItem, ChatSummary } from '../types';
 import { WhatsAppAdminChatModal } from './WhatsAppAdminChatModal';
 
 interface AdminDashboardProps {
@@ -35,16 +36,17 @@ interface AdminDashboardProps {
   isDarkTheme?: boolean;
 }
 
-type AdminTab = 'responses' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
+type AdminTab = 'chats' | 'users' | 'texts' | 'profiling' | 'styles' | 'flowers';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSelectUserToPreview,
   onViewMyExperience,
   isDarkTheme = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<AdminTab>('responses');
+  const [activeTab, setActiveTab] = useState<AdminTab>('chats');
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [responses, setResponses] = useState<AdminUserResponseItem[]>([]);
+  const [chatSummaries, setChatSummaries] = useState<ChatSummary[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('jhon');
   const [searchTerm, setSearchTerm] = useState('');
   const [chatModalUser, setChatModalUser] = useState<UserRecord | null>(null);
@@ -90,6 +92,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [themeName, setThemeName] = useState('');
   const [deletingResponseUserId, setDeletingResponseUserId] = useState<string | null>(null);
   const [confirmDeleteResponse, setConfirmDeleteResponse] = useState<{ userId: string; name: string } | null>(null);
+  const [clearingChatUserId, setClearingChatUserId] = useState<string | null>(null);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -117,7 +120,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     loadData();
 
     // Subscribe to real-time changes in Firestore Cloud
-    const unsubscribe = subscribeToAdminAllUsers((cloudUsers) => {
+    const unsubUsers = subscribeToAdminAllUsers((cloudUsers) => {
       if (cloudUsers && cloudUsers.length > 0) {
         setUsers(cloudUsers);
         const liveResponses: AdminUserResponseItem[] = cloudUsers
@@ -132,8 +135,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       }
     });
 
+    const unsubChats = api.subscribeToAllChats((liveChats) => {
+      if (liveChats) {
+        setChatSummaries(liveChats);
+      }
+    });
+
     return () => {
-      unsubscribe();
+      unsubUsers();
+      unsubChats();
     };
   }, []);
 
@@ -474,24 +484,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <div className="w-full max-w-full overflow-x-auto flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-[#E8E2D9] mb-5 sm:mb-6 shadow-2xs no-scrollbar touch-pan-x min-w-0">
         <button
           type="button"
-          onClick={() => setActiveTab('responses')}
+          onClick={() => setActiveTab('chats')}
           className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
-            activeTab === 'responses'
+            activeTab === 'chats'
               ? 'bg-[#2C2926] text-[#FAF8F5] shadow-xs'
               : 'text-[#6B635A] hover:bg-[#FAF8F5] hover:text-[#2C2926]'
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-          <span className="whitespace-nowrap">Respuestas</span>
-          {responses.length > 0 && (
+          <span className="whitespace-nowrap">Chats en Vivo</span>
+          {users.filter(u => u.id !== 'ronald' && u.id !== 'leiry' && u.username?.toLowerCase() !== 'leiry').length > 0 && (
             <span
               className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full shrink-0 ${
-                activeTab === 'responses'
+                activeTab === 'chats'
                   ? 'bg-white/25 text-white'
-                  : 'bg-[#2C2926] text-white'
+                  : 'bg-[#008069] text-white'
               }`}
             >
-              {responses.length}
+              {users.filter(u => u.id !== 'ronald' && u.id !== 'leiry' && u.username?.toLowerCase() !== 'leiry').length}
             </span>
           )}
         </button>
@@ -563,111 +573,180 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
 
       {/* ========================================================
-          TAB 1: RESPUESTAS PRIVADAS DE USUARIOS (RONALD ONLY)
+          TAB 1: CHATS EN VIVO CON USUARIOS (EXCEPTO LEIRY)
           ======================================================== */}
-      {activeTab === 'responses' && (
+      {activeTab === 'chats' && (
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#E8E2D9] p-4 sm:p-8 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#F0EAE1]">
             <div>
-              <h2 className="font-serif-display text-xl sm:text-2xl text-[#2C2926]">
-                Respuestas Personales Recibidas
+              <h2 className="font-serif-display text-xl sm:text-2xl text-[#2C2926] flex items-center space-x-2">
+                <span>Chats en Vivo</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse" />
               </h2>
               <p className="text-xs text-[#8C847B] mt-0.5">
-                Buzón confidencial visible exclusivamente para Ronald.
+                Conversaciones directas y respuestas en tiempo real con todos los destinatarios (Leiry excluida).
               </p>
             </div>
-            <span className="text-xs text-[#8C847B] font-mono">
-              Total: {responses.length} respuesta{responses.length === 1 ? '' : 's'}
-            </span>
+            <div className="relative w-full sm:w-auto">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#8C847B]" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar conversación..."
+                className="w-full sm:w-52 pl-8 pr-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] focus:outline-hidden"
+              />
+            </div>
           </div>
 
-          {responses.length === 0 ? (
-            <div className="py-14 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#FAF8F5] border border-[#E8E2D9] flex items-center justify-center text-[#8C847B] mx-auto mb-3">
-                <MessageSquare className="w-5 h-5 stroke-[1.4]" />
-              </div>
-              <h3 className="font-serif-display text-lg text-[#2C2926] mb-1">
-                Aún no hay respuestas enviadas
-              </h3>
-              <p className="text-xs text-[#8C847B] max-w-md mx-auto leading-relaxed">
-                Cuando los usuarios finalicen su experiencia y envíen su respuesta personal, se mostrarán aquí con su identificación y fecha exacta.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-[#F0EAE1] mt-2">
-              {responses.map((item, idx) => (
-                <div key={idx} className="py-5 first:pt-3 last:pb-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3">
-                    <div className="flex items-center space-x-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E8DFC8] flex items-center justify-center text-[#2C2926] font-semibold text-xs shrink-0">
-                        {item.name.charAt(0)}
-                      </div>
-                      <div>
-                        <span className="text-sm font-semibold text-[#2C2926] block">
-                          {item.name}
-                        </span>
-                        <span className="text-[11px] text-[#8C847B] font-mono">
-                          @{item.username}
-                        </span>
-                      </div>
-                    </div>
+          {/* List of Chat-Eligible Users (Excluding Ronald and Leiry) */}
+          {(() => {
+            const chatUsers = users.filter(
+              (u) =>
+                u.id !== 'ronald' &&
+                u.id !== 'leiry' &&
+                u.username?.toLowerCase() !== 'leiry' &&
+                (u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  u.username.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
 
-                    <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#8C847B]">
-                      <span className="inline-flex items-center space-x-1">
-                        <Clock className="w-3.5 h-3.5 text-[#937C67]" />
-                        <span>
-                          {new Date(
-                            item.response.updatedAt || item.response.submittedAt
-                          ).toLocaleString('es-ES', {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          })}
-                        </span>
-                      </span>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedUserId(item.userId);
-                          setActiveTab('chats');
-                        }}
-                        className="inline-flex items-center space-x-1 text-[11px] text-[#0284C7] hover:bg-[#E0F2FE] px-2.5 py-1 rounded-md border border-[#BAE6FD] transition-colors cursor-pointer font-medium"
-                      >
-                        <MessageSquare className="w-3 h-3" />
-                        <span>Chat en Vivo</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedUserId(item.userId);
-                          setActiveTab('texts');
-                        }}
-                        className="text-[11px] text-[#937C67] hover:text-[#2C2926] hover:underline underline-offset-2 cursor-pointer"
-                      >
-                        Configuración
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteResponse(item.userId, item.name)}
-                        disabled={deletingResponseUserId === item.userId}
-                        className="inline-flex items-center space-x-1 text-[11px] text-red-600 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-md border border-red-200 transition-colors disabled:opacity-50 cursor-pointer"
-                        title="Eliminar respuesta"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        <span>Borrar</span>
-                      </button>
-                    </div>
+            if (chatUsers.length === 0) {
+              return (
+                <div className="py-14 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#FAF8F5] border border-[#E8E2D9] flex items-center justify-center text-[#8C847B] mx-auto mb-3">
+                    <MessageSquare className="w-5 h-5 stroke-[1.4]" />
                   </div>
-
-                  <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D9] text-sm text-[#2C2926] leading-relaxed whitespace-pre-wrap font-serif break-words">
-                    {item.response.text}
-                  </div>
+                  <h3 className="font-serif-display text-lg text-[#2C2926] mb-1">
+                    No se encontraron conversaciones
+                  </h3>
+                  <p className="text-xs text-[#8C847B] max-w-md mx-auto leading-relaxed">
+                    Las conversaciones y respuestas de los usuarios se sincronizan automáticamente aquí en vivo.
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            }
+
+            return (
+              <div className="divide-y divide-[#F0EAE1] mt-2">
+                {chatUsers.map((u) => {
+                  const chatSummary = chatSummaries.find(
+                    (c) => c.userId?.toLowerCase() === u.id.toLowerCase() || c.id?.toLowerCase() === u.id.toLowerCase()
+                  );
+                  const lastText = chatSummary?.lastMessageText || u.userResponse?.text || '';
+                  const lastTime =
+                    chatSummary?.lastMessageAt ||
+                    chatSummary?.updatedAt ||
+                    u.userResponse?.submittedAt ||
+                    u.userResponse?.updatedAt;
+
+                  return (
+                    <div key={u.id} className="py-4 sm:py-5 first:pt-3 last:pb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-full bg-[#008069]/10 border border-[#008069]/20 flex items-center justify-center text-[#008069] font-bold text-sm shrink-0">
+                              {u.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] border-2 border-white absolute bottom-0 right-0" />
+                          </div>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm font-semibold text-[#2C2926]">
+                                {u.name}
+                              </span>
+                              <span className="text-[11px] text-[#8C847B] font-mono">
+                                @{u.username}
+                              </span>
+                            </div>
+                            {lastTime && (
+                              <span className="text-[11px] text-[#8C847B] flex items-center space-x-1 mt-0.5">
+                                <Clock className="w-3 h-3 text-[#937C67]" />
+                                <span>
+                                  {new Date(lastTime).toLocaleString('es-ES', {
+                                    dateStyle: 'short',
+                                    timeStyle: 'short',
+                                  })}
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Top Action Buttons for this chat */}
+                        <div className="flex items-center space-x-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setChatModalUser(u)}
+                            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-[#008069] hover:bg-[#00705c] text-white px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs"
+                            title={`Abrir chat con ${u.name}`}
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            <span>Abrir Chat</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (window.confirm(`¿Vaciar todos los mensajes de prueba con ${u.name}?`)) {
+                                setClearingChatUserId(u.id);
+                                try {
+                                  await api.clearChatHistory(u.id);
+                                  setSuccessMessage(`Mensajes de prueba con ${u.name} borrados.`);
+                                  setTimeout(() => setSuccessMessage(null), 3000);
+                                } catch (err: any) {
+                                  setErrorMessage(err.message || 'Error al vaciar chat.');
+                                } finally {
+                                  setClearingChatUserId(null);
+                                }
+                              }
+                            }}
+                            disabled={clearingChatUserId === u.id}
+                            className="inline-flex items-center space-x-1 text-xs text-[#8C847B] hover:text-red-600 hover:bg-red-50 px-2.5 py-2 rounded-xl border border-[#E8E2D9] hover:border-red-200 transition-colors cursor-pointer disabled:opacity-50"
+                            title="Borrar mensajes de prueba de este chat"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Vaciar</span>
+                          </button>
+
+                          {onSelectUserToPreview && (
+                            <button
+                              type="button"
+                              onClick={() => onSelectUserToPreview(u.username)}
+                              className="p-2 text-[#736C65] hover:text-[#2C2926] hover:bg-[#F2ECE4] rounded-xl border border-[#E8E2D9] transition-colors cursor-pointer"
+                              title={`Ver experiencia como ${u.name}`}
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Message preview snippet */}
+                      <div
+                        onClick={() => setChatModalUser(u)}
+                        className="p-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F5EFE7] border border-[#E8E2D9] cursor-pointer transition-colors"
+                      >
+                        {lastText ? (
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-xs text-[#2C2926] leading-relaxed line-clamp-2 whitespace-pre-wrap font-sans">
+                              {lastText}
+                            </p>
+                            <span className="text-[10px] text-[#008069] font-medium shrink-0 bg-[#E6F4F1] px-2 py-0.5 rounded-md">
+                              En vivo
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-[#8C847B] italic">
+                            Aún no hay mensajes. Cuando {u.name} envíe su respuesta o escriba, aparecerá aquí como un mensaje en vivo.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -781,7 +860,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <span>Ver</span>
                       </button>
                     )}
-                    {(u.id === 'isaias' || u.id === 'jhon') && (
+                    {u.id !== 'ronald' && u.id !== 'leiry' && u.username?.toLowerCase() !== 'leiry' && (
                       <button
                         type="button"
                         onClick={() => setChatModalUser(u)}
@@ -912,7 +991,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <Eye className="w-3.5 h-3.5" />
                             </button>
                           )}
-                          {(u.id === 'isaias' || u.id === 'jhon') && (
+                          {u.id !== 'ronald' && u.id !== 'leiry' && u.username?.toLowerCase() !== 'leiry' && (
                             <button
                               type="button"
                               onClick={() => setChatModalUser(u)}

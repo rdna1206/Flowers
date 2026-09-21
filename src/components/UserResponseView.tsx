@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Send, CheckCircle2, Lock, Flower2, BookOpen, MessageSquare } from 'lucide-react';
+import { Send, CheckCircle2, Lock, Flower2, BookOpen } from 'lucide-react';
 import type { UserExperienceData, UserResponse } from '../types';
 
 interface UserResponseViewProps {
@@ -8,7 +8,6 @@ interface UserResponseViewProps {
   onSubmitResponse: (text: string) => Promise<UserResponse | null>;
   onBackToFlowers: () => void;
   onBackToReading: () => void;
-  onProceedToChat?: () => void;
 }
 
 export const UserResponseView: React.FC<UserResponseViewProps> = ({
@@ -16,7 +15,6 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   onSubmitResponse,
   onBackToFlowers,
   onBackToReading,
-  onProceedToChat,
 }) => {
   const isJhon = experience.id === 'jhon' || experience.username?.toLowerCase() === 'jhon';
   const theme = experience.theme || {};
@@ -60,10 +58,6 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       const res = await onSubmitResponse(responseText.trim());
       if (res) {
         setSubmittedResponse(res);
-        if (experience.id === 'isaias' && onProceedToChat) {
-          onProceedToChat();
-          return;
-        }
         setSuccessToast(true);
         setTimeout(() => setSuccessToast(false), 4500);
       }
@@ -214,23 +208,6 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Releer</span>
               </button>
-
-              {(experience.id === 'isaias' || experience.id === 'jhon') && onProceedToChat && (
-                <button
-                  type="button"
-                  onClick={onProceedToChat}
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-xs py-2.5 px-4 rounded-full border transition-all cursor-pointer font-medium"
-                  style={{
-                    borderColor: borderColor,
-                    color: textColor,
-                    backgroundColor: innerCardBg,
-                  }}
-                  title="Chat con Ronald"
-                >
-                  <MessageSquare className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                  <span>Chat</span>
-                </button>
-              )}
             </div>
           </div>
         ) : (

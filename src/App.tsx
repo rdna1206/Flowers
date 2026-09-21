@@ -230,7 +230,6 @@ export default function App() {
                 mode="formation"
                 onProceedToReading={handleProceedToReading}
                 onProceedToResponse={() => setCurrentStep('response')}
-                onProceedToChat={() => setCurrentStep('chat')}
                 onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
@@ -243,7 +242,6 @@ export default function App() {
                 mode="result"
                 onProceedToReading={handleProceedToReading}
                 onProceedToResponse={() => setCurrentStep('response')}
-                onProceedToChat={() => setCurrentStep('chat')}
                 onBackToReading={handleProceedToReading}
                 onReplayFormation={() => setCurrentStep('flower-formation')}
               />
@@ -256,16 +254,6 @@ export default function App() {
                 onSubmitResponse={handleSubmitResponse}
                 onBackToFlowers={() => setCurrentStep('flower-result')}
                 onBackToReading={() => setCurrentStep('reading')}
-                onProceedToChat={() => setCurrentStep('chat')}
-              />
-            )}
-
-            {/* Step 6: Chat en tiempo real con Ronald (Disponible para Isaías y Jhon) */}
-            {currentStep === 'chat' && experience && (
-              <WhatsAppUserChatView
-                experience={experience}
-                onBackToFlowers={() => setCurrentStep('flower-result')}
-                onBackToReading={handleProceedToReading}
               />
             )}
           </>
