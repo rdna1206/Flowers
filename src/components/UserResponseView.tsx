@@ -92,19 +92,10 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     setIsSending(true);
 
     try {
-      // 1. Submit to user response document
-      await onSubmitResponse(clean).catch(() => {});
+      // 1. Submit to user response document (which automatically registers message #1 in chat)
+      await onSubmitResponse(clean);
 
-      // 2. Send as first message into chat
-      await api.sendChatMessage(
-        experience.id,
-        clean,
-        'user',
-        experience.id,
-        experience.name
-      );
-
-      // 3. Reveal the live chat
+      // 2. Reveal the live chat
       setHasStartedChat(true);
       setInitialResponseText('');
 
