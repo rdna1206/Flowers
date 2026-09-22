@@ -1110,12 +1110,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1 border-t border-[#334155]/60">
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#334155]/60">
                     {onSelectUserToPreview && (
                       <button
                         type="button"
                         onClick={() => onSelectUserToPreview(u.username)}
-                        className="py-2 px-2.5 rounded-xl text-xs font-medium text-slate-200 bg-[#1E293B] border border-[#334155] flex items-center justify-center space-x-1 hover:bg-[#334155] transition-colors cursor-pointer"
+                        className="flex-1 min-w-[70px] py-2 px-2.5 rounded-xl text-xs font-medium text-slate-200 bg-[#1E293B] border border-[#334155] flex items-center justify-center space-x-1 hover:bg-[#334155] transition-colors cursor-pointer"
                         title="Ver experiencia"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#38BDF8]" />
@@ -1126,7 +1126,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <button
                         type="button"
                         onClick={() => handleOpenChat(u)}
-                        className={`py-2 px-2.5 rounded-xl text-xs font-medium border flex items-center justify-center space-x-1 transition-colors cursor-pointer ${
+                        className={`flex-1 min-w-[70px] py-2 px-2.5 rounded-xl text-xs font-medium border flex items-center justify-center space-x-1 transition-colors cursor-pointer ${
                           openChatUsers.some((oc) => oc.id.toLowerCase() === u.id.toLowerCase())
                             ? 'bg-[#1E293B] text-[#38BDF8] border-[#38BDF8]/60'
                             : 'bg-[#1E293B] text-[#25D366] border-[#334155] hover:bg-[#334155]'
@@ -1140,7 +1140,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <button
                       type="button"
                       onClick={() => handleOpenEditUser(u)}
-                      className="flex-1 py-2 px-2.5 rounded-xl text-xs font-semibold text-slate-200 bg-[#1E293B] hover:bg-[#334155] border border-[#334155] flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                      className="flex-1 min-w-[75px] py-2 px-2.5 rounded-xl text-xs font-semibold text-slate-200 bg-[#1E293B] hover:bg-[#334155] border border-[#334155] flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
                     >
                       <KeyRound className="w-3.5 h-3.5 text-[#EAB308]" />
                       <span>Editar</span>
@@ -1151,7 +1151,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         setSelectedUserId(u.id);
                         setActiveTab('texts');
                       }}
-                      className="py-2 px-2.5 rounded-xl text-xs font-medium text-slate-300 bg-[#1E293B] hover:bg-[#334155] border border-[#334155] flex items-center justify-center space-x-1 transition-colors cursor-pointer"
+                      className="flex-1 min-w-[75px] py-2 px-2.5 rounded-xl text-xs font-medium text-slate-300 bg-[#1E293B] hover:bg-[#334155] border border-[#334155] flex items-center justify-center space-x-1 transition-colors cursor-pointer"
                       title="Configurar carta y textos"
                     >
                       <FileText className="w-3.5 h-3.5" />
@@ -1161,10 +1161,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <button
                         type="button"
                         onClick={() => handleDeleteUser(u.id, u.name)}
-                        className="p-2 rounded-xl text-rose-400 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800 transition-colors cursor-pointer"
+                        className="py-2 px-3 rounded-xl text-xs font-medium text-rose-400 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800 flex items-center justify-center space-x-1 transition-colors cursor-pointer"
                         title="Eliminar usuario"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
+                        <span>Eliminar</span>
                       </button>
                     )}
                   </div>
