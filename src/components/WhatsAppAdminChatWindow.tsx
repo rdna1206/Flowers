@@ -135,10 +135,6 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
             if (hasUnread) {
               api.markChatMessagesAsRead(chatId, 'admin').catch(() => {});
             }
-            // Ensure we scroll to the bottom when new messages arrive
-            setTimeout(() => {
-              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
           }
           if (isMinimized && liveMessages.length > prevMsgCountRef.current) {
             const newCount = liveMessages.length - prevMsgCountRef.current;
@@ -616,7 +612,7 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
 
       {/* Messages Container */}
       <div
-        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col custom-scrollbar"
+        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col-reverse custom-scrollbar"
         style={{
           backgroundColor: '#070A10',
           backgroundImage:
@@ -624,6 +620,7 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
           backgroundSize: '20px 20px',
         }}
       >
+        <div ref={messagesEndRef} />
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-2">
             <div
@@ -643,16 +640,20 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
             </div>
           </div>
         ) : (
-          messages.map((msg, index) => {
+          [...messages].reverse().map((msg, index) => {
             const isFromRonald =
               msg.senderRole === 'admin' || msg.senderId === 'ronald';
 
-            const prevMsg = index > 0 ? messages[index - 1] : null;
+            // Como hemos invertido la lista, necesitamos ajustar la lógica para saber si es un nuevo día
+            const nextMsg = index < messages.length - 1 ? messages[messages.length - 2 - index] : null;
             const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
-            const prevDateKey = prevMsg
-              ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
+            const nextDateKey = nextMsg
+              ? getMessageDayKey(nextMsg.createdAt || nextMsg.timestamp)
               : null;
-            const isNewDay = index === 0 || currentDateKey !== prevDateKey;
+            
+            // Si es el último elemento del array invertido (el más antiguo), siempre es nuevo día. 
+            // Si es diferente al "siguiente" (que en realidad es el anterior cronológico), es nuevo día.
+            const isNewDay = index === messages.length - 1 || currentDateKey !== nextDateKey;
             const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
 
             return (
