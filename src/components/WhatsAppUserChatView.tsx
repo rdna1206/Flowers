@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import type { ChatMessage, UserExperienceData, ChatPresenceState } from '../types';
+import { getChatDateSeparator, getMessageDayKey } from '../lib/dateUtils';
 import { AudioVoiceMessage } from './AudioVoiceMessage';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { AudioVoiceRecorder } from './AudioVoiceRecorder';
@@ -325,13 +326,6 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
             backgroundSize: '16px 16px',
           }}
         >
-          {/* Date Pill */}
-          <div className="flex justify-center my-1">
-            <span className="bg-white/90 text-[#54656F] text-[11px] font-medium px-3 py-1 rounded-lg shadow-2xs">
-              Hoy
-            </span>
-          </div>
-
           {messages.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
               <span className="bg-white/85 text-[#54656F] text-xs px-4 py-2 rounded-lg shadow-2xs max-w-xs">
@@ -339,80 +333,98 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
               </span>
             </div>
           ) : (
-            messages.map((msg) => {
+            messages.map((msg, index) => {
               const isFromMe =
                 msg.senderRole === 'user' || msg.senderId === currentUserId;
 
+              const prevMsg = index > 0 ? messages[index - 1] : null;
+              const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
+              const prevDateKey = prevMsg
+                ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
+                : null;
+              const isNewDay = index === 0 || currentDateKey !== prevDateKey;
+              const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
+
               return (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${
-                    isFromMe ? 'items-end' : 'items-start'
-                  } w-full`}
-                >
+                <React.Fragment key={msg.id}>
+                  {/* Centered Date Separator Pill */}
+                  {isNewDay && (
+                    <div className="flex justify-center my-2">
+                      <span className="bg-white/90 text-[#54656F] text-[11px] font-medium px-3.5 py-1 rounded-lg shadow-2xs">
+                        {dateLabel}
+                      </span>
+                    </div>
+                  )}
+
                   <div
-                    className={`max-w-[85%] sm:max-w-[78%] rounded-xl text-sm leading-relaxed relative shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
-                      msg.type === 'image' ? 'p-1.5' : 'px-3.5 py-2'
-                    } ${
-                      isFromMe
-                        ? 'bg-[#D9FDD3] text-[#111B21] rounded-tr-xs'
-                        : 'bg-white text-[#111B21] rounded-tl-xs'
-                    }`}
+                    className={`flex flex-col ${
+                      isFromMe ? 'items-end' : 'items-start'
+                    } w-full`}
                   >
-                    {/* CASE 1: IMAGE MESSAGE */}
-                    {msg.type === 'image' && msg.mediaUrl ? (
-                      <div className="flex flex-col space-y-1 max-w-[260px] sm:max-w-[300px]">
-                        <div
-                          onClick={() =>
-                            setLightboxData({
-                              url: msg.mediaUrl!,
-                              caption: msg.text !== 'Foto' ? msg.text : undefined,
-                              senderName: isFromMe ? 'Tú' : 'Ronald',
-                              timestamp: formatTime(msg.createdAt || msg.timestamp),
-                            })
-                          }
-                          className="relative overflow-hidden rounded-lg bg-black/10 cursor-pointer group/img"
-                        >
-                          <img
-                            src={msg.mediaUrl}
-                            alt={msg.text || 'Foto'}
-                            className="w-full max-h-[240px] object-cover transition-transform duration-200 group-hover/img:scale-105"
-                            loading="lazy"
+                    <div
+                      className={`max-w-[85%] sm:max-w-[78%] rounded-xl text-sm leading-relaxed relative shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
+                        msg.type === 'image' ? 'p-1.5' : 'px-3.5 py-2'
+                      } ${
+                        isFromMe
+                          ? 'bg-[#D9FDD3] text-[#111B21] rounded-tr-xs'
+                          : 'bg-white text-[#111B21] rounded-tl-xs'
+                      }`}
+                    >
+                      {/* CASE 1: IMAGE MESSAGE */}
+                      {msg.type === 'image' && msg.mediaUrl ? (
+                        <div className="flex flex-col space-y-1 max-w-[260px] sm:max-w-[300px]">
+                          <div
+                            onClick={() =>
+                              setLightboxData({
+                                url: msg.mediaUrl!,
+                                caption: msg.text !== 'Foto' ? msg.text : undefined,
+                                senderName: isFromMe ? 'Tú' : 'Ronald',
+                                timestamp: formatTime(msg.createdAt || msg.timestamp),
+                              })
+                            }
+                            className="relative overflow-hidden rounded-lg bg-black/10 cursor-pointer group/img"
+                          >
+                            <img
+                              src={msg.mediaUrl}
+                              alt={msg.text || 'Foto'}
+                              className="w-full max-h-[240px] object-cover transition-transform duration-200 group-hover/img:scale-105"
+                              loading="lazy"
+                            />
+                          </div>
+                          {msg.text && msg.text !== 'Foto' && (
+                            <p className="whitespace-pre-wrap break-words px-1 text-xs sm:text-sm text-[#111B21]">
+                              {msg.text}
+                            </p>
+                          )}
+                        </div>
+                      ) : msg.type === 'audio' && msg.mediaUrl ? (
+                        /* CASE 2: AUDIO VOICE NOTE */
+                        <div className="flex flex-col">
+                          <AudioVoiceMessage
+                            mediaUrl={msg.mediaUrl}
+                            duration={msg.audioDuration}
+                            isMe={isFromMe}
+                            accentColor="#008069"
                           />
                         </div>
-                        {msg.text && msg.text !== 'Foto' && (
-                          <p className="whitespace-pre-wrap break-words px-1 text-xs sm:text-sm text-[#111B21]">
-                            {msg.text}
-                          </p>
+                      ) : (
+                        /* CASE 3: TEXT MESSAGE */
+                        <p className="whitespace-pre-wrap break-words pr-2">
+                          {msg.text}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-end space-x-1 mt-1 -mb-0.5">
+                        <span className="text-[10px] text-[#667781] leading-none">
+                          {formatTime(msg.createdAt || msg.timestamp)}
+                        </span>
+                        {isFromMe && (
+                          <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
                         )}
                       </div>
-                    ) : msg.type === 'audio' && msg.mediaUrl ? (
-                      /* CASE 2: AUDIO VOICE NOTE */
-                      <div className="flex flex-col">
-                        <AudioVoiceMessage
-                          mediaUrl={msg.mediaUrl}
-                          duration={msg.audioDuration}
-                          isMe={isFromMe}
-                          accentColor="#008069"
-                        />
-                      </div>
-                    ) : (
-                      /* CASE 3: TEXT MESSAGE */
-                      <p className="whitespace-pre-wrap break-words pr-2">
-                        {msg.text}
-                      </p>
-                    )}
-
-                    <div className="flex items-center justify-end space-x-1 mt-1 -mb-0.5">
-                      <span className="text-[10px] text-[#667781] leading-none">
-                        {formatTime(msg.createdAt || msg.timestamp)}
-                      </span>
-                      {isFromMe && (
-                        <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
-                      )}
                     </div>
                   </div>
-                </div>
+                </React.Fragment>
               );
             })
           )}

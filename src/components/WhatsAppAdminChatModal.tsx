@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import type { ChatMessage, UserRecord, ChatPresenceState } from '../types';
+import { getChatDateSeparator, getMessageDayKey } from '../lib/dateUtils';
 import { AudioVoiceMessage } from './AudioVoiceMessage';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { AudioVoiceRecorder } from './AudioVoiceRecorder';
@@ -473,17 +474,34 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                 </div>
               </div>
             ) : (
-              messages.map((msg) => {
+              messages.map((msg, index) => {
                 const isFromRonald =
                   msg.senderRole === 'admin' || msg.senderId === 'ronald';
 
+                const prevMsg = index > 0 ? messages[index - 1] : null;
+                const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
+                const prevDateKey = prevMsg
+                  ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
+                  : null;
+                const isNewDay = index === 0 || currentDateKey !== prevDateKey;
+                const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
+
                 return (
-                  <div
-                    key={msg.id}
-                    className={`group/msg flex flex-col ${
-                      isFromRonald ? 'items-end' : 'items-start'
-                    } w-full relative`}
-                  >
+                  <React.Fragment key={msg.id}>
+                    {/* Centered Date Separator Pill */}
+                    {isNewDay && (
+                      <div className="flex justify-center my-2">
+                        <span className="bg-[#131B2A]/90 border border-white/10 text-[#94A3B8] text-[11px] font-medium px-3.5 py-1 rounded-full shadow-2xs backdrop-blur-xs">
+                          {dateLabel}
+                        </span>
+                      </div>
+                    )}
+
+                    <div
+                      className={`group/msg flex flex-col ${
+                        isFromRonald ? 'items-end' : 'items-start'
+                      } w-full relative`}
+                    >
                     <div className="flex items-end gap-1.5 max-w-[90%] sm:max-w-[82%]">
                       {/* Left side trash icon for Ronald's outgoing messages */}
                       {isFromRonald && (
@@ -613,9 +631,10 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                       )}
                     </div>
                   </div>
-                );
-              })
-            )}
+                </React.Fragment>
+              );
+            })
+          )}
 
             {/* Real-time Indicator: User recording audio */}
             {presence.userRecording && (

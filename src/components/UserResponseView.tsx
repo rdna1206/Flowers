@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { UserExperienceData, UserResponse, ChatMessage, ChatPresenceState } from '../types';
 import { api } from '../lib/api';
+import { getChatDateSeparator, getMessageDayKey } from '../lib/dateUtils';
 import { AudioVoiceMessage } from './AudioVoiceMessage';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { AudioVoiceRecorder } from './AudioVoiceRecorder';
@@ -544,92 +545,119 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
               {messages.map((msg, index) => {
                 const isFromMe = msg.senderRole === 'user' || msg.senderId === experience.id;
 
+                const prevMsg = index > 0 ? messages[index - 1] : null;
+                const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
+                const prevDateKey = prevMsg
+                  ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
+                  : null;
+                const isNewDay = index === 0 || currentDateKey !== prevDateKey;
+                const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
+
                 return (
-                  <motion.div
-                    key={msg.id || index}
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.25 }}
-                    className={`flex flex-col ${isFromMe ? 'items-end' : 'items-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl ${
-                        msg.type === 'image' ? 'p-2' : 'px-4 py-2.5'
-                      } shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${
-                        isFromMe
-                          ? 'rounded-br-xs text-white shadow-md'
-                          : 'rounded-bl-xs border text-left shadow-xs'
-                      }`}
-                      style={
-                        isFromMe
-                          ? {
-                              backgroundColor: primaryColor,
-                              color: '#FFFFFF',
-                              boxShadow: `0 4px 14px ${primaryColor}35`,
-                            }
-                          : {
-                              backgroundColor: isDarkTheme ? '#131F38' : '#FFFFFF',
-                              borderColor: borderColor,
-                              color: isDarkTheme ? '#F1F5F9' : '#1E293B',
-                            }
-                      }
-                    >
-                      {!isFromMe && (
-                        <div className="text-[10px] font-bold text-emerald-400 mb-0.5 tracking-wide">
-                          Ronald
-                        </div>
-                      )}
-
-                      {/* CASE 1: IMAGE */}
-                      {msg.type === 'image' && msg.mediaUrl ? (
-                        <div className="flex flex-col space-y-1 max-w-[260px] sm:max-w-[300px]">
-                          <div
-                            onClick={() =>
-                              setLightboxData({
-                                url: msg.mediaUrl!,
-                                caption: msg.text !== 'Foto' ? msg.text : undefined,
-                                senderName: isFromMe ? 'Tú' : 'Ronald',
-                                timestamp: formatMessageTime(msg.createdAt),
-                              })
-                            }
-                            className="relative overflow-hidden rounded-xl bg-black/20 cursor-pointer group/img"
-                          >
-                            <img
-                              src={msg.mediaUrl}
-                              alt={msg.text || 'Foto'}
-                              className="w-full max-h-[240px] object-cover transition-transform duration-200 group-hover/img:scale-105"
-                              loading="lazy"
-                            />
-                          </div>
-                          {msg.text && msg.text !== 'Foto' && (
-                            <p className="text-sm select-text font-normal px-1">
-                              {msg.text}
-                            </p>
-                          )}
-                        </div>
-                      ) : msg.type === 'audio' && msg.mediaUrl ? (
-                        /* CASE 2: AUDIO */
-                        <AudioVoiceMessage
-                          mediaUrl={msg.mediaUrl}
-                          duration={msg.audioDuration}
-                          isMe={isFromMe}
-                          accentColor={accentColor}
-                        />
-                      ) : (
-                        /* CASE 3: TEXT */
-                        <p className="text-sm select-text font-normal">{msg.text}</p>
-                      )}
-
-                      <div
-                        className={`flex items-center justify-end space-x-1 mt-1 text-[10px] ${
-                          isFromMe ? 'text-white/80' : isDarkTheme ? 'text-gray-400' : 'text-gray-500'
-                        }`}
-                      >
-                        <span>{formatMessageTime(msg.createdAt)}</span>
-                        {isFromMe && <CheckCheck className="w-3.5 h-3.5 text-white/90" />}
+                  <React.Fragment key={msg.id || index}>
+                    {/* Centered Date Separator Pill */}
+                    {isNewDay && (
+                      <div className="flex justify-center my-2">
+                        <span
+                          className="text-[11px] font-medium px-3.5 py-1 rounded-full border shadow-2xs backdrop-blur-xs"
+                          style={{
+                            backgroundColor: isDarkTheme
+                              ? 'rgba(19, 31, 56, 0.9)'
+                              : 'rgba(255, 255, 255, 0.9)',
+                            borderColor: borderColor,
+                            color: mutedTextColor,
+                          }}
+                        >
+                          {dateLabel}
+                        </span>
                       </div>
-                    </div>
-                  </motion.div>
+                    )}
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.25 }}
+                      className={`flex flex-col ${isFromMe ? 'items-end' : 'items-start'}`}
+                    >
+                      <div
+                        className={`max-w-[85%] sm:max-w-[75%] rounded-2xl ${
+                          msg.type === 'image' ? 'p-2' : 'px-4 py-2.5'
+                        } shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${
+                          isFromMe
+                            ? 'rounded-br-xs text-white shadow-md'
+                            : 'rounded-bl-xs border text-left shadow-xs'
+                        }`}
+                        style={
+                          isFromMe
+                            ? {
+                                backgroundColor: primaryColor,
+                                color: '#FFFFFF',
+                                boxShadow: `0 4px 14px ${primaryColor}35`,
+                              }
+                            : {
+                                backgroundColor: isDarkTheme ? '#131F38' : '#FFFFFF',
+                                borderColor: borderColor,
+                                color: isDarkTheme ? '#F1F5F9' : '#1E293B',
+                              }
+                        }
+                      >
+                        {!isFromMe && (
+                          <div className="text-[10px] font-bold text-emerald-400 mb-0.5 tracking-wide">
+                            Ronald
+                          </div>
+                        )}
+
+                        {/* CASE 1: IMAGE */}
+                        {msg.type === 'image' && msg.mediaUrl ? (
+                          <div className="flex flex-col space-y-1 max-w-[260px] sm:max-w-[300px]">
+                            <div
+                              onClick={() =>
+                                setLightboxData({
+                                  url: msg.mediaUrl!,
+                                  caption: msg.text !== 'Foto' ? msg.text : undefined,
+                                  senderName: isFromMe ? 'Tú' : 'Ronald',
+                                  timestamp: formatMessageTime(msg.createdAt),
+                                })
+                              }
+                              className="relative overflow-hidden rounded-xl bg-black/20 cursor-pointer group/img"
+                            >
+                              <img
+                                src={msg.mediaUrl}
+                                alt={msg.text || 'Foto'}
+                                className="w-full max-h-[240px] object-cover transition-transform duration-200 group-hover/img:scale-105"
+                                loading="lazy"
+                              />
+                            </div>
+                            {msg.text && msg.text !== 'Foto' && (
+                              <p className="text-sm select-text font-normal px-1">
+                                {msg.text}
+                              </p>
+                            )}
+                          </div>
+                        ) : msg.type === 'audio' && msg.mediaUrl ? (
+                          /* CASE 2: AUDIO */
+                          <AudioVoiceMessage
+                            mediaUrl={msg.mediaUrl}
+                            duration={msg.audioDuration}
+                            isMe={isFromMe}
+                            accentColor={accentColor}
+                          />
+                        ) : (
+                          /* CASE 3: TEXT */
+                          <p className="text-sm select-text font-normal">{msg.text}</p>
+                        )}
+
+                        <div
+                          className={`flex items-center justify-end space-x-1 mt-1 text-[10px] ${
+                            isFromMe ? 'text-white/80' : isDarkTheme ? 'text-gray-400' : 'text-gray-500'
+                          }`}
+                        >
+                          <span>{formatMessageTime(msg.createdAt)}</span>
+                          {isFromMe && <CheckCheck className="w-3.5 h-3.5 text-white/90" />}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </React.Fragment>
                 );
               })}
 
