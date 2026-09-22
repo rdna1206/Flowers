@@ -13,6 +13,9 @@ import {
   Image as ImageIcon,
   Mic,
   LogOut,
+  Reply,
+  Plus,
+  X,
 } from 'lucide-react';
 import type { UserExperienceData, UserResponse, ChatMessage, ChatPresenceState } from '../types';
 import { api } from '../lib/api';
@@ -66,6 +69,25 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   const [hasStartedChat, setHasStartedChat] = useState<boolean>(() => {
     return Boolean(experience.userResponse?.text && experience.userResponse.text.trim().length > 0);
   });
+
+  const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
+  const [pickerMsgId, setPickerMsgId] = useState<string | null>(null);
+
+  const IOS_EMOJIS = [
+    '❤️', '👍', '😂', '😮', '😢', '🙏',
+    '😊', '🥰', '😎', '🔥', '✨', '🎉',
+    '💯', '🌹', '😍', '🥳', '👏', '🙌',
+    '💪', '👑', '💡', '☕', '🌟', '🍀',
+    '💙', '💚', '💛', '💜', '🤍', '🚀'
+  ];
+
+  const handleToggleReaction = async (msgId: string, emoji: string) => {
+    try {
+      await api.toggleMessageReaction(chatId, msgId, emoji, experience.id);
+    } catch (err) {
+      console.warn('Error toggling reaction:', err);
+    }
+  };
 
   // Media modals state
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
@@ -238,11 +260,22 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     try {
       await api.sendChatMessage(
         chatId,
-        clean,
+        {
+          text: clean,
+          type: 'text',
+          replyTo: replyingTo
+            ? {
+                id: replyingTo.id,
+                text: replyingTo.text,
+                senderName: replyingTo.senderName,
+              }
+            : undefined,
+        },
         'user',
         experience.id,
         experience.name
       );
+      setReplyingTo(null);
 
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -593,8 +626,98 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                       initial={{ opacity: 0, y: 10, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.25 }}
-                      className={`flex flex-col ${isFromMe ? 'items-end' : 'items-start'}`}
+                      className={`group relative flex flex-col ${isFromMe ? 'items-end' : 'items-start'} my-1`}
+                      onTouchStart={(e) => {
+                        (e.currentTarget as any)._touchStartX = e.touches[0].clientX;
+                      }}
+                      onTouchEnd={(e) => {
+                        const startX = (e.currentTarget as any)._touchStartX || 0;
+                        const diff = e.changedTouches[0].clientX - startX;
+                        if (diff > 60) {
+                          setReplyingTo({
+                            id: msg.id,
+                            text: msg.text,
+                            senderName: isFromMe ? 'Tú' : (msg.senderName || 'Ronald'),
+                          });
+                        }
+                      }}
                     >
+                      {/* Backdrop to close emoji picker when clicking anywhere outside */}
+                      {pickerMsgId === msg.id && (
+                        <div
+                          className="fixed inset-0 z-40 bg-transparent"
+                          onClick={() => setPickerMsgId(null)}
+                        />
+                      )}
+
+                      {/* Hover / Tap Action Toolbar (Reply & Quick Reactions) positioned beside message */}
+                      <div
+                        className={`absolute top-1/2 -translate-y-1/2 ${
+                          isFromMe ? 'right-full mr-2.5' : 'left-full ml-2.5'
+                        } opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center space-x-1.5 bg-black/80 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-xl z-30 whitespace-nowrap`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setReplyingTo({
+                              id: msg.id,
+                              text: msg.text,
+                              senderName: isFromMe ? 'Tú' : (msg.senderName || 'Ronald'),
+                            })
+                          }
+                          className="text-white hover:text-cyan-400 transition-colors cursor-pointer"
+                          title="Responder"
+                        >
+                          <Reply className="w-3.5 h-3.5" />
+                        </button>
+                        {['❤️', '👍', '😂'].map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => handleToggleReaction(msg.id, emoji)}
+                            className="text-sm hover:scale-125 transition-transform cursor-pointer"
+                            title={`Reaccionar con ${emoji}`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => setPickerMsgId(pickerMsgId === msg.id ? null : msg.id)}
+                          className="p-0.5 text-white hover:text-yellow-300 transition-colors rounded-full bg-white/20 cursor-pointer"
+                          title="Más emojis (+)"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Full iOS Emoji Picker Popover */}
+                      {pickerMsgId === msg.id && (
+                        <div
+                          className={`absolute z-50 ${
+                            isFromMe ? 'right-full mr-2.5' : 'left-full ml-2.5'
+                          } top-1/2 -translate-y-1/2 p-3 rounded-2xl border shadow-2xl backdrop-blur-xl w-64 grid grid-cols-6 gap-2`}
+                          style={{
+                            backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            borderColor: borderColor,
+                          }}
+                        >
+                          {IOS_EMOJIS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => {
+                                handleToggleReaction(msg.id, emoji);
+                                setPickerMsgId(null);
+                              }}
+                              className="text-xl p-1.5 rounded-xl hover:bg-white/20 transition-colors text-center cursor-pointer"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
                       <div
                         className={`max-w-[85%] sm:max-w-[75%] rounded-2xl ${
                           msg.type === 'image' ? 'p-2' : 'px-4 py-2.5'
@@ -620,6 +743,22 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                         {!isFromMe && (
                           <div className="text-[10px] font-bold text-emerald-400 mb-0.5 tracking-wide">
                             Ronald
+                          </div>
+                        )}
+
+                        {/* Quoted Reply Quote Block */}
+                        {msg.replyTo && (
+                          <div
+                            className="mb-2 p-2 rounded-xl border-l-2 text-xs opacity-95"
+                            style={{
+                              backgroundColor: isFromMe ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.06)',
+                              borderColor: accentColor,
+                            }}
+                          >
+                            <div className="font-bold text-[11px] mb-0.5" style={{ color: accentColor }}>
+                              {msg.replyTo.senderName}
+                            </div>
+                            <div className="truncate italic text-[11px]">{msg.replyTo.text}</div>
                           </div>
                         )}
 
@@ -679,6 +818,40 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                           )}
                         </div>
                       </div>
+
+                      {/* Reactions Pills Below Message Bubble */}
+                      {msg.reactions && Object.keys(msg.reactions).length > 0 && (
+                        <div className={`flex flex-wrap gap-1 mt-1 ${isFromMe ? 'justify-end' : 'justify-start'}`}>
+                          {Object.entries(msg.reactions).map(([emoji, users]) => {
+                            const hasReacted = users.includes(experience.id);
+                            return (
+                              <button
+                                key={emoji}
+                                type="button"
+                                onClick={() => handleToggleReaction(msg.id, emoji)}
+                                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs border shadow-2xs transition-transform hover:scale-110 cursor-pointer"
+                                style={{
+                                  backgroundColor: hasReacted
+                                    ? isFromMe
+                                      ? 'rgba(255,255,255,0.25)'
+                                      : accentColor + '30'
+                                    : isDarkTheme
+                                    ? '#1E293B'
+                                    : '#F1F5F9',
+                                  borderColor: hasReacted ? accentColor : borderColor,
+                                  color: textColor,
+                                }}
+                                title={`${users.length} reacción(es)`}
+                              >
+                                <span>{emoji}</span>
+                                {users.length > 1 && (
+                                  <span className="text-[10px] font-bold">{users.length}</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </motion.div>
                   </React.Fragment>
                 );
@@ -740,6 +913,33 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                 borderColor: borderColor,
               }}
             >
+              {/* Reply Preview Banner */}
+              {replyingTo && (
+                <div
+                  className="mb-2.5 px-3.5 py-2 rounded-xl border flex items-center justify-between text-xs backdrop-blur-md"
+                  style={{
+                    backgroundColor: innerCardBg,
+                    borderColor: accentColor,
+                    color: textColor,
+                  }}
+                >
+                  <div className="flex items-center space-x-2 truncate">
+                    <Reply className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                    <div className="truncate">
+                      <span className="font-semibold">Respondiendo a {replyingTo.senderName}:</span>{' '}
+                      <span className="opacity-80">{replyingTo.text}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setReplyingTo(null)}
+                    className="p-1 rounded-full hover:bg-black/10 transition-colors cursor-pointer shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
               {isRecordingVoice ? (
                 <AudioVoiceRecorder
                   onSendAudio={handleConfirmSendAudio}

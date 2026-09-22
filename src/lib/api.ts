@@ -35,6 +35,7 @@ import {
   subscribeToChatPresence,
   uploadChatMedia,
   markChatMessagesAsRead,
+  toggleMessageReaction,
 } from './firebase';
 
 const TOKEN_KEY = 'floral_session_token';
@@ -552,5 +553,12 @@ export const api = {
     onError?: (err: Error) => void
   ): () => void {
     return subscribeToChatPresence(chatId, onUpdate, onError);
+  },
+
+  /**
+   * Toggle reaction on a chat message
+   */
+  async toggleMessageReaction(chatId: string, messageId: string, emoji: string, userKey: string): Promise<void> {
+    await toggleMessageReaction(chatId, messageId, emoji, userKey);
   },
 };

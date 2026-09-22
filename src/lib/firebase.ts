@@ -647,6 +647,11 @@ export async function sendChatMessage(
     fileSize?: number;
     mimeType?: string;
     audioDuration?: number;
+    replyTo?: {
+      id: string;
+      text: string;
+      senderName: string;
+    };
   }
 ): Promise<ChatMessage> {
   const normChatId = chatId.trim().toLowerCase();
@@ -685,6 +690,9 @@ export async function sendChatMessage(
   }
   if (message.audioDuration !== undefined && message.audioDuration !== null && !isNaN(message.audioDuration)) {
     newMsg.audioDuration = message.audioDuration;
+  }
+  if (message.replyTo !== undefined && message.replyTo !== null) {
+    newMsg.replyTo = message.replyTo;
   }
 
   const cleanMsgPayload = cleanUndefined(newMsg);
@@ -727,6 +735,44 @@ export async function sendChatMessage(
     return newMsg;
   } catch (err) {
     handleFirestoreError(err, 'create', `${CHATS_COLLECTION}/${normChatId}/${MESSAGES_COLLECTION}/${msgId}`);
+  }
+}
+
+/**
+ * Toggle a reaction emoji on a message
+ */
+export async function toggleMessageReaction(
+  chatId: string,
+  messageId: string,
+  emoji: string,
+  userKey: string
+): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const msgRef = doc(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION, messageId);
+    const msgSnap = await getDoc(msgRef);
+    if (!msgSnap.exists()) return;
+    const msgData = msgSnap.data() as ChatMessage;
+    const reactions = msgData.reactions || {};
+    const existingUsers = reactions[emoji] || [];
+
+    let updatedUsers: string[];
+    if (existingUsers.includes(userKey)) {
+      updatedUsers = existingUsers.filter((u) => u !== userKey);
+    } else {
+      updatedUsers = [...existingUsers, userKey];
+    }
+
+    const updatedReactions = { ...reactions };
+    if (updatedUsers.length > 0) {
+      updatedReactions[emoji] = updatedUsers;
+    } else {
+      delete updatedReactions[emoji];
+    }
+
+    await updateDoc(msgRef, { reactions: updatedReactions });
+  } catch (err) {
+    console.warn('Error toggling reaction:', err);
   }
 }
 
