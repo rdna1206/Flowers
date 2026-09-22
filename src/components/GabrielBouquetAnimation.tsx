@@ -47,18 +47,18 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
     setIsCompleted(false);
 
     const timers = [
-      setTimeout(() => setStep('yellow-stems-and-leaves'), 1200),
-      setTimeout(() => setStep('yellow-blooms-opening'), 2800),
-      setTimeout(() => setStep('blue-black-aura-awakens'), 5000),
-      setTimeout(() => setStep('blue-black-outer-unfold'), 6600),
-      setTimeout(() => setStep('blue-black-mid-unfold'), 8800),
-      setTimeout(() => setStep('blue-black-inner-unfold'), 10800),
-      setTimeout(() => setStep('blue-black-corona-unfold'), 12600),
-      setTimeout(() => setStep('number-13-reveal'), 14200),
+      setTimeout(() => setStep('yellow-stems-and-leaves'), 1000),
+      setTimeout(() => setStep('yellow-blooms-opening'), 2500),
+      setTimeout(() => setStep('blue-black-aura-awakens'), 4800),
+      setTimeout(() => setStep('blue-black-outer-unfold'), 6400),
+      setTimeout(() => setStep('blue-black-mid-unfold'), 8400),
+      setTimeout(() => setStep('blue-black-inner-unfold'), 10200),
+      setTimeout(() => setStep('blue-black-corona-unfold'), 11800),
+      setTimeout(() => setStep('number-13-reveal'), 13400),
       setTimeout(() => {
         setStep('bouquet-complete');
         setIsCompleted(true);
-      }, 15800),
+      }, 14800),
     ];
 
     timerRefs.current = timers;
@@ -135,27 +135,17 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
         <div className="relative w-full flex items-center justify-center">
           <svg
             viewBox="0 0 400 520"
-            className="w-full h-auto max-w-[360px] sm:max-w-[420px] drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)]"
+            className="w-full h-auto max-w-[360px] sm:max-w-[420px] drop-shadow-[0_15px_30px_rgba(0,0,0,0.85)]"
             style={{ overflow: 'visible' }}
           >
             <defs>
-              {/* =========================================================
-                  LIGHTING, SHADOW & GLOW FILTERS
-                 ========================================================= */}
-              <filter id="gabrielGlow13" x="-40%" y="-40%" width="180%" height="180%">
+              {/* LIGHTING & GLOW FILTERS */}
+              <filter id="gabrielGlow13" x="-30%" y="-30%" width="160%" height="160%">
                 <feGaussianBlur stdDeviation="2" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
-              <filter id="gabrielDropShadow3D" x="-30%" y="-30%" width="160%" height="160%">
-                <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#000000" floodOpacity="0.9" />
-              </filter>
-              <filter id="gabrielPetalShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#020617" floodOpacity="0.85" />
-              </filter>
 
-              {/* =========================================================
-                  YELLOW BLOOMS GRADIENTS
-                 ========================================================= */}
+              {/* YELLOW BLOOMS GRADIENTS */}
               <radialGradient id="gabrielYellowSunburst" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="#FEF08A" />
                 <stop offset="50%" stopColor="#FACC15" />
@@ -175,9 +165,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                 <stop offset="100%" stopColor="#78350F" />
               </radialGradient>
 
-              {/* =========================================================
-                  GABRIEL'S SIGNATURE BLUE & BLACK SPECIAL FLOWER GRADIENTS
-                 ========================================================= */}
+              {/* GABRIEL'S SIGNATURE BLUE & BLACK SPECIAL FLOWER GRADIENTS */}
               <radialGradient id="gabrielBlueBlackAura" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.9" />
                 <stop offset="35%" stopColor="#1E40AF" stopOpacity="0.65" />
@@ -220,9 +208,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                 <stop offset="100%" stopColor="#000000" />
               </radialGradient>
 
-              {/* =========================================================
-                  FOLIAGE & WRAP GRADIENTS
-                 ========================================================= */}
+              {/* FOLIAGE & WRAP GRADIENTS */}
               <linearGradient id="gabrielLeafEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#10B981" />
                 <stop offset="60%" stopColor="#047857" />
@@ -254,7 +240,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.2, ease: 'easeOut' }}
+                  transition={{ duration: 1.0, ease: 'easeOut' }}
                 />
                 <motion.path
                   d="M 200,480 Q 210,360 260,230"
@@ -264,7 +250,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.2, delay: 0.1, ease: 'easeOut' }}
+                  transition={{ duration: 1.0, delay: 0.08, ease: 'easeOut' }}
                 />
                 <motion.path
                   d="M 200,480 Q 180,380 100,280"
@@ -274,7 +260,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.1, delay: 0.15, ease: 'easeOut' }}
+                  transition={{ duration: 0.9, delay: 0.12, ease: 'easeOut' }}
                 />
                 <motion.path
                   d="M 200,480 Q 220,380 300,280"
@@ -284,7 +270,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.1, delay: 0.2, ease: 'easeOut' }}
+                  transition={{ duration: 0.9, delay: 0.16, ease: 'easeOut' }}
                 />
                 <motion.path
                   d="M 200,480 Q 170,390 145,340"
@@ -294,7 +280,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1, delay: 0.25, ease: 'easeOut' }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
                 />
                 <motion.path
                   d="M 200,480 Q 230,390 255,340"
@@ -304,7 +290,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+                  transition={{ duration: 0.8, delay: 0.24, ease: 'easeOut' }}
                 />
 
                 {/* Leaves Unfolding */}
@@ -313,7 +299,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="url(#gabrielLeafEmerald)"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 0.9 }}
-                  transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+                  transition={{ duration: 0.8, delay: 0.25, ease: 'easeOut' }}
                   style={{ transformOrigin: '160px 340px' }}
                 />
                 <motion.path
@@ -321,7 +307,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="url(#gabrielLeafEmerald)"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 0.9 }}
-                  transition={{ duration: 1, delay: 0.35, ease: 'easeOut' }}
+                  transition={{ duration: 0.8, delay: 0.28, ease: 'easeOut' }}
                   style={{ transformOrigin: '240px 340px' }}
                 />
                 <motion.path
@@ -329,7 +315,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="url(#gabrielLeafEmerald)"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 0.85 }}
-                  transition={{ duration: 1, delay: 0.4, ease: 'easeOut' }}
+                  transition={{ duration: 0.8, delay: 0.32, ease: 'easeOut' }}
                   style={{ transformOrigin: '180px 260px' }}
                 />
                 <motion.path
@@ -337,7 +323,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="url(#gabrielLeafEmerald)"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 0.85 }}
-                  transition={{ duration: 1, delay: 0.45, ease: 'easeOut' }}
+                  transition={{ duration: 0.8, delay: 0.36, ease: 'easeOut' }}
                   style={{ transformOrigin: '220px 260px' }}
                 />
               </g>
@@ -353,7 +339,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   strokeWidth="1.5"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 1.1, delay: 0.5, ease: 'easeOut' }}
+                  transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
                   style={{ transformOrigin: '200px 500px' }}
                 />
                 <motion.line
@@ -365,7 +351,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   strokeWidth="2"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1, delay: 0.6 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
                 />
                 <motion.line
                   x1="280"
@@ -376,7 +362,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   strokeWidth="2"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 1, delay: 0.6 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
                 />
 
                 {/* Ribbon Knot */}
@@ -385,7 +371,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="url(#gabrielWrapGoldTrim)"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ duration: 0.8, delay: 0.7 }}
+                  transition={{ duration: 0.7, delay: 0.58 }}
                   style={{ transformOrigin: '200px 375px' }}
                 />
                 <motion.path
@@ -396,7 +382,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.9, delay: 0.75 }}
+                  transition={{ duration: 0.8, delay: 0.62 }}
                 />
                 <motion.path
                   d="M 220,375 C 240,420 250,450 245,470"
@@ -406,15 +392,15 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.9, delay: 0.75 }}
+                  transition={{ duration: 0.8, delay: 0.62 }}
                 />
               </g>
             )}
 
-            {/* Layer 3: Abundant Prominent Yellow Flowers (Apertura Radial de Pétalos desde Cerrados a Abiertos) */}
+            {/* Layer 3: Abundant Prominent Yellow Flowers - Smooth Hardware Accelerated Opening */}
             {isStepAtLeast('yellow-blooms-opening') && (
               <g id="gabriel-yellow-blooms">
-                {/* Yellow Bloom #1 - Top Left (cx: 135, cy: 160) */}
+                {/* Yellow Bloom #1 - Top Left (135, 160) */}
                 <g transform="translate(135, 160)">
                   {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
                     <g key={`y1-g-${i}`} transform={`rotate(${angle})`}>
@@ -423,12 +409,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                         fill="url(#gabrielYellowPetalSoft)"
                         stroke="#EAB308"
                         strokeWidth="0.8"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -30, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.3,
-                          delay: (i % 3) * 0.12 + Math.floor(i / 3) * 0.06,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.9,
+                          delay: (i % 3) * 0.08 + Math.floor(i / 3) * 0.05,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -439,12 +425,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       <motion.path
                         d="M 0,0 C -9,-26 0,-38 0,-38 C 0,-38 9,-26 0,0 Z"
                         fill="url(#gabrielYellowSunburst)"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -20, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.2,
-                          delay: 0.3 + (i % 3) * 0.1,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.8,
+                          delay: 0.25 + (i % 3) * 0.06,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -459,11 +445,11 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                     strokeWidth="1.2"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.8, delay: 0.55 }}
+                    transition={{ duration: 0.6, delay: 0.45, ease: 'easeOut' }}
                   />
                 </g>
 
-                {/* Yellow Bloom #2 - Top Right (cx: 265, cy: 160) */}
+                {/* Yellow Bloom #2 - Top Right (265, 160) */}
                 <g transform="translate(265, 160)">
                   {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
                     <g key={`y2-g-${i}`} transform={`rotate(${angle})`}>
@@ -472,12 +458,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                         fill="url(#gabrielYellowPetalSoft)"
                         stroke="#EAB308"
                         strokeWidth="0.8"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -30, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.3,
-                          delay: 0.1 + (i % 3) * 0.12 + Math.floor(i / 3) * 0.06,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.9,
+                          delay: 0.1 + (i % 3) * 0.08 + Math.floor(i / 3) * 0.05,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -488,12 +474,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       <motion.path
                         d="M 0,0 C -9,-26 0,-38 0,-38 C 0,-38 9,-26 0,0 Z"
                         fill="url(#gabrielYellowSunburst)"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -20, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.2,
-                          delay: 0.4 + (i % 3) * 0.1,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.8,
+                          delay: 0.35 + (i % 3) * 0.06,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -508,11 +494,11 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                     strokeWidth="1.2"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.8, delay: 0.6 }}
+                    transition={{ duration: 0.6, delay: 0.5, ease: 'easeOut' }}
                   />
                 </g>
 
-                {/* Yellow Bloom #3 - Mid Left (cx: 95, cy: 245) */}
+                {/* Yellow Bloom #3 - Mid Left (95, 245) */}
                 <g transform="translate(95, 245)">
                   {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((angle, i) => (
                     <g key={`y3-g-${i}`} transform={`rotate(${angle})`}>
@@ -521,12 +507,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                         fill="url(#gabrielYellowSunburst)"
                         stroke="#CA8A04"
                         strokeWidth="0.8"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -25, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.2,
-                          delay: 0.2 + (i % 3) * 0.12,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.85,
+                          delay: 0.15 + (i % 3) * 0.07,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -541,11 +527,11 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                     strokeWidth="1"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.65 }}
+                    transition={{ duration: 0.55, delay: 0.55, ease: 'easeOut' }}
                   />
                 </g>
 
-                {/* Yellow Bloom #4 - Mid Right (cx: 305, cy: 245) */}
+                {/* Yellow Bloom #4 - Mid Right (305, 245) */}
                 <g transform="translate(305, 245)">
                   {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((angle, i) => (
                     <g key={`y4-g-${i}`} transform={`rotate(${angle})`}>
@@ -554,12 +540,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                         fill="url(#gabrielYellowSunburst)"
                         stroke="#CA8A04"
                         strokeWidth="0.8"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -25, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.2,
-                          delay: 0.25 + (i % 3) * 0.12,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.85,
+                          delay: 0.2 + (i % 3) * 0.07,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -574,23 +560,23 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                     strokeWidth="1"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.7 }}
+                    transition={{ duration: 0.55, delay: 0.6, ease: 'easeOut' }}
                   />
                 </g>
 
-                {/* Yellow Bloom #5 - Lower Left Base (cx: 145, cy: 310) */}
+                {/* Yellow Bloom #5 - Lower Left Base (145, 310) */}
                 <g transform="translate(145, 310)">
                   {[0, 40, 80, 120, 160, 200, 240, 280, 320].map((angle, i) => (
                     <g key={`y5-g-${i}`} transform={`rotate(${angle})`}>
                       <motion.path
                         d="M 0,0 C -10,-28 0,-40 0,-40 C 0,-40 10,-28 0,0 Z"
                         fill="url(#gabrielYellowSunburst)"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -20, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.1,
-                          delay: 0.3 + (i % 3) * 0.1,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.8,
+                          delay: 0.25 + (i % 3) * 0.06,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -603,23 +589,23 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                     fill="url(#gabrielYellowCenter)"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.75 }}
+                    transition={{ duration: 0.5, delay: 0.65, ease: 'easeOut' }}
                   />
                 </g>
 
-                {/* Yellow Bloom #6 - Lower Right Base (cx: 255, cy: 310) */}
+                {/* Yellow Bloom #6 - Lower Right Base (255, 310) */}
                 <g transform="translate(255, 310)">
                   {[0, 40, 80, 120, 160, 200, 240, 280, 320].map((angle, i) => (
                     <g key={`y6-g-${i}`} transform={`rotate(${angle})`}>
                       <motion.path
                         d="M 0,0 C -10,-28 0,-40 0,-40 C 0,-40 10,-28 0,0 Z"
                         fill="url(#gabrielYellowSunburst)"
-                        initial={{ scale: 0, scaleX: 0.1, rotate: -20, opacity: 0 }}
-                        animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          duration: 1.1,
-                          delay: 0.35 + (i % 3) * 0.1,
-                          ease: [0.16, 1, 0.3, 1],
+                          duration: 0.8,
+                          delay: 0.3 + (i % 3) * 0.06,
+                          ease: 'easeOut',
                         }}
                         style={{ transformOrigin: '0px 0px' }}
                       />
@@ -632,24 +618,15 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                     fill="url(#gabrielYellowCenter)"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.8 }}
+                    transition={{ duration: 0.5, delay: 0.7, ease: 'easeOut' }}
                   />
                 </g>
               </g>
             )}
 
-            {/* =========================================================
-                GABRIEL'S HIGHLY DETAILED & IMPOSING SPECIAL BLUE-BLACK FLOWER
-                - Opening sequence:
-                  1. Stem & Aura awaken
-                  2. Tier 1 (Capas traseras): 12 Lanceolate Petals unfold outwards
-                  3. Tier 2 (Capas intermedias): 12 Curved Petals open in counter-rotation
-                  4. Tier 3 (Capas frontales / Corola): 10 Silk Inner Petals blossom
-                  5. Tier 4: Corona of Mini Petals & Filaments expands
-                  6. Receptacle Core & Integrated Number 13 reveals at exact center
-               ========================================================= */}
+            {/* SPECIAL BLUE-BLACK FLOWER - Smooth 60fps Hardware Accelerated Motion */}
             <g id="gabriel-special-blue-black-flower">
-              {/* Special Stem growing from base up to center (200, 205) */}
+              {/* Special Stem */}
               {isStepAtLeast('blue-black-aura-awakens') && (
                 <motion.path
                   d="M 200,480 Q 200,340 200,205"
@@ -659,12 +636,12 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.4, ease: 'easeOut' }}
+                  transition={{ duration: 1.2, ease: 'easeOut' }}
                 />
               )}
 
               {/* Central Flower Group centered at (200, 205) */}
-              <g transform="translate(200, 205)" filter="url(#gabrielDropShadow3D)">
+              <g transform="translate(200, 205)">
                 {/* 1. Volumetric Ambient Aura & Rotating Energy Rings */}
                 {isStepAtLeast('blue-black-aura-awakens') && (
                   <g id="special-aura-layer">
@@ -676,7 +653,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       className="pointer-events-none"
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 0.95 }}
-                      transition={{ duration: 1.8, ease: 'easeOut' }}
+                      transition={{ duration: 1.5, ease: 'easeOut' }}
                     />
                     {/* Outer Rotating Dashed Ring */}
                     <motion.circle
@@ -691,7 +668,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       initial={{ scale: 0 }}
                       animate={{ scale: 1, rotate: 360 }}
                       transition={{
-                        scale: { duration: 1.4 },
+                        scale: { duration: 1.2 },
                         rotate: { duration: 22, repeat: Infinity, ease: 'linear' },
                       }}
                     />
@@ -708,25 +685,25 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       initial={{ scale: 0 }}
                       animate={{ scale: 1, rotate: -360 }}
                       transition={{
-                        scale: { duration: 1.4 },
+                        scale: { duration: 1.2 },
                         rotate: { duration: 17, repeat: Infinity, ease: 'linear' },
                       }}
                     />
                   </g>
                 )}
 
-                {/* TIER 1: OUTER LAYER - CAPAS TRASERAS - 12 GRAND LANCEOLATE PETALS (Apertura progresiva por grupos) */}
+                {/* TIER 1: OUTER LAYER - 12 GRAND LANCEOLATE PETALS */}
                 {isStepAtLeast('blue-black-outer-unfold') && (
                   <g id="special-tier1-outer">
                     {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
                       <g key={`t1-p-g-${i}`} transform={`rotate(${deg})`}>
                         <motion.g
-                          initial={{ scale: 0, scaleX: 0.08, rotate: -40, opacity: 0 }}
-                          animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
                           transition={{
-                            duration: 1.6,
-                            delay: (i % 4) * 0.16 + Math.floor(i / 4) * 0.1,
-                            ease: [0.16, 1, 0.3, 1],
+                            duration: 1.2,
+                            delay: (i % 4) * 0.1 + Math.floor(i / 4) * 0.08,
+                            ease: 'easeOut',
                           }}
                           style={{ transformOrigin: '0px 0px' }}
                         >
@@ -736,7 +713,6 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                             fill="url(#gabrielOuterPetalGrad)"
                             stroke="#020617"
                             strokeWidth="1.2"
-                            filter="url(#gabrielPetalShadow)"
                           />
                           {/* Shadow Accent for 3D Overlap Depth */}
                           <path
@@ -759,18 +735,18 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   </g>
                 )}
 
-                {/* TIER 2: MID LAYER - CAPAS INTERMEDIAS - 12 CURVED PETALS (Offset 15 deg) */}
+                {/* TIER 2: MID LAYER - 12 CURVED PETALS (Offset 15 deg) */}
                 {isStepAtLeast('blue-black-mid-unfold') && (
                   <g id="special-tier2-mid">
                     {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg, i) => (
                       <g key={`t2-p-g-${i}`} transform={`rotate(${deg})`}>
                         <motion.g
-                          initial={{ scale: 0, scaleX: 0.1, rotate: 35, opacity: 0 }}
-                          animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
                           transition={{
-                            duration: 1.5,
-                            delay: (i % 4) * 0.15 + Math.floor(i / 4) * 0.09,
-                            ease: [0.16, 1, 0.3, 1],
+                            duration: 1.1,
+                            delay: (i % 4) * 0.1 + Math.floor(i / 4) * 0.07,
+                            ease: 'easeOut',
                           }}
                           style={{ transformOrigin: '0px 0px' }}
                         >
@@ -779,7 +755,6 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                             fill="url(#gabrielMidPetalGrad)"
                             stroke="#1E3A8A"
                             strokeWidth="1"
-                            filter="url(#gabrielPetalShadow)"
                           />
                           {/* Inner Shadow Core */}
                           <path
@@ -800,18 +775,18 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                   </g>
                 )}
 
-                {/* TIER 3: INNER COROLLA - CAPAS FRONTALES - 10 SILK AZURE PETALS (Offset 18 deg) */}
+                {/* TIER 3: INNER COROLLA - 10 SILK AZURE PETALS (Offset 18 deg) */}
                 {isStepAtLeast('blue-black-inner-unfold') && (
                   <g id="special-tier3-inner">
                     {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((deg, i) => (
                       <g key={`t3-p-g-${i}`} transform={`rotate(${deg + 18})`}>
                         <motion.g
-                          initial={{ scale: 0, scaleX: 0.12, rotate: -25, opacity: 0 }}
-                          animate={{ scale: 1, scaleX: 1, rotate: 0, opacity: 1 }}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
                           transition={{
-                            duration: 1.4,
-                            delay: i * 0.08,
-                            ease: [0.16, 1, 0.3, 1],
+                            duration: 1.0,
+                            delay: i * 0.06,
+                            ease: 'easeOut',
                           }}
                           style={{ transformOrigin: '0px 0px' }}
                         >
@@ -835,7 +810,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                         <motion.g
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 1.2, delay: i * 0.05, ease: 'easeOut' }}
+                          transition={{ duration: 0.9, delay: i * 0.04, ease: 'easeOut' }}
                           style={{ transformOrigin: '0px 0px' }}
                         >
                           {/* Mini Crown Petal */}
@@ -868,7 +843,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       strokeWidth="2.2"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                      transition={{ duration: 0.7, ease: 'easeOut' }}
                     />
 
                     {/* Concentric Sapphire & Jet Black Disc */}
@@ -881,7 +856,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       strokeWidth="1.2"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+                      transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
                     />
 
                     {/* Inner Fine Accent Ring */}
@@ -894,7 +869,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       strokeWidth="0.8"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ duration: 0.7, delay: 0.3 }}
+                      transition={{ duration: 0.6, delay: 0.25, ease: 'easeOut' }}
                     />
 
                     {/* Glowing Pistil Dots framing the exact center */}
@@ -907,7 +882,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                         fill="#38BDF8"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.35 + k * 0.03 }}
+                        transition={{ duration: 0.4, delay: 0.3 + k * 0.02, ease: 'easeOut' }}
                       />
                     ))}
 
@@ -923,9 +898,9 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
                       fontFamily="Playfair Display, Georgia, serif"
                       letterSpacing="1px"
                       filter="url(#gabrielGlow13)"
-                      initial={{ opacity: 0, scale: 0.4 }}
+                      initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
+                      transition={{ duration: 0.8, delay: 0.35, ease: 'easeOut' }}
                     >
                       13
                     </motion.text>
@@ -971,7 +946,7 @@ export const GabrielBouquetAnimation: React.FC<GabrielBouquetAnimationProps> = (
               <SaveFlowerButton
                 userName="Gabriel"
                 stageContainerId="gabriel-bouquet-container"
-                animationDurationMs={15800}
+                animationDurationMs={14800}
                 onReplayAnimation={handleReplay}
                 ambientGlow="rgba(37, 99, 235, 0.28)"
               />
