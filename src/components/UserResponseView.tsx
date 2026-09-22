@@ -123,7 +123,10 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     const unsubscribeMessages = api.subscribeToChat(
       chatId,
       (liveMessages) => {
-        setMessages(liveMessages);
+        const sortedMessages = [...liveMessages].sort((a, b) => 
+          new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
+        );
+        setMessages(sortedMessages);
         if (liveMessages.length > 0 || (experience.userResponse?.text && experience.userResponse.text.trim().length > 0)) {
           setHasStartedChat(true);
           const hasUnread = liveMessages.some((m) => m.senderRole === 'admin' && !m.read);

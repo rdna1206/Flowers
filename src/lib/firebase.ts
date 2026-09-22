@@ -662,6 +662,29 @@ export async function sendChatMessage(
   const normChatId = chatId.trim().toLowerCase();
   const msgId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
   const now = new Date().toISOString();
+  let resolvedNow = now;
+
+  // Sincronización robusta ante clock-drift (desfase de reloj de clientes)
+  try {
+    const messagesRef = collection(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION);
+    const lastMsgQuery = query(messagesRef, orderBy('createdAt', 'desc'), limit(1));
+    const lastMsgSnap = await getDocs(lastMsgQuery);
+    if (!lastMsgSnap.empty) {
+      const lastMsgData = lastMsgSnap.docs[0].data() as ChatMessage;
+      if (lastMsgData && lastMsgData.createdAt) {
+        const lastTime = new Date(lastMsgData.createdAt).getTime();
+        const currentTime = new Date(resolvedNow).getTime();
+        if (currentTime <= lastTime) {
+          // Si el reloj local está atrasado frente al último mensaje recibido,
+          // forzamos a que el nuevo mensaje tenga un timestamp estrictamente secuencial
+          // de exactamente 1 segundo después del último mensaje en la base de datos.
+          resolvedNow = new Date(lastTime + 1000).toISOString();
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error fetching latest message for clock synchronization:', err);
+  }
 
   const isStringMsg = typeof message === 'string';
   const msgObj = isStringMsg ? {} : message;
@@ -682,7 +705,7 @@ export async function sendChatMessage(
     text: displayText,
     isOriginalResponse: false,
     read: false,
-    createdAt: now,
+    createdAt: resolvedNow,
   };
 
   if (!isStringMsg) {
@@ -716,10 +739,10 @@ export async function sendChatMessage(
       userId: normChatId,
       lastMessageText: summaryText,
       lastMessageType: msgType,
-      lastMessageAt: now,
+      lastMessageAt: resolvedNow,
       lastMessageSenderRole: newMsg.senderRole,
       lastMessageRead: false,
-      updatedAt: now,
+      updatedAt: resolvedNow,
     };
 
     if (newMsg.senderRole === 'user') {
