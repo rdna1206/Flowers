@@ -215,23 +215,14 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     setIsSending(true);
 
     try {
-      // 1. Submit to user response document (if not already recorded)
+      // Submit response (this automatically initializes the first message in live chat idempotently)
       try {
         await onSubmitResponse(clean);
       } catch (subErr) {
-        console.warn('Initial response record warning (submitting message to chat):', subErr);
+        console.warn('Initial response record warning:', subErr);
       }
 
-      // 2. Ensure message is also dispatched to live chat
-      await api.sendChatMessage(
-        chatId,
-        clean,
-        'user',
-        experience.id,
-        experience.name
-      );
-
-      // 3. Reveal the live chat
+      // Reveal the live chat
       setHasStartedChat(true);
       setInitialResponseText('');
       await api.setUserChatPresence(chatId, 'user', true).catch(() => {});
@@ -825,7 +816,8 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                       {msg.reactions && Object.keys(msg.reactions).length > 0 && (
                         <div className={`flex flex-wrap gap-1 mt-1 ${isFromMe ? 'justify-end' : 'justify-start'}`}>
                           {Object.entries(msg.reactions).map(([emoji, users]) => {
-                            const hasReacted = users.includes(experience.id);
+                            const userList = (users || []) as string[];
+                            const hasReacted = userList.includes(experience.id);
                             return (
                               <button
                                 key={emoji}
@@ -843,11 +835,11 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                                   borderColor: hasReacted ? accentColor : borderColor,
                                   color: textColor,
                                 }}
-                                title={`${users.length} reacción(es)`}
+                                title={`${userList.length} reacción(es)`}
                               >
                                 <span>{emoji}</span>
-                                {users.length > 1 && (
-                                  <span className="text-[10px] font-bold">{users.length}</span>
+                                {userList.length > 1 && (
+                                  <span className="text-[10px] font-bold">{userList.length}</span>
                                 )}
                               </button>
                             );

@@ -118,6 +118,12 @@ export interface ChatMessage {
   delivered?: boolean;
   createdAt: string;
   timestamp?: string;
+  reactions?: Record<string, string[]>;
+  replyTo?: {
+    id: string;
+    text: string;
+    senderName: string;
+  };
 }
 
 export interface ChatSummary {

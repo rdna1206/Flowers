@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { api, getStoredToken, isSessionExpired, touchSessionActivity } from './lib/api';
+import { api, getStoredToken, clearStoredToken, isSessionExpired, touchSessionActivity } from './lib/api';
 import type {
   UserSummary,
   UserExperienceData,
@@ -38,14 +38,17 @@ export default function App() {
 
   const lastTouchRef = useRef<number>(Date.now());
 
-  const handleLogout = useCallback(async (reasonMessage?: string) => {
-    await api.logout();
+  const handleLogout = useCallback((reasonMessage?: string) => {
+    // 1. Immediately clear storage token & reset React state so UI instantly switches to login screen
+    clearStoredToken();
     setCurrentUser(null);
     setExperience(null);
     setCurrentStep('login');
     if (reasonMessage) {
       setLoginError(reasonMessage);
     }
+    // 2. Perform background Firebase signout without blocking UI
+    api.logout().catch(() => {});
   }, []);
 
   // Initialize session on load & verify 2-hour validity

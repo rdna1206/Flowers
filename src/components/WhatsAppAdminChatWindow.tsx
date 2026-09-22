@@ -908,7 +908,8 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                   {msg.reactions && Object.keys(msg.reactions).length > 0 && (
                     <div className={`flex flex-wrap gap-1 mt-1 ${isFromRonald ? 'justify-end' : 'justify-start'}`}>
                       {Object.entries(msg.reactions).map(([emoji, users]) => {
-                        const hasReacted = users.includes('ronald');
+                        const userList = (users || []) as string[];
+                        const hasReacted = userList.includes('ronald');
                         return (
                           <button
                             key={emoji}
@@ -924,11 +925,11 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                               borderColor: hasReacted ? primaryColor : 'rgba(255,255,255,0.15)',
                               color: '#F1F5F9',
                             }}
-                            title={`${users.length} reacción(es)`}
+                            title={`${userList.length} reacción(es)`}
                           >
                             <span>{emoji}</span>
-                            {users.length > 1 && (
-                              <span className="text-[10px] font-bold">{users.length}</span>
+                            {userList.length > 1 && (
+                              <span className="text-[10px] font-bold">{userList.length}</span>
                             )}
                           </button>
                         );

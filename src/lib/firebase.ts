@@ -636,39 +636,48 @@ export async function uploadChatMedia(
  */
 export async function sendChatMessage(
   chatId: string,
-  message: {
-    senderId: string;
-    senderName: string;
-    senderRole: 'user' | 'admin';
-    text?: string;
-    type?: 'text' | 'image' | 'audio';
-    mediaUrl?: string;
-    fileName?: string;
-    fileSize?: number;
-    mimeType?: string;
-    audioDuration?: number;
-    replyTo?: {
-      id: string;
-      text: string;
-      senderName: string;
-    };
-  }
+  message:
+    | string
+    | {
+        senderId?: string;
+        senderName?: string;
+        senderRole?: 'user' | 'admin';
+        text?: string;
+        type?: 'text' | 'image' | 'audio';
+        mediaUrl?: string;
+        fileName?: string;
+        fileSize?: number;
+        mimeType?: string;
+        audioDuration?: number;
+        replyTo?: {
+          id: string;
+          text: string;
+          senderName: string;
+        };
+      },
+  role?: 'user' | 'admin',
+  senderId?: string,
+  senderName?: string
 ): Promise<ChatMessage> {
   const normChatId = chatId.trim().toLowerCase();
   const msgId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
   const now = new Date().toISOString();
 
-  const msgType = message.type || 'text';
-  const rawText = message.text?.trim() || '';
+  const isStringMsg = typeof message === 'string';
+  const msgObj = isStringMsg ? {} : message;
+
+  const msgType = !isStringMsg ? msgObj.type || 'text' : 'text';
+  const rawText = isStringMsg ? message.trim() : msgObj.text?.trim() || '';
   const displayText = rawText || (msgType === 'image' ? 'Foto' : msgType === 'audio' ? 'Mensaje de voz' : '');
+  const resolvedRole = role || (!isStringMsg ? msgObj.senderRole : undefined) || 'user';
 
   const newMsg: ChatMessage = {
     id: msgId,
     chatId: normChatId,
     userId: normChatId,
-    senderId: message.senderId || normChatId,
-    senderName: message.senderName || (message.senderRole === 'admin' ? 'Ronald' : 'Usuario'),
-    senderRole: message.senderRole || 'user',
+    senderId: senderId || (!isStringMsg ? msgObj.senderId : undefined) || (resolvedRole === 'admin' ? 'ronald' : normChatId),
+    senderName: senderName || (!isStringMsg ? msgObj.senderName : undefined) || (resolvedRole === 'admin' ? 'Ronald' : 'Usuario'),
+    senderRole: resolvedRole,
     type: msgType,
     text: displayText,
     isOriginalResponse: false,
@@ -676,23 +685,13 @@ export async function sendChatMessage(
     createdAt: now,
   };
 
-  if (message.mediaUrl !== undefined && message.mediaUrl !== null && message.mediaUrl !== '') {
-    newMsg.mediaUrl = message.mediaUrl;
-  }
-  if (message.fileName !== undefined && message.fileName !== null && message.fileName !== '') {
-    newMsg.fileName = message.fileName;
-  }
-  if (message.fileSize !== undefined && message.fileSize !== null && !isNaN(message.fileSize)) {
-    newMsg.fileSize = message.fileSize;
-  }
-  if (message.mimeType !== undefined && message.mimeType !== null && message.mimeType !== '') {
-    newMsg.mimeType = message.mimeType;
-  }
-  if (message.audioDuration !== undefined && message.audioDuration !== null && !isNaN(message.audioDuration)) {
-    newMsg.audioDuration = message.audioDuration;
-  }
-  if (message.replyTo !== undefined && message.replyTo !== null) {
-    newMsg.replyTo = message.replyTo;
+  if (!isStringMsg) {
+    if (msgObj.mediaUrl) newMsg.mediaUrl = msgObj.mediaUrl;
+    if (msgObj.fileName) newMsg.fileName = msgObj.fileName;
+    if (msgObj.fileSize) newMsg.fileSize = msgObj.fileSize;
+    if (msgObj.mimeType) newMsg.mimeType = msgObj.mimeType;
+    if (msgObj.audioDuration) newMsg.audioDuration = msgObj.audioDuration;
+    if (msgObj.replyTo) newMsg.replyTo = msgObj.replyTo;
   }
 
   const cleanMsgPayload = cleanUndefined(newMsg);

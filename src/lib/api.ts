@@ -441,6 +441,11 @@ export const api = {
           fileSize?: number;
           mimeType?: string;
           audioDuration?: number;
+          replyTo?: {
+            id: string;
+            text: string;
+            senderName: string;
+          };
         },
     senderRole: 'user' | 'admin',
     senderId: string,

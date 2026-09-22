@@ -17,8 +17,8 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-warm-bg);
-  color: var(--color-warm-text);
+  background-color: #030206;
+  color: #E6EDF8;
   overflow-x: hidden;
 }
 
