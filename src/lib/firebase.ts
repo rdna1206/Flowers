@@ -319,6 +319,16 @@ export async function logoutFromFirebaseAuth(): Promise<void> {
   }
 }
 
+function cleanUndefined<T extends Record<string, any>>(obj: T): Partial<T> {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result as Partial<T>;
+}
+
 /**
  * Get single isolated user document for the authenticated user
  */
@@ -329,7 +339,9 @@ export async function getAuthenticatedUserDoc(userId: string): Promise<UserRecor
     if (snap.exists()) {
       return snap.data() as UserRecord;
     }
-    const initial = INITIAL_USERS.find((u) => u.id === normId);
+    const initial = INITIAL_USERS.find(
+      (u) => u.id.toLowerCase() === normId || u.username.toLowerCase() === normId
+    );
     return initial || null;
   } catch (err) {
     handleFirestoreError(err, 'get', `${USERS_COLLECTION}/${normId}`);
@@ -410,11 +422,12 @@ export async function submitAuthenticatedUserResponse(
 export async function initUserChatWithOriginalResponse(
   user: UserRecord,
   responseText: string,
-  submittedAt: string
+  submittedAt?: string
 ): Promise<void> {
-  const normId = user.id.toLowerCase();
+  const normId = user.id.trim().toLowerCase();
   const chatRef = doc(db, CHATS_COLLECTION, normId);
   const msgRef = doc(db, CHATS_COLLECTION, normId, MESSAGES_COLLECTION, 'original_response');
+  const safeTime = submittedAt || user.userResponse?.submittedAt || new Date().toISOString();
 
   try {
     // Check if original response message already exists (Idempotent: prevents duplicate)
@@ -425,14 +438,15 @@ export async function initUserChatWithOriginalResponse(
         chatId: normId,
         userId: normId,
         senderId: normId,
-        senderName: user.name,
+        senderName: user.name || 'Usuario',
         senderRole: 'user',
+        type: 'text',
         text: responseText.trim(),
         isOriginalResponse: true,
         read: false,
-        createdAt: submittedAt,
+        createdAt: safeTime,
       };
-      await setDoc(msgRef, originalMsg);
+      await setDoc(msgRef, cleanUndefined(originalMsg));
     }
 
     // Set or merge chat header doc
@@ -443,8 +457,8 @@ export async function initUserChatWithOriginalResponse(
         userId: normId,
         userName: user.name,
         lastMessageText: responseText.trim(),
-        lastMessageAt: submittedAt,
-        createdAt: submittedAt,
+        lastMessageAt: safeTime,
+        createdAt: safeTime,
         updatedAt: new Date().toISOString(),
       },
       { merge: true }
@@ -541,24 +555,37 @@ export async function sendChatMessage(
     id: msgId,
     chatId: normChatId,
     userId: normChatId,
-    senderId: message.senderId,
-    senderName: message.senderName,
-    senderRole: message.senderRole,
+    senderId: message.senderId || normChatId,
+    senderName: message.senderName || (message.senderRole === 'admin' ? 'Ronald' : 'Usuario'),
+    senderRole: message.senderRole || 'user',
     type: msgType,
     text: displayText,
-    mediaUrl: message.mediaUrl,
-    fileName: message.fileName,
-    fileSize: message.fileSize,
-    mimeType: message.mimeType,
-    audioDuration: message.audioDuration,
     isOriginalResponse: false,
     read: false,
     createdAt: now,
   };
 
+  if (message.mediaUrl !== undefined && message.mediaUrl !== null && message.mediaUrl !== '') {
+    newMsg.mediaUrl = message.mediaUrl;
+  }
+  if (message.fileName !== undefined && message.fileName !== null && message.fileName !== '') {
+    newMsg.fileName = message.fileName;
+  }
+  if (message.fileSize !== undefined && message.fileSize !== null && !isNaN(message.fileSize)) {
+    newMsg.fileSize = message.fileSize;
+  }
+  if (message.mimeType !== undefined && message.mimeType !== null && message.mimeType !== '') {
+    newMsg.mimeType = message.mimeType;
+  }
+  if (message.audioDuration !== undefined && message.audioDuration !== null && !isNaN(message.audioDuration)) {
+    newMsg.audioDuration = message.audioDuration;
+  }
+
+  const cleanMsgPayload = cleanUndefined(newMsg);
+
   try {
     const msgRef = doc(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION, msgId);
-    await setDoc(msgRef, newMsg);
+    await setDoc(msgRef, cleanMsgPayload);
 
     // Update parent chat summary for real-time list
     const summaryText =

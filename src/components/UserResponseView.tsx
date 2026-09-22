@@ -59,9 +59,9 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [presence, setPresence] = useState<ChatPresenceState>({});
-  const [hasStartedChat, setHasStartedChat] = useState<boolean>(
-    Boolean(experience.userResponse?.text)
-  );
+  const [hasStartedChat, setHasStartedChat] = useState<boolean>(() => {
+    return Boolean(experience.userResponse?.text && experience.userResponse.text.trim().length > 0);
+  });
 
   // Media modals state
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
@@ -82,15 +82,11 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
 
   // Initialize and subscribe to real-time chat & presence
   useEffect(() => {
-    // 1. Mark presence if chat is active
-    if (hasStartedChat) {
-      api.setUserChatPresence(chatId, 'user', true).catch(() => {});
-    }
+    // 1. Mark presence
+    api.setUserChatPresence(chatId, 'user', true).catch(() => {});
 
     const heartbeatInterval = setInterval(() => {
-      if (hasStartedChat) {
-        api.updateUserChatHeartbeat(chatId, 'user').catch(() => {});
-      }
+      api.updateUserChatHeartbeat(chatId, 'user').catch(() => {});
     }, 8000);
 
     // Ensure chat doc exists and carries initial response if any
@@ -101,11 +97,8 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       chatId,
       (liveMessages) => {
         setMessages(liveMessages);
-        if (liveMessages.length > 0) {
+        if (liveMessages.length > 0 || (experience.userResponse?.text && experience.userResponse.text.trim().length > 0)) {
           setHasStartedChat(true);
-          api.setUserChatPresence(chatId, 'user', true).catch(() => {});
-        } else {
-          setHasStartedChat(false);
         }
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -135,7 +128,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
         api.setUserChatPresence(chatId, 'user', false).catch(() => {});
         api.setUserChatTyping(chatId, 'user', false).catch(() => {});
         api.setUserChatRecording(chatId, 'user', false).catch(() => {});
-      } else if (document.visibilityState === 'visible' && hasStartedChat) {
+      } else if (document.visibilityState === 'visible') {
         api.setUserChatPresence(chatId, 'user', true).catch(() => {});
       }
     };
@@ -156,7 +149,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       api.setUserChatTyping(chatId, 'user', false).catch(() => {});
       api.setUserChatRecording(chatId, 'user', false).catch(() => {});
     };
-  }, [chatId, hasStartedChat]);
+  }, [chatId]);
 
   useEffect(() => {
     if (hasStartedChat) {
@@ -190,13 +183,26 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     setIsSending(true);
 
     try {
-      // 1. Submit to user response document (which automatically registers message #1 in chat)
-      await onSubmitResponse(clean);
+      // 1. Submit to user response document (if not already recorded)
+      try {
+        await onSubmitResponse(clean);
+      } catch (subErr) {
+        console.warn('Initial response record warning (submitting message to chat):', subErr);
+      }
 
-      // 2. Reveal the live chat
+      // 2. Ensure message is also dispatched to live chat
+      await api.sendChatMessage(
+        chatId,
+        clean,
+        'user',
+        experience.id,
+        experience.name
+      );
+
+      // 3. Reveal the live chat
       setHasStartedChat(true);
       setInitialResponseText('');
-      await api.setUserChatPresence(chatId, 'user', true);
+      await api.setUserChatPresence(chatId, 'user', true).catch(() => {});
 
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -235,6 +241,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       }, 80);
     } catch (err) {
       console.error('Error sending message:', err);
+      setInputText(clean);
     } finally {
       setIsSending(false);
     }

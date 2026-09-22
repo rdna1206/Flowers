@@ -24,11 +24,12 @@ import {
   Check,
   Cloud,
   Send,
+  Layers,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { subscribeToAdminAllUsers } from '../lib/firebase';
 import type { UserRecord, UserTheme, AdminUserResponseItem, ChatSummary } from '../types';
-import { WhatsAppAdminChatModal } from './WhatsAppAdminChatModal';
+import { WhatsAppAdminMultiChatManager } from './WhatsAppAdminMultiChatManager';
 
 interface AdminDashboardProps {
   onSelectUserToPreview?: (username: string, passwordPlain?: string) => void;
@@ -49,7 +50,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [chatSummaries, setChatSummaries] = useState<ChatSummary[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('jhon');
   const [searchTerm, setSearchTerm] = useState('');
-  const [chatModalUser, setChatModalUser] = useState<UserRecord | null>(null);
+  const [openChatUsers, setOpenChatUsers] = useState<UserRecord[]>([]);
+
+  const handleOpenChat = (user: UserRecord) => {
+    setOpenChatUsers((prev) => {
+      const exists = prev.some((u) => u.id.toLowerCase() === user.id.toLowerCase());
+      if (exists) {
+        // Bring to end (highest priority / active)
+        return [...prev.filter((u) => u.id.toLowerCase() !== user.id.toLowerCase()), user];
+      }
+      return [...prev, user];
+    });
+  };
+
+  const handleCloseChat = (userId: string) => {
+    setOpenChatUsers((prev) => prev.filter((u) => u.id.toLowerCase() !== userId.toLowerCase()));
+  };
+
+  const handleCloseAllChats = () => {
+    setOpenChatUsers([]);
+  };
+
+  const handleOpenAllChats = () => {
+    const chatUsers = users.filter(
+      (u) =>
+        u.id !== 'ronald' &&
+        u.id !== 'leiry' &&
+        u.username?.toLowerCase() !== 'leiry'
+    );
+    setOpenChatUsers(chatUsers);
+  };
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -584,18 +614,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse" />
               </h2>
               <p className="text-xs text-[#8C847B] mt-0.5">
-                Conversaciones directas y respuestas en tiempo real con todos los destinatarios (Leiry excluida).
+                Conversaciones directas y respuestas en tiempo real con todos los destinatarios (Leiry excluida). Puedes abrir múltiples ventanas a la vez.
               </p>
             </div>
-            <div className="relative w-full sm:w-auto">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#8C847B]" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar conversación..."
-                className="w-full sm:w-52 pl-8 pr-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] focus:outline-hidden"
-              />
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={handleOpenAllChats}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-[#2C2926] hover:bg-[#1A1817] text-white px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-xs shrink-0"
+                title="Abrir ventanas de todos los chats a la vez"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Abrir Todos</span>
+              </button>
+              <div className="relative w-full sm:w-auto">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#8C847B]" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar conversación..."
+                  className="w-full sm:w-48 pl-8 pr-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#E2DBD2] text-xs text-[#2C2926] focus:outline-hidden"
+                />
+              </div>
             </div>
           </div>
 
@@ -689,12 +730,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <div className="flex items-center space-x-2 shrink-0">
                           <button
                             type="button"
-                            onClick={() => setChatModalUser(u)}
-                            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-[#008069] hover:bg-[#00705c] text-white px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs"
-                            title={`Abrir chat con ${u.name}`}
+                            onClick={() => handleOpenChat(u)}
+                            className={`inline-flex items-center space-x-1.5 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs ${
+                              openChatUsers.some((oc) => oc.id.toLowerCase() === u.id.toLowerCase())
+                                ? 'bg-[#0F172A] text-[#38BDF8] border border-[#38BDF8]/40'
+                                : 'bg-[#008069] hover:bg-[#00705c] text-white'
+                            }`}
+                            title={`Abrir ventana de chat con ${u.name}`}
                           >
                             <MessageSquare className="w-3.5 h-3.5" />
-                            <span>Abrir Chat</span>
+                            <span>
+                              {openChatUsers.some((oc) => oc.id.toLowerCase() === u.id.toLowerCase())
+                                ? 'Ventana Abierta'
+                                : 'Abrir Chat'}
+                            </span>
                           </button>
 
                           <button
@@ -751,7 +800,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                       {/* Message preview snippet */}
                       <div
-                        onClick={() => setChatModalUser(u)}
+                        onClick={() => handleOpenChat(u)}
                         className="p-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F5EFE7] border border-[#E8E2D9] cursor-pointer transition-colors"
                       >
                         {lastText ? (
@@ -891,9 +940,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     {u.id !== 'ronald' && u.id !== 'leiry' && u.username?.toLowerCase() !== 'leiry' && (
                       <button
                         type="button"
-                        onClick={() => setChatModalUser(u)}
-                        className="py-2 px-2.5 rounded-xl text-xs font-medium text-[#2C2926] bg-white border border-[#E2DBD2] flex items-center justify-center space-x-1 hover:bg-[#F2ECE4] transition-colors cursor-pointer"
-                        title={`Abrir chat con ${u.name}`}
+                        onClick={() => handleOpenChat(u)}
+                        className={`py-2 px-2.5 rounded-xl text-xs font-medium border flex items-center justify-center space-x-1 transition-colors cursor-pointer ${
+                          openChatUsers.some((oc) => oc.id.toLowerCase() === u.id.toLowerCase())
+                            ? 'bg-[#0F172A] text-[#38BDF8] border-[#38BDF8]/40'
+                            : 'bg-white text-[#2C2926] border-[#E2DBD2] hover:bg-[#F2ECE4]'
+                        }`}
+                        title={`Abrir ventana de chat con ${u.name}`}
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-[#008069]" />
                         <span>Chat</span>
@@ -1022,9 +1075,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {u.id !== 'ronald' && u.id !== 'leiry' && u.username?.toLowerCase() !== 'leiry' && (
                             <button
                               type="button"
-                              onClick={() => setChatModalUser(u)}
-                              className="inline-flex items-center space-x-1 text-[11px] text-[#2C2926] font-medium bg-white hover:bg-[#F2ECE4] px-2.5 py-1 rounded-lg border border-[#E2DBD2] transition-colors cursor-pointer"
-                              title={`Abrir chat con ${u.name}`}
+                              onClick={() => handleOpenChat(u)}
+                              className={`inline-flex items-center space-x-1 text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                                openChatUsers.some((oc) => oc.id.toLowerCase() === u.id.toLowerCase())
+                                  ? 'bg-[#0F172A] text-[#38BDF8] border-[#38BDF8]/40'
+                                  : 'bg-white text-[#2C2926] hover:bg-[#F2ECE4] border-[#E2DBD2]'
+                              }`}
+                              title={`Abrir ventana de chat con ${u.name}`}
                             >
                               <MessageSquare className="w-3.5 h-3.5 text-[#008069]" />
                               <span>Chat</span>
@@ -1665,11 +1722,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       )}
 
-      {/* WhatsApp Clean Admin Chat Modal */}
-      <WhatsAppAdminChatModal
-        user={chatModalUser}
-        isOpen={Boolean(chatModalUser)}
-        onClose={() => setChatModalUser(null)}
+      {/* Multi-Window Live WhatsApp Admin Chat Manager */}
+      <WhatsAppAdminMultiChatManager
+        openUsers={openChatUsers}
+        onCloseUser={handleCloseChat}
+        onCloseAll={handleCloseAllChats}
+        onOpenUser={handleOpenChat}
       />
     </div>
   );
