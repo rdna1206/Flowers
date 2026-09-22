@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Flower2, MessageSquare, BookOpen, ArrowRight, Lock } from 'lucide-react';
+import { Flower2, MessageSquare, BookOpen, Lock } from 'lucide-react';
 import type { UserExperienceData } from '../types';
 
 interface UserMenuViewProps {
@@ -71,7 +71,7 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
         </h1>
       </motion.div>
 
-      {/* 3 Main Options Grid */}
+      {/* 3 Main Options Grid - Large Clickable Buttons with zero additional text */}
       <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {/* OPTION 1: IR A FLOR */}
         <motion.button
@@ -83,7 +83,7 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           transition={{ duration: 0.5, delay: 0.1 }}
           whileHover={{ scale: 1.03, y: -4 }}
           whileTap={{ scale: 0.98 }}
-          className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden"
+          className="group relative flex flex-col items-center justify-center text-center p-8 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden min-h-[180px] sm:min-h-[220px]"
           style={{
             backgroundColor: surfaceColor,
             borderColor: borderColor,
@@ -93,12 +93,12 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl sm:rounded-3xl"
             style={{
-              background: `radial-gradient(circle at 50% 30%, ${primaryColor}22 0%, transparent 70%)`,
+              background: `radial-gradient(circle at 50% 35%, ${primaryColor}25 0%, transparent 70%)`,
             }}
           />
 
           <div
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 shadow-md border"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-md border"
             style={{
               backgroundColor: subCardBg,
               borderColor: borderColor,
@@ -109,30 +109,11 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           </div>
 
           <h2
-            className="text-lg sm:text-xl font-bold tracking-wider uppercase mb-2"
+            className="text-lg sm:text-xl font-bold tracking-wider uppercase transition-colors"
             style={{ color: textColor }}
           >
             IR A FLOR
           </h2>
-
-          <p
-            className="text-xs sm:text-sm font-light leading-relaxed mb-6"
-            style={{ color: mutedTextColor }}
-          >
-            Experiencia visual de tu ramo
-          </p>
-
-          <div
-            className="mt-auto inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full border transition-all duration-300 group-hover:px-5"
-            style={{
-              backgroundColor: subCardBg,
-              borderColor: borderColor,
-              color: accentColor,
-            }}
-          >
-            <span>Abrir flor</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </div>
         </motion.button>
 
         {/* OPTION 2: IR A CHAT */}
@@ -146,7 +127,7 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
             transition={{ duration: 0.5, delay: 0.2 }}
             whileHover={{ scale: 1.03, y: -4 }}
             whileTap={{ scale: 0.98 }}
-            className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden"
+            className="group relative flex flex-col items-center justify-center text-center p-8 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden min-h-[180px] sm:min-h-[220px]"
             style={{
               backgroundColor: surfaceColor,
               borderColor: borderColor,
@@ -156,12 +137,12 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl sm:rounded-3xl"
               style={{
-                background: `radial-gradient(circle at 50% 30%, ${secondaryColor}22 0%, transparent 70%)`,
+                background: `radial-gradient(circle at 50% 35%, ${secondaryColor}25 0%, transparent 70%)`,
               }}
             />
 
             <div
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 shadow-md border"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-md border"
               style={{
                 backgroundColor: subCardBg,
                 borderColor: borderColor,
@@ -172,43 +153,24 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
             </div>
 
             <h2
-              className="text-lg sm:text-xl font-bold tracking-wider uppercase mb-2"
+              className="text-lg sm:text-xl font-bold tracking-wider uppercase transition-colors"
               style={{ color: textColor }}
             >
               IR A CHAT
             </h2>
-
-            <p
-              className="text-xs sm:text-sm font-light leading-relaxed mb-6"
-              style={{ color: mutedTextColor }}
-            >
-              Conversación privada en tiempo real
-            </p>
-
-            <div
-              className="mt-auto inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full border transition-all duration-300 group-hover:px-5"
-              style={{
-                backgroundColor: subCardBg,
-                borderColor: borderColor,
-                color: secondaryColor,
-              }}
-            >
-              <span>Abrir chat</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-            </div>
           </motion.button>
         ) : (
           <div
             id="btn-menu-option-chat-disabled"
-            className="relative flex flex-col items-center text-center p-6 sm:p-8 rounded-2xl sm:rounded-3xl border shadow-md backdrop-blur-md opacity-40 cursor-not-allowed overflow-hidden"
+            className="relative flex flex-col items-center justify-center text-center p-8 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-md backdrop-blur-md opacity-40 cursor-not-allowed overflow-hidden min-h-[180px] sm:min-h-[220px]"
             style={{
               backgroundColor: surfaceColor,
               borderColor: borderColor,
             }}
-            title="Chat no disponible para este usuario"
+            title="Chat no disponible"
           >
             <div
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-5 shadow-xs border"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 shadow-xs border"
               style={{
                 backgroundColor: subCardBg,
                 borderColor: borderColor,
@@ -219,29 +181,11 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
             </div>
 
             <h2
-              className="text-lg sm:text-xl font-bold tracking-wider uppercase mb-2"
+              className="text-lg sm:text-xl font-bold tracking-wider uppercase"
               style={{ color: textColor }}
             >
               IR A CHAT
             </h2>
-
-            <p
-              className="text-xs sm:text-sm font-light leading-relaxed mb-6"
-              style={{ color: mutedTextColor }}
-            >
-              No disponible
-            </p>
-
-            <div
-              className="mt-auto inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full border"
-              style={{
-                backgroundColor: subCardBg,
-                borderColor: borderColor,
-                color: mutedTextColor,
-              }}
-            >
-              <span>No disponible</span>
-            </div>
           </div>
         )}
 
@@ -255,7 +199,7 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           transition={{ duration: 0.5, delay: 0.3 }}
           whileHover={{ scale: 1.03, y: -4 }}
           whileTap={{ scale: 0.98 }}
-          className="group relative flex flex-col items-center text-center p-6 sm:p-8 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden"
+          className="group relative flex flex-col items-center justify-center text-center p-8 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden min-h-[180px] sm:min-h-[220px]"
           style={{
             backgroundColor: surfaceColor,
             borderColor: borderColor,
@@ -265,12 +209,12 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl sm:rounded-3xl"
             style={{
-              background: `radial-gradient(circle at 50% 30%, ${primaryColor}22 0%, transparent 70%)`,
+              background: `radial-gradient(circle at 50% 35%, ${primaryColor}25 0%, transparent 70%)`,
             }}
           />
 
           <div
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 shadow-md border"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-md border"
             style={{
               backgroundColor: subCardBg,
               borderColor: borderColor,
@@ -281,30 +225,11 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           </div>
 
           <h2
-            className="text-lg sm:text-xl font-bold tracking-wider uppercase mb-2"
+            className="text-lg sm:text-xl font-bold tracking-wider uppercase transition-colors"
             style={{ color: textColor }}
           >
             IR A TEXTO
           </h2>
-
-          <p
-            className="text-xs sm:text-sm font-light leading-relaxed mb-6"
-            style={{ color: mutedTextColor }}
-          >
-            Leer tu texto personal
-          </p>
-
-          <div
-            className="mt-auto inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full border transition-all duration-300 group-hover:px-5"
-            style={{
-              backgroundColor: subCardBg,
-              borderColor: borderColor,
-              color: primaryColor,
-            }}
-          >
-            <span>Abrir texto</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </div>
         </motion.button>
       </div>
     </div>
