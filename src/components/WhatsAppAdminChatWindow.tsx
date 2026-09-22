@@ -132,6 +132,10 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
             if (hasUnread) {
               api.markChatMessagesAsRead(chatId, 'admin').catch(() => {});
             }
+            // Ensure we scroll to the bottom when new messages arrive
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
           }
           if (isMinimized && liveMessages.length > prevMsgCountRef.current) {
             const newCount = liveMessages.length - prevMsgCountRef.current;
