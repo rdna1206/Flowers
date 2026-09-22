@@ -126,11 +126,11 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
       unsubscribeChat = api.subscribeToChat(
         chatId,
         (liveMessages) => {
-          console.log('Mensajes recibidos (Admin):', liveMessages.map(m => ({ text: m.text, createdAt: m.createdAt })));
-          const sortedMessages = [...liveMessages].sort((a, b) => 
-            new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
-          );
-          console.log('Mensajes ordenados (Admin):', sortedMessages.map(m => ({ text: m.text, createdAt: m.createdAt })));
+          const sortedMessages = [...liveMessages].sort((a, b) => {
+            const timeA = new Date(a.createdAt || a.timestamp || '').getTime();
+            const timeB = new Date(b.createdAt || b.timestamp || '').getTime();
+            return timeA - timeB;
+          });
           setMessages(sortedMessages);
           if (!isMinimized) {
             const hasUnread = liveMessages.some((m) => m.senderRole === 'user' && !m.read);
@@ -618,7 +618,7 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
 
       {/* Messages Container */}
       <div
-        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col-reverse custom-scrollbar"
+        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col custom-scrollbar"
         style={{
           backgroundColor: '#070A10',
           backgroundImage:
@@ -626,7 +626,6 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
           backgroundSize: '20px 20px',
         }}
       >
-        <div ref={messagesEndRef} />
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-2">
             <div
@@ -646,20 +645,17 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
             </div>
           </div>
         ) : (
-          [...messages].reverse().map((msg, index) => {
+          messages.map((msg, index) => {
             const isFromRonald =
               msg.senderRole === 'admin' || msg.senderId === 'ronald';
 
-            // Como hemos invertido la lista, necesitamos ajustar la lógica para saber si es un nuevo día
-            const nextMsg = index < messages.length - 1 ? messages[messages.length - 2 - index] : null;
+            const prevMsg = index > 0 ? messages[index - 1] : null;
             const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
-            const nextDateKey = nextMsg
-              ? getMessageDayKey(nextMsg.createdAt || nextMsg.timestamp)
+            const prevDateKey = prevMsg
+              ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
               : null;
             
-            // Si es el último elemento del array invertido (el más antiguo), siempre es nuevo día. 
-            // Si es diferente al "siguiente" (que en realidad es el anterior cronológico), es nuevo día.
-            const isNewDay = index === messages.length - 1 || currentDateKey !== nextDateKey;
+            const isNewDay = index === 0 || currentDateKey !== prevDateKey;
             const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
 
             return (

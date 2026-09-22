@@ -123,9 +123,11 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     const unsubscribeMessages = api.subscribeToChat(
       chatId,
       (liveMessages) => {
-        const sortedMessages = [...liveMessages].sort((a, b) => 
-          new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
-        );
+        const sortedMessages = [...liveMessages].sort((a, b) => {
+          const timeA = new Date(a.createdAt || a.timestamp || '').getTime();
+          const timeB = new Date(b.createdAt || b.timestamp || '').getTime();
+          return timeA - timeB;
+        });
         setMessages(sortedMessages);
         if (liveMessages.length > 0 || (experience.userResponse?.text && experience.userResponse.text.trim().length > 0)) {
           setHasStartedChat(true);

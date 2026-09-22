@@ -1,5 +1,5 @@
+import React from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { Component } from 'react';
 
 type ErrorBoundaryProps = {
   children: ReactNode;
@@ -9,10 +9,11 @@ type ErrorBoundaryState = {
   hasError: boolean;
 };
 
-export class ErrorBoundary extends Component<
+export class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
+  props!: ErrorBoundaryProps;
   state: ErrorBoundaryState = {
     hasError: false,
   };
