@@ -577,7 +577,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
 
             {/* Messages Container (Izquierda = Ronald, Derecha = Usuario) */}
             <div
-              className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 flex flex-col custom-scrollbar"
+              className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 flex flex-col-reverse custom-scrollbar"
               style={{
                 backgroundColor: isDarkTheme ? 'rgba(5, 10, 20, 0.75)' : 'rgba(248, 246, 240, 0.65)',
                 backgroundImage: isDarkTheme
@@ -588,37 +588,67 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                 minHeight: '260px',
               }}
             >
-              {messages.map((msg, index) => {
+              <div ref={messagesEndRef} />
+
+              {/* Ronald recording indicator */}
+              {presence.adminRecording && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-start"
+                >
+                  <div
+                    className="max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 shadow-xs text-sm rounded-bl-xs border flex items-center space-x-2 bg-red-950/40 border-red-500/30 text-red-200"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                    <span className="text-xs font-medium italic">
+                      Ronald está grabando un audio...
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Ronald typing indicator */}
+              {presence.adminTyping && !presence.adminRecording && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-start"
+                >
+                  <div
+                    className="max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 shadow-xs text-sm rounded-bl-xs border flex items-center space-x-2"
+                    style={{
+                      backgroundColor: isDarkTheme ? '#131F38' : '#FFFFFF',
+                      borderColor: borderColor,
+                    }}
+                  >
+                    <div className="flex space-x-1 items-center">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                    <span className="text-xs text-emerald-400 font-medium italic">
+                      Ronald está escribiendo...
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {[...messages].reverse().map((msg, index) => {
                 const isFromMe = msg.senderRole === 'user' || msg.senderId === experience.id;
 
-                const prevMsg = index > 0 ? messages[index - 1] : null;
+                const nextMsg = index < messages.length - 1 ? messages[messages.length - 2 - index] : null;
                 const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
-                const prevDateKey = prevMsg
-                  ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
+                const nextDateKey = nextMsg
+                  ? getMessageDayKey(nextMsg.createdAt || nextMsg.timestamp)
                   : null;
-                const isNewDay = index === 0 || currentDateKey !== prevDateKey;
+                const isNewDay = index === messages.length - 1 || currentDateKey !== nextDateKey;
                 const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
 
                 return (
                   <React.Fragment key={msg.id || index}>
-                    {/* Centered Date Separator Pill */}
-                    {isNewDay && (
-                      <div className="flex justify-center my-2">
-                        <span
-                          className="text-[11px] font-medium px-3.5 py-1 rounded-full border shadow-2xs backdrop-blur-xs"
-                          style={{
-                            backgroundColor: isDarkTheme
-                              ? 'rgba(19, 31, 56, 0.9)'
-                              : 'rgba(255, 255, 255, 0.9)',
-                            borderColor: borderColor,
-                            color: mutedTextColor,
-                          }}
-                        >
-                          {dateLabel}
-                        </span>
-                      </div>
-                    )}
-
                     <motion.div
                       initial={{ opacity: 0, y: 10, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -855,53 +885,6 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                   </React.Fragment>
                 );
               })}
-
-              {/* Ronald recording voice indicator */}
-              {presence.adminRecording && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="flex flex-col items-start"
-                >
-                  <div
-                    className="max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 shadow-xs text-sm rounded-bl-xs border flex items-center space-x-2 bg-red-950/40 border-red-500/30 text-red-200"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                    <span className="text-xs font-medium italic">
-                      Ronald está grabando un audio...
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Ronald typing indicator */}
-              {presence.adminTyping && !presence.adminRecording && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="flex flex-col items-start"
-                >
-                  <div
-                    className="max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 shadow-xs text-sm rounded-bl-xs border flex items-center space-x-2"
-                    style={{
-                      backgroundColor: isDarkTheme ? '#131F38' : '#FFFFFF',
-                      borderColor: borderColor,
-                    }}
-                  >
-                    <div className="flex space-x-1 items-center">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    <span className="text-xs text-emerald-400 font-medium italic">
-                      Ronald está escribiendo...
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Message Input Bar (To continue chatting in real time) */}

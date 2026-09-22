@@ -618,7 +618,7 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
 
       {/* Messages Container */}
       <div
-        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col custom-scrollbar"
+        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col-reverse custom-scrollbar"
         style={{
           backgroundColor: '#070A10',
           backgroundImage:
@@ -626,6 +626,51 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
           backgroundSize: '20px 20px',
         }}
       >
+        <div ref={messagesEndRef} />
+
+        {/* Real-time Indicator: User recording audio */}
+        {presence.userRecording && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-start w-full"
+          >
+            <div className="px-3 py-1.5 rounded-2xl text-[11px] rounded-tl-xs border border-red-500/20 flex items-center space-x-2 shadow-md bg-[#1F1418] text-red-200 border-l-3 border-l-red-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+              <span className="text-red-300 font-medium">
+                {user.name} está grabando un audio...
+              </span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Real-time Indicator: User typing text */}
+        {presence.userTyping && !presence.userRecording && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-start w-full"
+          >
+            <div
+              className="px-3 py-1.5 rounded-2xl text-[11px] rounded-tl-xs border border-white/10 flex items-center space-x-2 shadow-md bg-[#151E2E] text-gray-300"
+              style={{
+                borderLeft: `3px solid ${primaryColor}`,
+              }}
+            >
+              <div className="flex space-x-1 items-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+              <span className="font-medium">
+                {user.name} está escribiendo...
+              </span>
+            </div>
+          </motion.div>
+        )}
+
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-2">
             <div
@@ -645,29 +690,21 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
             </div>
           </div>
         ) : (
-          messages.map((msg, index) => {
+          [...messages].reverse().map((msg, index) => {
             const isFromRonald =
               msg.senderRole === 'admin' || msg.senderId === 'ronald';
 
-            const prevMsg = index > 0 ? messages[index - 1] : null;
+            const nextMsg = index < messages.length - 1 ? messages[messages.length - 2 - index] : null;
             const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
-            const prevDateKey = prevMsg
-              ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
+            const nextDateKey = nextMsg
+              ? getMessageDayKey(nextMsg.createdAt || nextMsg.timestamp)
               : null;
             
-            const isNewDay = index === 0 || currentDateKey !== prevDateKey;
+            const isNewDay = index === messages.length - 1 || currentDateKey !== nextDateKey;
             const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
 
             return (
               <React.Fragment key={msg.id}>
-                {isNewDay && (
-                  <div className="flex justify-center my-1">
-                    <span className="bg-[#131B2A]/90 border border-white/10 text-[#94A3B8] text-[10px] font-medium px-2.5 py-0.5 rounded-full shadow-2xs">
-                      {dateLabel}
-                    </span>
-                  </div>
-                )}
-
                 <div
                   className={`group/msg flex flex-col ${
                     isFromRonald ? 'items-end' : 'items-start'
@@ -941,54 +978,17 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                     </div>
                   )}
                 </div>
+                {isNewDay && (
+                  <div className="flex justify-center my-1">
+                    <span className="bg-[#131B2A]/90 border border-white/10 text-[#94A3B8] text-[10px] font-medium px-2.5 py-0.5 rounded-full shadow-2xs">
+                      {dateLabel}
+                    </span>
+                  </div>
+                )}
               </React.Fragment>
             );
           })
         )}
-
-        {/* Real-time Indicator: User recording audio */}
-        {presence.userRecording && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-start w-full"
-          >
-            <div className="px-3 py-1.5 rounded-2xl text-[11px] rounded-tl-xs border border-red-500/20 flex items-center space-x-2 shadow-md bg-[#1F1418] text-red-200 border-l-3 border-l-red-500">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-              <span className="text-red-300 font-medium">
-                {user.name} está grabando un audio...
-              </span>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Real-time Indicator: User typing text */}
-        {presence.userTyping && !presence.userRecording && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-start w-full"
-          >
-            <div
-              className="px-3 py-1.5 rounded-2xl text-[11px] rounded-tl-xs border border-white/10 flex items-center space-x-2 shadow-md bg-[#151E2E] text-gray-300"
-              style={{
-                borderLeft: `3px solid ${primaryColor}`,
-              }}
-            >
-              <div className="flex space-x-1 items-center">
-                <span className="w-1 h-1 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1 h-1 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1 h-1 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-              <span className="font-medium">
-                {user.name} está escribiendo...
-              </span>
-            </div>
-          </motion.div>
-        )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Bottom Bar: Voice Recorder or Standard Input Bar */}
