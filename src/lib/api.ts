@@ -39,29 +39,75 @@ import {
 const TOKEN_KEY = 'floral_session_token';
 const ACTIVE_USER_ID_KEY = 'floral_active_user_id';
 const ACTIVE_USER_ROLE_KEY = 'floral_active_user_role';
+const LAST_ACTIVITY_KEY = 'floral_session_last_activity';
+const SESSION_LOGIN_TIME_KEY = 'floral_session_login_time';
+
+// 2 hours in milliseconds (2 * 60 * 60 * 1000)
+export const SESSION_MAX_INACTIVITY_MS = 2 * 60 * 60 * 1000;
+
+export function isSessionExpired(): boolean {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return true;
+
+  const lastActivityStr = localStorage.getItem(LAST_ACTIVITY_KEY);
+  if (!lastActivityStr) {
+    // If there is a token but no timestamp yet, initialize it
+    touchSessionActivity();
+    return false;
+  }
+
+  const lastActivity = parseInt(lastActivityStr, 10);
+  if (isNaN(lastActivity)) {
+    return true;
+  }
+
+  const elapsed = Date.now() - lastActivity;
+  return elapsed > SESSION_MAX_INACTIVITY_MS;
+}
+
+export function touchSessionActivity(): void {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) {
+    localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+  }
+}
 
 export function getStoredToken(): string | null {
+  if (isSessionExpired()) {
+    clearStoredToken();
+    return null;
+  }
   return localStorage.getItem(TOKEN_KEY);
 }
 
 export function setStoredToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token);
+  touchSessionActivity();
 }
 
 export function clearStoredToken(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ACTIVE_USER_ID_KEY);
   localStorage.removeItem(ACTIVE_USER_ROLE_KEY);
+  localStorage.removeItem(LAST_ACTIVITY_KEY);
+  localStorage.removeItem(SESSION_LOGIN_TIME_KEY);
 }
 
 function getActiveUserId(): string | null {
+  if (isSessionExpired()) {
+    clearStoredToken();
+    return null;
+  }
   return localStorage.getItem(ACTIVE_USER_ID_KEY);
 }
 
 function setActiveUserSession(user: UserSummary, token: string): void {
-  setStoredToken(token);
+  const nowStr = Date.now().toString();
+  localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(ACTIVE_USER_ID_KEY, user.id);
   localStorage.setItem(ACTIVE_USER_ROLE_KEY, user.role);
+  localStorage.setItem(LAST_ACTIVITY_KEY, nowStr);
+  localStorage.setItem(SESSION_LOGIN_TIME_KEY, nowStr);
 }
 
 function toUserExperienceData(user: UserRecord): UserExperienceData {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { api, getStoredToken } from './lib/api';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { api, getStoredToken, isSessionExpired, touchSessionActivity } from './lib/api';
 import type {
   UserSummary,
   UserExperienceData,
@@ -36,7 +36,19 @@ export default function App() {
   const [isLoginLoading, setIsLoginLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Initialize session on load
+  const lastTouchRef = useRef<number>(Date.now());
+
+  const handleLogout = useCallback(async (reasonMessage?: string) => {
+    await api.logout();
+    setCurrentUser(null);
+    setExperience(null);
+    setCurrentStep('login');
+    if (reasonMessage) {
+      setLoginError(reasonMessage);
+    }
+  }, []);
+
+  // Initialize session on load & verify 2-hour validity
   useEffect(() => {
     const initSession = async () => {
       const token = getStoredToken();
@@ -44,9 +56,18 @@ export default function App() {
         setIsLoading(false);
         return;
       }
+
+      if (isSessionExpired()) {
+        console.warn('Session has exceeded 2 hours of inactivity.');
+        await handleLogout('Tu sesión ha caducado por inactividad tras 2 horas. Por favor inicia sesión nuevamente.');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const user = await api.getMe();
         setCurrentUser(user);
+        touchSessionActivity();
 
         if (user.role === 'admin') {
           // Ronald lands directly on the Admin Dashboard
@@ -58,17 +79,78 @@ export default function App() {
         }
       } catch (err) {
         console.warn('Session verification failed, logging out:', err);
-        await api.logout();
-        setCurrentUser(null);
-        setExperience(null);
-        setCurrentStep('login');
+        await handleLogout();
       } finally {
         setIsLoading(false);
       }
     };
 
     initSession();
-  }, []);
+  }, [handleLogout]);
+
+  // Track user activity and enforce 2-hour inactivity auto-logout
+  useEffect(() => {
+    if (!currentUser) return;
+
+    // Throttled activity updater (at most once every 15 seconds)
+    const handleUserActivity = () => {
+      const now = Date.now();
+      if (now - lastTouchRef.current > 15000) {
+        lastTouchRef.current = now;
+        touchSessionActivity();
+      }
+    };
+
+    // Check expiration immediately
+    const checkExpiration = () => {
+      if (isSessionExpired()) {
+        console.warn('Auto-logging out due to 2 hours of inactivity.');
+        handleLogout('Tu sesión se ha cerrado automáticamente tras 2 horas de inactividad.');
+      }
+    };
+
+    // Periodic check every 15 seconds
+    const intervalId = setInterval(checkExpiration, 15000);
+
+    // Also check when tab becomes visible or focused
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkExpiration();
+        handleUserActivity();
+      }
+    };
+
+    const handleFocus = () => {
+      checkExpiration();
+      handleUserActivity();
+    };
+
+    // Listen for storage events across tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'floral_session_token' && !e.newValue) {
+        handleLogout();
+      }
+    };
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll', 'click'];
+    activityEvents.forEach((ev) => {
+      window.addEventListener(ev, handleUserActivity, { passive: true });
+    });
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      clearInterval(intervalId);
+      activityEvents.forEach((ev) => {
+        window.removeEventListener(ev, handleUserActivity);
+      });
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [currentUser, handleLogout]);
 
   const handleLogin = async (username: string, passwordPlain: string) => {
     setIsLoginLoading(true);
@@ -76,6 +158,7 @@ export default function App() {
     try {
       const res = await api.login(username, passwordPlain);
       setCurrentUser(res.user);
+      lastTouchRef.current = Date.now();
 
       if (res.user.role === 'admin') {
         // Ronald: Direct entry to the Admin Dashboard
@@ -91,13 +174,6 @@ export default function App() {
     } finally {
       setIsLoginLoading(false);
     }
-  };
-
-  const handleLogout = async () => {
-    await api.logout();
-    setCurrentUser(null);
-    setExperience(null);
-    setCurrentStep('login');
   };
 
   const handleSubmitResponse = async (text: string): Promise<UserResponse | null> => {
