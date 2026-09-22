@@ -647,7 +647,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <div className="w-10 h-10 rounded-full bg-[#008069]/10 border border-[#008069]/20 flex items-center justify-center text-[#008069] font-bold text-sm shrink-0">
                               {u.name.charAt(0).toUpperCase()}
                             </div>
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] border-2 border-white absolute bottom-0 right-0" />
+                            {chatSummary?.userInChat ? (
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] border-2 border-white absolute bottom-0 right-0 animate-pulse" title="Usuario dentro del chat" />
+                            ) : (
+                              <span className="w-2.5 h-2.5 rounded-full bg-gray-400 border-2 border-white absolute bottom-0 right-0" title="Fuera del chat" />
+                            )}
                           </div>
                           <div>
                             <div className="flex items-center space-x-2">
@@ -657,6 +661,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <span className="text-[11px] text-[#8C847B] font-mono">
                                 @{u.username}
                               </span>
+                              {chatSummary?.userTyping ? (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-[#25D366]/20 text-[#008069] font-medium animate-pulse">
+                                  Escribiendo...
+                                </span>
+                              ) : chatSummary?.userInChat ? (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-[#25D366]/20 text-[#008069] font-medium">
+                                  En su chat
+                                </span>
+                              ) : null}
                             </div>
                             {lastTime && (
                               <span className="text-[11px] text-[#8C847B] flex items-center space-x-1 mt-0.5">

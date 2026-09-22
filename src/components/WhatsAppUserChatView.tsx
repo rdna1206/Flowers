@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Send, Flower2, BookOpen, CheckCheck } from 'lucide-react';
 import { api } from '../lib/api';
-import type { ChatMessage, UserExperienceData } from '../types';
+import type { ChatMessage, UserExperienceData, ChatPresenceState } from '../types';
 
 interface WhatsAppUserChatViewProps {
   experience: UserExperienceData;
@@ -18,15 +18,27 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [presence, setPresence] = useState<ChatPresenceState>({});
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const chatId = experience.id;
   const currentUserId = experience.id;
   const currentUserName = experience.name || experience.username || 'Usuario';
 
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+    // 1. Mark user as actively present in this chat
+    api.setUserChatPresence(chatId, 'user', true).catch(() => {});
+
+    // 2. Start heartbeat while user is inside their chat
+    const heartbeatInterval = setInterval(() => {
+      api.updateUserChatHeartbeat(chatId, 'user').catch(() => {});
+    }, 8000);
+
+    let unsubscribeChat: (() => void) | undefined;
+    let unsubscribePresence: (() => void) | undefined;
 
     const setupChat = async () => {
       try {
@@ -35,7 +47,7 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
         // silent fallback
       }
 
-      unsubscribe = api.subscribeToChat(
+      unsubscribeChat = api.subscribeToChat(
         chatId,
         (liveMessages) => {
           setMessages(liveMessages);
@@ -44,25 +56,77 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
           // silent fallback
         }
       );
+
+      unsubscribePresence = api.subscribeToChatPresence(
+        chatId,
+        (livePresence) => {
+          setPresence(livePresence);
+        }
+      );
     };
 
     setupChat();
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
+    // Disconnect cleanup on pagehide / beforeunload / visibility change
+    const handleLeave = () => {
+      api.setUserChatPresence(chatId, 'user', false).catch(() => {});
+      api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        api.setUserChatPresence(chatId, 'user', false).catch(() => {});
+        api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+      } else if (document.visibilityState === 'visible') {
+        api.setUserChatPresence(chatId, 'user', true).catch(() => {});
       }
+    };
+
+    window.addEventListener('beforeunload', handleLeave);
+    window.addEventListener('pagehide', handleLeave);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (unsubscribeChat) unsubscribeChat();
+      if (unsubscribePresence) unsubscribePresence();
+      window.removeEventListener('beforeunload', handleLeave);
+      window.removeEventListener('pagehide', handleLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      api.setUserChatPresence(chatId, 'user', false).catch(() => {});
+      api.setUserChatTyping(chatId, 'user', false).catch(() => {});
     };
   }, [chatId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, presence.adminTyping]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setInputText(val);
+
+    const hasText = val.trim().length > 0;
+    if (hasText) {
+      api.setUserChatTyping(chatId, 'user', true).catch(() => {});
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+      }, 2500);
+    } else {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+    }
+  };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = inputText.trim();
     if (!trimmed || isSending) return;
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    api.setUserChatTyping(chatId, 'user', false).catch(() => {});
 
     setIsSending(true);
     setInputText('');
@@ -119,8 +183,25 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
                 Ronald
               </h3>
               <div className="flex items-center space-x-1.5 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-[#25D366]" />
-                <span className="text-xs text-white/90 font-light">en línea</span>
+                {presence.adminTyping ? (
+                  <span className="text-xs text-[#25D366] font-medium animate-pulse">
+                    escribiendo...
+                  </span>
+                ) : presence.adminInChat ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
+                    <span className="text-xs text-white/95 font-medium">
+                      Ronald se encuentra en este chat
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-white/40" />
+                    <span className="text-xs text-white/70 font-light">
+                      Desconectado
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -193,7 +274,7 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
                     </p>
                     <div className="flex items-center justify-end space-x-1 mt-1 -mb-0.5">
                       <span className="text-[10px] text-[#667781] leading-none">
-                        {formatTime(msg.timestamp)}
+                        {formatTime(msg.createdAt || msg.timestamp)}
                       </span>
                       {isFromMe && (
                         <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
@@ -204,6 +285,27 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
               );
             })
           )}
+
+          {presence.adminTyping && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-start w-full"
+            >
+              <div className="max-w-[85%] sm:max-w-[78%] px-3.5 py-2 rounded-xl text-sm leading-relaxed relative bg-white text-[#111B21] rounded-tl-xs shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] flex items-center space-x-2">
+                <div className="flex space-x-1 items-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#008069] animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#008069] animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#008069] animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+                <span className="text-xs text-[#54656F] italic">
+                  Ronald está escribiendo...
+                </span>
+              </div>
+            </motion.div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
 
@@ -216,7 +318,7 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
             ref={inputRef}
             type="text"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Escribe un mensaje"
             className="flex-1 bg-white text-[#111B21] placeholder-[#667781] text-sm px-4 py-2.5 rounded-full border border-transparent focus:border-[#00A884] focus:outline-hidden transition-all shadow-2xs"

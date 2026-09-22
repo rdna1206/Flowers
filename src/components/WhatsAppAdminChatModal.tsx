@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, X, CheckCheck, Trash2, AlertTriangle, Sparkles, MessageSquare } from 'lucide-react';
 import { api } from '../lib/api';
-import type { ChatMessage, UserRecord } from '../types';
+import type { ChatMessage, UserRecord, ChatPresenceState } from '../types';
 
 interface WhatsAppAdminChatModalProps {
   user: UserRecord | null;
@@ -21,9 +21,11 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
   const [isClearing, setIsClearing] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null);
+  const [presence, setPresence] = useState<ChatPresenceState>({});
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Personalized theme extraction from the user's custom flower profile
   const theme = user?.theme || {};
@@ -35,23 +37,40 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
   useEffect(() => {
     if (!isOpen || !user) return;
     setShowClearConfirm(false);
+    const chatId = user.id;
 
-    let unsubscribe: (() => void) | undefined;
+    // 1. Mark Ronald as active/present inside this specific user's chat
+    api.setUserChatPresence(chatId, 'admin', true).catch(() => {});
+
+    // 2. Start heartbeat while Ronald has this modal open
+    const heartbeatInterval = setInterval(() => {
+      api.updateUserChatHeartbeat(chatId, 'admin').catch(() => {});
+    }, 8000);
+
+    let unsubscribeChat: (() => void) | undefined;
+    let unsubscribePresence: (() => void) | undefined;
 
     const setupChat = async () => {
       try {
-        await api.ensureUserChatInitialized(user.id);
+        await api.ensureUserChatInitialized(chatId);
       } catch {
         // non-blocking
       }
 
-      unsubscribe = api.subscribeToChat(
-        user.id,
+      unsubscribeChat = api.subscribeToChat(
+        chatId,
         (liveMessages) => {
           setMessages(liveMessages);
         },
         () => {
           // silent fallback
+        }
+      );
+
+      unsubscribePresence = api.subscribeToChatPresence(
+        chatId,
+        (livePresence) => {
+          setPresence(livePresence);
         }
       );
     };
@@ -63,21 +82,68 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
       inputRef.current?.focus();
     }, 150);
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
+    // Disconnect cleanup on pagehide / beforeunload / visibility change
+    const handleLeave = () => {
+      api.setUserChatPresence(chatId, 'admin', false).catch(() => {});
+      api.setUserChatTyping(chatId, 'admin', false).catch(() => {});
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        api.setUserChatPresence(chatId, 'admin', false).catch(() => {});
+        api.setUserChatTyping(chatId, 'admin', false).catch(() => {});
+      } else if (document.visibilityState === 'visible') {
+        api.setUserChatPresence(chatId, 'admin', true).catch(() => {});
       }
+    };
+
+    window.addEventListener('beforeunload', handleLeave);
+    window.addEventListener('pagehide', handleLeave);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (unsubscribeChat) unsubscribeChat();
+      if (unsubscribePresence) unsubscribePresence();
+      window.removeEventListener('beforeunload', handleLeave);
+      window.removeEventListener('pagehide', handleLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      api.setUserChatPresence(chatId, 'admin', false).catch(() => {});
+      api.setUserChatTyping(chatId, 'admin', false).catch(() => {});
     };
   }, [isOpen, user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, presence.userTyping]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setInputText(val);
+
+    if (!user) return;
+    const hasText = val.trim().length > 0;
+
+    if (hasText) {
+      api.setUserChatTyping(user.id, 'admin', true).catch(() => {});
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        api.setUserChatTyping(user.id, 'admin', false).catch(() => {});
+      }, 2500);
+    } else {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      api.setUserChatTyping(user.id, 'admin', false).catch(() => {});
+    }
+  };
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = inputText.trim();
     if (!trimmed || !user || isSending) return;
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    api.setUserChatTyping(user.id, 'admin', false).catch(() => {});
 
     setIsSending(true);
     setInputText('');
@@ -192,11 +258,23 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center space-x-2 mt-0.5">
-                  <span className="flex items-center space-x-1 text-[11px] text-[#25D366] font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
-                    <span>en vivo</span>
-                  </span>
-                  <span className="text-[10px] text-white/50">•</span>
+                  {presence.userTyping ? (
+                    <span className="flex items-center space-x-1.5 text-[11px] text-[#25D366] font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-ping" />
+                      <span className="animate-pulse">{user.name} está escribiendo...</span>
+                    </span>
+                  ) : presence.userInChat ? (
+                    <span className="flex items-center space-x-1.5 text-[11px] text-[#25D366] font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
+                      <span>{user.name} se encuentra en este chat</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center space-x-1.5 text-[11px] text-gray-400 font-normal">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-500/60" />
+                      <span>Fuera del chat</span>
+                    </span>
+                  )}
+                  <span className="text-[10px] text-white/40">•</span>
                   <span
                     className="text-[10px] font-medium px-2 py-0.2 rounded-full border border-white/10"
                     style={{
@@ -392,6 +470,32 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                 );
               })
             )}
+            {presence.userTyping && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-start w-full"
+              >
+                <div
+                  className="px-4 py-2.5 rounded-2xl text-xs rounded-tl-xs border border-white/10 flex items-center space-x-2.5 shadow-md"
+                  style={{
+                    backgroundColor: '#151E2E',
+                    color: '#F1F5F9',
+                    borderLeft: `3px solid ${primaryColor}`,
+                  }}
+                >
+                  <div className="flex space-x-1 items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="text-xs text-gray-300 font-medium">
+                    {user.name} está escribiendo...
+                  </span>
+                </div>
+              </motion.div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -404,7 +508,7 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
               ref={inputRef}
               type="text"
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={`Escribir a ${user.name}...`}
               className="flex-1 bg-[#1E293B] text-white placeholder-gray-400 text-sm px-4 py-2.5 rounded-xl border border-white/10 focus:border-white/30 focus:outline-hidden transition-all shadow-inner"

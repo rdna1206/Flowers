@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Check, CheckCheck, Lock, Flower2, BookOpen, ShieldCheck, Sparkles, MessageSquare } from 'lucide-react';
-import type { UserExperienceData, UserResponse, ChatMessage } from '../types';
+import type { UserExperienceData, UserResponse, ChatMessage, ChatPresenceState } from '../types';
 import { api } from '../lib/api';
 
 interface UserResponseViewProps {
@@ -41,25 +41,41 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   const [initialResponseText, setInitialResponseText] = useState('');
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [presence, setPresence] = useState<ChatPresenceState>({});
   const [hasStartedChat, setHasStartedChat] = useState<boolean>(
     Boolean(experience.userResponse?.text)
   );
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize and subscribe to real-time chat
+  const chatId = experience.id;
+
+  // Initialize and subscribe to real-time chat & presence
   useEffect(() => {
-    // Ensure chat doc exists and carries initial response if any
-    api.ensureUserChatInitialized(experience.id).catch(() => {});
+    // 1. Mark presence if chat is active
+    if (hasStartedChat) {
+      api.setUserChatPresence(chatId, 'user', true).catch(() => {});
+    }
 
-    // Subscribe to real-time updates
-    const unsubscribe = api.subscribeToChat(
-      experience.id,
+    const heartbeatInterval = setInterval(() => {
+      if (hasStartedChat) {
+        api.updateUserChatHeartbeat(chatId, 'user').catch(() => {});
+      }
+    }, 8000);
+
+    // Ensure chat doc exists and carries initial response if any
+    api.ensureUserChatInitialized(chatId).catch(() => {});
+
+    // Subscribe to messages
+    const unsubscribeMessages = api.subscribeToChat(
+      chatId,
       (liveMessages) => {
         setMessages(liveMessages);
         if (liveMessages.length > 0) {
           setHasStartedChat(true);
+          api.setUserChatPresence(chatId, 'user', true).catch(() => {});
         } else {
           setHasStartedChat(false);
         }
@@ -72,16 +88,67 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       }
     );
 
-    return () => {
-      unsubscribe();
+    // Subscribe to presence
+    const unsubscribePresence = api.subscribeToChatPresence(
+      chatId,
+      (livePresence) => {
+        setPresence(livePresence);
+      }
+    );
+
+    const handleLeave = () => {
+      api.setUserChatPresence(chatId, 'user', false).catch(() => {});
+      api.setUserChatTyping(chatId, 'user', false).catch(() => {});
     };
-  }, [experience.id]);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        api.setUserChatPresence(chatId, 'user', false).catch(() => {});
+        api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+      } else if (document.visibilityState === 'visible' && hasStartedChat) {
+        api.setUserChatPresence(chatId, 'user', true).catch(() => {});
+      }
+    };
+
+    window.addEventListener('beforeunload', handleLeave);
+    window.addEventListener('pagehide', handleLeave);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      unsubscribeMessages();
+      unsubscribePresence();
+      window.removeEventListener('beforeunload', handleLeave);
+      window.removeEventListener('pagehide', handleLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      api.setUserChatPresence(chatId, 'user', false).catch(() => {});
+      api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+    };
+  }, [chatId, hasStartedChat]);
 
   useEffect(() => {
     if (hasStartedChat) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages.length, hasStartedChat]);
+  }, [messages.length, hasStartedChat, presence.adminTyping]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setInputText(val);
+
+    const hasText = val.trim().length > 0;
+    if (hasText) {
+      api.setUserChatTyping(chatId, 'user', true).catch(() => {});
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+      }, 2500);
+    } else {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+    }
+  };
 
   // First-time surprise submit from the discreet "Mi respuesta" form
   const handleFirstResponseSubmit = async (e: React.FormEvent) => {
@@ -98,6 +165,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       // 2. Reveal the live chat
       setHasStartedChat(true);
       setInitialResponseText('');
+      await api.setUserChatPresence(chatId, 'user', true);
 
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -115,12 +183,15 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
     const clean = inputText.trim();
     if (!clean || isSending) return;
 
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    api.setUserChatTyping(chatId, 'user', false).catch(() => {});
+
     setIsSending(true);
     setInputText('');
 
     try {
       await api.sendChatMessage(
-        experience.id,
+        chatId,
         clean,
         'user',
         experience.id,
@@ -322,17 +393,35 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                   >
                     R
                   </div>
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-black" />
+                  {presence.adminInChat ? (
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-black animate-pulse" />
+                  ) : (
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-400 border-2 border-white dark:border-black" />
+                  )}
                 </div>
                 <div>
                   <div className="text-xs sm:text-sm font-semibold flex items-center space-x-1.5" style={{ color: textColor }}>
                     <span>Ronald</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-400 font-medium">
-                      En línea
-                    </span>
+                    {presence.adminTyping ? (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-400 font-medium animate-pulse">
+                        Escribiendo...
+                      </span>
+                    ) : presence.adminInChat ? (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-400 font-medium">
+                        En el chat
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/10 text-gray-400 font-medium">
+                        Desconectado
+                      </span>
+                    )}
                   </div>
                   <p className="text-[10px]" style={{ color: mutedTextColor }}>
-                    Tu mensaje le llegó directamente
+                    {presence.adminTyping
+                      ? 'Ronald está respondiéndote ahora...'
+                      : presence.adminInChat
+                      ? 'Ronald se encuentra en este chat'
+                      : 'Tu mensaje le llegará directamente'}
                   </p>
                 </div>
               </div>
@@ -409,6 +498,31 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                   </motion.div>
                 );
               })}
+              {presence.adminTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-start"
+                >
+                  <div
+                    className="max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 shadow-xs text-sm rounded-bl-xs border flex items-center space-x-2"
+                    style={{
+                      backgroundColor: isDarkTheme ? '#131F38' : '#FFFFFF',
+                      borderColor: borderColor,
+                    }}
+                  >
+                    <div className="flex space-x-1 items-center">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                    <span className="text-xs text-emerald-400 font-medium italic">
+                      Ronald está escribiendo...
+                    </span>
+                  </div>
+                </motion.div>
+              )}
               <div ref={messagesEndRef} />
             </div>
 
@@ -427,7 +541,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                   id="chat-user-message-input"
                   type="text"
                   value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
+                  onChange={handleInputChange}
                   placeholder="Escribe otro mensaje para Ronald..."
                   disabled={isSending}
                   className="w-full px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-full border focus:outline-hidden transition-all"

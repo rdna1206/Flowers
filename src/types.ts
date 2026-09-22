@@ -82,6 +82,17 @@ export interface UserExperienceData {
   audioUrl?: string;
 }
 
+export interface ChatPresenceState {
+  adminInChat?: boolean;
+  userInChat?: boolean;
+  adminTyping?: boolean;
+  userTyping?: boolean;
+  adminLastSeen?: string;
+  userLastSeen?: string;
+  adminHeartbeat?: number;
+  userHeartbeat?: number;
+}
+
 export interface ChatMessage {
   id: string;
   chatId: string;
@@ -93,6 +104,7 @@ export interface ChatMessage {
   isOriginalResponse?: boolean;
   read: boolean;
   createdAt: string;
+  timestamp?: string;
 }
 
 export interface ChatSummary {
@@ -103,6 +115,14 @@ export interface ChatSummary {
   lastMessageAt?: string;
   unreadCountForAdmin?: number;
   unreadCountForUser?: number;
+  adminInChat?: boolean;
+  userInChat?: boolean;
+  adminTyping?: boolean;
+  userTyping?: boolean;
+  adminLastSeen?: string;
+  userLastSeen?: string;
+  adminHeartbeat?: number;
+  userHeartbeat?: number;
   originalResponse?: UserResponse | null;
   createdAt: string;
   updatedAt: string;

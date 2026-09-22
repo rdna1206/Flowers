@@ -51,7 +51,7 @@
     },
     "Chat": {
       "title": "Chat",
-      "description": "Chat session between user and admin",
+      "description": "Chat session between user and admin with real-time presence and typing states",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -59,6 +59,14 @@
         "userName": { "type": "string" },
         "lastMessageText": { "type": "string" },
         "lastMessageAt": { "type": "string" },
+        "adminInChat": { "type": "boolean" },
+        "userInChat": { "type": "boolean" },
+        "adminTyping": { "type": "boolean" },
+        "userTyping": { "type": "boolean" },
+        "adminLastSeen": { "type": "string" },
+        "userLastSeen": { "type": "string" },
+        "adminHeartbeat": { "type": "number" },
+        "userHeartbeat": { "type": "number" },
         "createdAt": { "type": "string" },
         "updatedAt": { "type": "string" }
       },

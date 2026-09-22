@@ -27,6 +27,7 @@ import type {
   UserSummary,
   ChatMessage,
   ChatSummary,
+  ChatPresenceState,
 } from '../types';
 import { INITIAL_USERS } from '../data/initialUsers';
 
@@ -658,8 +659,23 @@ export function subscribeToAllChats(
       chatsRef,
       (snapshot) => {
         const list: ChatSummary[] = [];
+        const now = Date.now();
         snapshot.forEach((docSnap) => {
-          list.push(docSnap.data() as ChatSummary);
+          const data = docSnap.data() as ChatSummary;
+          const isAdminActive =
+            Boolean(data.adminInChat) &&
+            (!data.adminHeartbeat || now - data.adminHeartbeat < 30000);
+          const isUserActive =
+            Boolean(data.userInChat) &&
+            (!data.userHeartbeat || now - data.userHeartbeat < 30000);
+
+          list.push({
+            ...data,
+            adminInChat: isAdminActive,
+            userInChat: isUserActive,
+            adminTyping: isAdminActive && Boolean(data.adminTyping),
+            userTyping: isUserActive && Boolean(data.userTyping),
+          });
         });
         list.sort((a, b) => (b.lastMessageAt || b.updatedAt || '').localeCompare(a.lastMessageAt || a.updatedAt || ''));
         onUpdate(list);
@@ -671,6 +687,180 @@ export function subscribeToAllChats(
     );
   } catch (err) {
     console.warn('Setup error in all chats snapshot:', err);
+    return () => {};
+  }
+}
+
+/**
+ * Set real-time presence for a chat participant (user or admin)
+ */
+export async function setUserChatPresence(
+  chatId: string,
+  role: 'user' | 'admin',
+  isPresent: boolean
+): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    const nowIso = new Date().toISOString();
+    const nowTime = Date.now();
+
+    if (role === 'admin') {
+      await setDoc(
+        chatRef,
+        {
+          id: normChatId,
+          userId: normChatId,
+          adminInChat: isPresent,
+          adminLastSeen: nowIso,
+          ...(isPresent
+            ? { adminHeartbeat: nowTime }
+            : { adminTyping: false, adminHeartbeat: 0 }),
+          updatedAt: nowIso,
+        },
+        { merge: true }
+      );
+    } else {
+      await setDoc(
+        chatRef,
+        {
+          id: normChatId,
+          userId: normChatId,
+          userInChat: isPresent,
+          userLastSeen: nowIso,
+          ...(isPresent
+            ? { userHeartbeat: nowTime }
+            : { userTyping: false, userHeartbeat: 0 }),
+          updatedAt: nowIso,
+        },
+        { merge: true }
+      );
+    }
+  } catch (err) {
+    console.warn(`Error setting presence for ${normChatId}:`, err);
+  }
+}
+
+/**
+ * Send heartbeat to keep presence alive while active in chat
+ */
+export async function updateUserChatHeartbeat(
+  chatId: string,
+  role: 'user' | 'admin'
+): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    const nowTime = Date.now();
+
+    if (role === 'admin') {
+      await setDoc(
+        chatRef,
+        {
+          adminInChat: true,
+          adminHeartbeat: nowTime,
+        },
+        { merge: true }
+      );
+    } else {
+      await setDoc(
+        chatRef,
+        {
+          userInChat: true,
+          userHeartbeat: nowTime,
+        },
+        { merge: true }
+      );
+    }
+  } catch {
+    // silent fallback for heartbeat
+  }
+}
+
+/**
+ * Set real-time typing status in chat
+ */
+export async function setUserChatTyping(
+  chatId: string,
+  role: 'user' | 'admin',
+  isTyping: boolean
+): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    if (role === 'admin') {
+      await setDoc(
+        chatRef,
+        {
+          adminTyping: isTyping,
+        },
+        { merge: true }
+      );
+    } else {
+      await setDoc(
+        chatRef,
+        {
+          userTyping: isTyping,
+        },
+        { merge: true }
+      );
+    }
+  } catch {
+    // silent fallback for typing status
+  }
+}
+
+/**
+ * Subscribe in real-time to presence & typing status of a specific chat
+ */
+export function subscribeToChatPresence(
+  chatId: string,
+  onUpdate: (presence: ChatPresenceState) => void,
+  onError?: (err: Error) => void
+): () => void {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    return onSnapshot(
+      chatRef,
+      (docSnap) => {
+        if (!docSnap.exists()) {
+          onUpdate({
+            adminInChat: false,
+            userInChat: false,
+            adminTyping: false,
+            userTyping: false,
+          });
+          return;
+        }
+
+        const data = docSnap.data();
+        const now = Date.now();
+        const isAdminActive =
+          Boolean(data.adminInChat) &&
+          (!data.adminHeartbeat || now - data.adminHeartbeat < 30000);
+        const isUserActive =
+          Boolean(data.userInChat) &&
+          (!data.userHeartbeat || now - data.userHeartbeat < 30000);
+
+        onUpdate({
+          adminInChat: isAdminActive,
+          userInChat: isUserActive,
+          adminTyping: isAdminActive && Boolean(data.adminTyping),
+          userTyping: isUserActive && Boolean(data.userTyping),
+          adminLastSeen: data.adminLastSeen,
+          userLastSeen: data.userLastSeen,
+          adminHeartbeat: data.adminHeartbeat,
+          userHeartbeat: data.userHeartbeat,
+        });
+      },
+      (err) => {
+        console.warn(`Error in presence snapshot for ${normChatId}:`, err);
+        if (onError) onError(err);
+      }
+    );
+  } catch (err: any) {
+    console.warn(`Setup error in presence snapshot for ${normChatId}:`, err);
     return () => {};
   }
 }

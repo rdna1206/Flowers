@@ -28,6 +28,10 @@ import {
   subscribeToChatMessages,
   subscribeToAllChats,
   ensureChatInitialized,
+  setUserChatPresence,
+  updateUserChatHeartbeat,
+  setUserChatTyping,
+  subscribeToChatPresence,
 } from './firebase';
 
 const TOKEN_KEY = 'floral_session_token';
@@ -419,5 +423,37 @@ export const api = {
     if (userDoc) {
       await ensureChatInitialized(userDoc);
     }
+  },
+
+  /**
+   * Update chat presence (user or admin)
+   */
+  async setUserChatPresence(chatId: string, role: 'user' | 'admin', isPresent: boolean): Promise<void> {
+    await setUserChatPresence(chatId, role, isPresent);
+  },
+
+  /**
+   * Send heartbeat while active in chat
+   */
+  async updateUserChatHeartbeat(chatId: string, role: 'user' | 'admin'): Promise<void> {
+    await updateUserChatHeartbeat(chatId, role);
+  },
+
+  /**
+   * Update typing state in chat
+   */
+  async setUserChatTyping(chatId: string, role: 'user' | 'admin', isTyping: boolean): Promise<void> {
+    await setUserChatTyping(chatId, role, isTyping);
+  },
+
+  /**
+   * Subscribe to real-time presence & typing state of a chat
+   */
+  subscribeToChatPresence(
+    chatId: string,
+    onUpdate: (presence: import('../types').ChatPresenceState) => void,
+    onError?: (err: Error) => void
+  ): () => void {
+    return subscribeToChatPresence(chatId, onUpdate, onError);
   },
 };
