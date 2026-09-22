@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Image as ImageIcon,
   Mic,
+  LogOut,
 } from 'lucide-react';
 import type { UserExperienceData, UserResponse, ChatMessage, ChatPresenceState } from '../types';
 import { api } from '../lib/api';
@@ -27,6 +28,7 @@ interface UserResponseViewProps {
   onSubmitResponse: (text: string) => Promise<UserResponse | null>;
   onBackToFlowers: () => void;
   onBackToReading: () => void;
+  onLogout?: () => void;
 }
 
 export const UserResponseView: React.FC<UserResponseViewProps> = ({
@@ -34,6 +36,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   onSubmitResponse,
   onBackToFlowers,
   onBackToReading,
+  onLogout,
 }) => {
   const isJhon = experience.id === 'jhon' || experience.username?.toLowerCase() === 'jhon';
   const theme = experience.theme || {};
@@ -827,33 +830,53 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       {/* Persistent Navigation Buttons when Chat is Active */}
       {hasStartedChat && (
         <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-center sm:justify-between gap-3">
-          <button
-            type="button"
-            onClick={onBackToFlowers}
-            className="inline-flex items-center space-x-2 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer"
-            style={{
-              borderColor: borderColor,
-              color: textColor,
-              backgroundColor: innerCardBg,
-            }}
-          >
-            <Flower2 className="w-3.5 h-3.5" style={{ color: accentColor }} />
-            <span>Volver a la flor</span>
-          </button>
+          {experience.hasFlowerExperience !== false ? (
+            <>
+              <button
+                type="button"
+                onClick={onBackToFlowers}
+                className="inline-flex items-center space-x-2 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer"
+                style={{
+                  borderColor: borderColor,
+                  color: textColor,
+                  backgroundColor: innerCardBg,
+                }}
+              >
+                <Flower2 className="w-3.5 h-3.5" style={{ color: accentColor }} />
+                <span>Volver a la flor</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={onBackToReading}
-            className="inline-flex items-center space-x-2 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer"
-            style={{
-              borderColor: borderColor,
-              color: textColor,
-              backgroundColor: innerCardBg,
-            }}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Releer</span>
-          </button>
+              <button
+                type="button"
+                onClick={onBackToReading}
+                className="inline-flex items-center space-x-2 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer"
+                style={{
+                  borderColor: borderColor,
+                  color: textColor,
+                  backgroundColor: innerCardBg,
+                }}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Releer</span>
+              </button>
+            </>
+          ) : (
+            onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="inline-flex items-center space-x-2 text-xs py-2 px-4 rounded-full border transition-colors cursor-pointer mx-auto"
+                style={{
+                  borderColor: borderColor,
+                  color: textColor,
+                  backgroundColor: innerCardBg,
+                }}
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Cerrar sesión</span>
+              </button>
+            )
+          )}
         </div>
       )}
 

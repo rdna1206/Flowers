@@ -14,7 +14,6 @@ import { ReadingExperience } from './components/ReadingExperience';
 import { OrganicFlowerCreation } from './components/OrganicFlowerCreation';
 import { UserResponseView } from './components/UserResponseView';
 import { AdminDashboard } from './components/AdminDashboard';
-import { WhatsAppUserChatView } from './components/WhatsAppUserChatView';
 import { UserMenuView } from './components/UserMenuView';
 
 type AppStep =
@@ -325,15 +324,19 @@ export default function App() {
               />
             )}
 
-            {/* Step: WhatsApp User Chat (Direct real-time WhatsApp communication) */}
-            {currentStep === 'whatsapp-chat' && experience && (
-              <WhatsAppUserChatView
-                experience={experience}
-                onBackToFlowers={() => setCurrentStep('flower-result')}
-                onBackToReading={handleProceedToReading}
-                onLogout={handleLogout}
-              />
-            )}
+            {/* Step: WhatsApp User Chat / Mi Respuesta (Direct real-time communication) */}
+            {(currentStep === 'whatsapp-chat' || currentStep === 'response' || currentStep === 'chat') &&
+              experience &&
+              experience.id?.toLowerCase() !== 'leiry' &&
+              experience.username?.toLowerCase() !== 'leiry' && (
+                <UserResponseView
+                  experience={experience}
+                  onSubmitResponse={handleSubmitResponse}
+                  onBackToFlowers={() => setCurrentStep('flower-result')}
+                  onBackToReading={handleProceedToReading}
+                  onLogout={handleLogout}
+                />
+              )}
 
             {/* Step 2: MI TEXTO (Only Ronald's exact text) */}
             {currentStep === 'reading' && experience && (
@@ -383,18 +386,7 @@ export default function App() {
               />
             )}
 
-            {/* Step 5: "Mi respuesta" / Chat (Strictly named "Mi respuesta", saved to Ronald only) */}
-            {(currentStep === 'response' || currentStep === 'chat') &&
-              experience &&
-              experience.id?.toLowerCase() !== 'leiry' &&
-              experience.username?.toLowerCase() !== 'leiry' && (
-                <UserResponseView
-                  experience={experience}
-                  onSubmitResponse={handleSubmitResponse}
-                  onBackToFlowers={() => setCurrentStep('flower-result')}
-                  onBackToReading={() => setCurrentStep('reading')}
-                />
-              )}
+
           </>
         )}
       </main>
