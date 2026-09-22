@@ -126,15 +126,21 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
       unsubscribeChat = api.subscribeToChat(
         chatId,
         (liveMessages) => {
+          console.log('Mensajes recibidos (Admin):', liveMessages.map(m => ({ text: m.text, createdAt: m.createdAt })));
           const sortedMessages = [...liveMessages].sort((a, b) => 
             new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
           );
+          console.log('Mensajes ordenados (Admin):', sortedMessages.map(m => ({ text: m.text, createdAt: m.createdAt })));
           setMessages(sortedMessages);
           if (!isMinimized) {
             const hasUnread = liveMessages.some((m) => m.senderRole === 'user' && !m.read);
             if (hasUnread) {
               api.markChatMessagesAsRead(chatId, 'admin').catch(() => {});
             }
+            // Ensure we scroll to the bottom when new messages arrive
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
           }
           if (isMinimized && liveMessages.length > prevMsgCountRef.current) {
             const newCount = liveMessages.length - prevMsgCountRef.current;
