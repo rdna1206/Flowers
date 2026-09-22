@@ -50,6 +50,7 @@ export interface UserRecord {
   authUid?: string;
   role: UserRole;
   isActive: boolean;
+  hasFlowerExperience?: boolean; // false = direct chat only, true or undefined = has flower & letter
   profiling: string;
   personalText: string;
   theme: UserTheme;
@@ -66,6 +67,7 @@ export interface UserSummary {
   name: string;
   username: string;
   role: UserRole;
+  hasFlowerExperience?: boolean;
 }
 
 export interface UserExperienceData {
@@ -80,6 +82,7 @@ export interface UserExperienceData {
   savedFormulation: FlowerFormulation | null;
   userResponse?: UserResponse | null;
   audioUrl?: string;
+  hasFlowerExperience?: boolean;
 }
 
 export interface ChatPresenceState {
@@ -111,6 +114,8 @@ export interface ChatMessage {
   audioDuration?: number;
   isOriginalResponse?: boolean;
   read: boolean;
+  readAt?: string;
+  delivered?: boolean;
   createdAt: string;
   timestamp?: string;
 }
@@ -122,6 +127,8 @@ export interface ChatSummary {
   lastMessageText?: string;
   lastMessageType?: 'text' | 'image' | 'audio';
   lastMessageAt?: string;
+  lastMessageSenderRole?: 'user' | 'admin';
+  lastMessageRead?: boolean;
   unreadCountForAdmin?: number;
   unreadCountForUser?: number;
   adminInChat?: boolean;

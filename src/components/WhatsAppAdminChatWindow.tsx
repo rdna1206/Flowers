@@ -21,6 +21,7 @@ import { AudioVoiceMessage } from './AudioVoiceMessage';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { AudioVoiceRecorder } from './AudioVoiceRecorder';
 import { ImageSendPreviewModal } from './ImageSendPreviewModal';
+import { ChatReadReceipt } from './ChatReadReceipt';
 
 export interface WhatsAppAdminChatWindowProps {
   user: UserRecord;
@@ -104,6 +105,12 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
         chatId,
         (liveMessages) => {
           setMessages(liveMessages);
+          if (!isMinimized) {
+            const hasUnread = liveMessages.some((m) => m.senderRole === 'user' && !m.read);
+            if (hasUnread) {
+              api.markChatMessagesAsRead(chatId, 'admin').catch(() => {});
+            }
+          }
           if (isMinimized && liveMessages.length > prevMsgCountRef.current) {
             const newCount = liveMessages.length - prevMsgCountRef.current;
             const lastMsg = liveMessages[liveMessages.length - 1];
@@ -172,8 +179,12 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
     if (!isMinimized) {
       setUnreadWhileMinimized(0);
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      const hasUnread = messages.some((m) => m.senderRole === 'user' && !m.read);
+      if (hasUnread) {
+        api.markChatMessagesAsRead(user.id, 'admin').catch(() => {});
+      }
     }
-  }, [isMinimized, messages, presence.userTyping, presence.userRecording]);
+  }, [isMinimized, messages, presence.userTyping, presence.userRecording, user.id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -724,7 +735,12 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                           {formatTime(msg.createdAt || (msg as any).timestamp)}
                         </span>
                         {isFromRonald && (
-                          <CheckCheck className="w-3 h-3 text-[#38BDF8]" />
+                          <ChatReadReceipt
+                            read={Boolean(msg.read)}
+                            isRecipientActive={Boolean(presence.userInChat)}
+                            isDarkBackground={true}
+                            className="w-3.5 h-3.5"
+                          />
                         )}
                       </div>
                     </div>

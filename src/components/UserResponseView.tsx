@@ -20,6 +20,7 @@ import { AudioVoiceMessage } from './AudioVoiceMessage';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { AudioVoiceRecorder } from './AudioVoiceRecorder';
 import { ImageSendPreviewModal } from './ImageSendPreviewModal';
+import { ChatReadReceipt } from './ChatReadReceipt';
 
 interface UserResponseViewProps {
   experience: UserExperienceData;
@@ -99,6 +100,10 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
         setMessages(liveMessages);
         if (liveMessages.length > 0 || (experience.userResponse?.text && experience.userResponse.text.trim().length > 0)) {
           setHasStartedChat(true);
+          const hasUnread = liveMessages.some((m) => m.senderRole === 'admin' && !m.read);
+          if (hasUnread) {
+            api.markChatMessagesAsRead(chatId, 'user').catch(() => {});
+          }
         }
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -130,6 +135,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
         api.setUserChatRecording(chatId, 'user', false).catch(() => {});
       } else if (document.visibilityState === 'visible') {
         api.setUserChatPresence(chatId, 'user', true).catch(() => {});
+        api.markChatMessagesAsRead(chatId, 'user').catch(() => {});
       }
     };
 
@@ -660,7 +666,14 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                           }`}
                         >
                           <span>{formatMessageTime(msg.createdAt)}</span>
-                          {isFromMe && <CheckCheck className="w-3.5 h-3.5 text-white/90" />}
+                          {isFromMe && (
+                            <ChatReadReceipt
+                              read={Boolean(msg.read)}
+                              isRecipientActive={Boolean(presence.adminInChat)}
+                              isDarkBackground={isDarkTheme}
+                              className="w-3.5 h-3.5"
+                            />
+                          )}
                         </div>
                       </div>
                     </motion.div>

@@ -34,6 +34,7 @@ import {
   setUserChatRecording,
   subscribeToChatPresence,
   uploadChatMedia,
+  markChatMessagesAsRead,
 } from './firebase';
 
 const TOKEN_KEY = 'floral_session_token';
@@ -123,6 +124,7 @@ function toUserExperienceData(user: UserRecord): UserExperienceData {
     savedFormulation: user.generatedFormulation,
     userResponse: user.userResponse,
     audioUrl: user.audioUrl || (user.id.toLowerCase() === 'isaias' ? '/audio/neo_roneo.mp3' : undefined),
+    hasFlowerExperience: user.hasFlowerExperience !== false,
   };
 }
 
@@ -203,6 +205,7 @@ export const api = {
       name: userDoc.name,
       username: userDoc.username,
       role: userDoc.role,
+      hasFlowerExperience: userDoc.hasFlowerExperience !== false,
     };
   },
 
@@ -531,6 +534,13 @@ export const api = {
    */
   async setUserChatRecording(chatId: string, role: 'user' | 'admin', isRecording: boolean): Promise<void> {
     await setUserChatRecording(chatId, role, isRecording);
+  },
+
+  /**
+   * Mark messages in a chat as read by the participant
+   */
+  async markChatMessagesAsRead(chatId: string, readerRole: 'user' | 'admin'): Promise<void> {
+    await markChatMessagesAsRead(chatId, readerRole);
   },
 
   /**

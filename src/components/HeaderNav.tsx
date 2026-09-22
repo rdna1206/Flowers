@@ -43,7 +43,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               color: '#E6EDF8',
             }}
             title="Inicio"
-            onClick={user?.role === 'admin' ? onOpenAdmin : (onGoToMenu || onViewExperience)}
+            onClick={user?.role === 'admin' ? onOpenAdmin : (user?.hasFlowerExperience !== false ? (onGoToMenu || onViewExperience) : undefined)}
           >
             <LogoR className="w-5 h-5 p-0.5" />
           </div>
@@ -53,8 +53,8 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         <div className="flex items-center space-x-2 sm:space-x-3">
           {user && (
             <>
-              {/* If user is regular user outside menu */}
-              {user.role !== 'admin' && currentView !== 'menu' && currentView !== 'login' && onGoToMenu && (
+              {/* If user is regular user outside menu (only if has flower experience) */}
+              {user.role !== 'admin' && user.hasFlowerExperience !== false && currentView !== 'menu' && currentView !== 'login' && onGoToMenu && (
                 <button
                   id="btn-nav-to-menu"
                   type="button"

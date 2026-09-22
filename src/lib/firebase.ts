@@ -19,6 +19,7 @@ import {
   query,
   orderBy,
   limit,
+  increment,
   Firestore,
 } from 'firebase/firestore';
 import {
@@ -303,6 +304,7 @@ export async function loginWithFirebaseAuth(
     name: userRecord.name,
     username: userRecord.username,
     role: userRecord.role,
+    hasFlowerExperience: userRecord.hasFlowerExperience !== false,
   };
 
   return { user: userSummary, token, rawUser: userRecord };
@@ -702,18 +704,25 @@ export async function sendChatMessage(
         : displayText;
 
     const chatRef = doc(db, CHATS_COLLECTION, normChatId);
-    await setDoc(
-      chatRef,
-      {
-        id: normChatId,
-        userId: normChatId,
-        lastMessageText: summaryText,
-        lastMessageType: msgType,
-        lastMessageAt: now,
-        updatedAt: now,
-      },
-      { merge: true }
-    );
+    const chatUpdatePayload: any = {
+      id: normChatId,
+      userId: normChatId,
+      lastMessageText: summaryText,
+      lastMessageType: msgType,
+      lastMessageAt: now,
+      lastMessageSenderRole: newMsg.senderRole,
+      lastMessageRead: false,
+      updatedAt: now,
+    };
+
+    if (newMsg.senderRole === 'user') {
+      chatUpdatePayload.unreadCountForAdmin = increment(1);
+    } else {
+      chatUpdatePayload.unreadCountForUser = increment(1);
+      chatUpdatePayload.lastMessageRead = false;
+    }
+
+    await setDoc(chatRef, chatUpdatePayload, { merge: true });
 
     return newMsg;
   } catch (err) {
@@ -856,6 +865,47 @@ export function subscribeToChatMessages(
   } catch (err: any) {
     console.warn(`Setup error in chat snapshot for ${normChatId}:`, err);
     return () => {};
+  }
+}
+
+/**
+ * Mark messages in a conversation as read by the recipient (realistic WhatsApp blue checkmarks)
+ */
+export async function markChatMessagesAsRead(
+  chatId: string,
+  readerRole: 'user' | 'admin'
+): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const messagesRef = collection(db, CHATS_COLLECTION, normChatId, MESSAGES_COLLECTION);
+    const snap = await getDocs(messagesRef);
+    const unreadDocs = snap.docs.filter((d) => {
+      const data = d.data();
+      // If reader is admin, mark user's messages as read.
+      // If reader is user, mark admin's messages as read.
+      return !data.read && data.senderRole !== readerRole;
+    });
+
+    if (unreadDocs.length === 0) return;
+
+    const nowIso = new Date().toISOString();
+    const updatePromises = unreadDocs.map((d) =>
+      updateDoc(d.ref, {
+        read: true,
+        readAt: nowIso,
+      })
+    );
+    await Promise.all(updatePromises);
+
+    // Also update parent chat unread count
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    if (readerRole === 'admin') {
+      await setDoc(chatRef, { unreadCountForAdmin: 0, lastMessageRead: true, updatedAt: nowIso }, { merge: true });
+    } else {
+      await setDoc(chatRef, { unreadCountForUser: 0, lastMessageRead: true, updatedAt: nowIso }, { merge: true });
+    }
+  } catch (err) {
+    console.warn(`Error marking messages as read in ${normChatId}:`, err);
   }
 }
 
@@ -1237,6 +1287,7 @@ export async function createAdminUserWithAuth(
     username: data.username || cleanId,
     role: data.role === 'admin' ? 'admin' : 'user',
     isActive: data.isActive !== undefined ? data.isActive : true,
+    hasFlowerExperience: data.hasFlowerExperience !== undefined ? data.hasFlowerExperience : false,
     profiling: data.profiling || '',
     personalText: data.personalText || '',
     theme: data.theme || {

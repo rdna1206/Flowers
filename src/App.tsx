@@ -25,6 +25,7 @@ type AppStep =
   | 'flower-result'
   | 'response'
   | 'chat'
+  | 'whatsapp-chat'
   | 'admin';
 
 export default function App() {
@@ -75,7 +76,11 @@ export default function App() {
         } else {
           const exp = await api.getExperience();
           setExperience(exp);
-          setCurrentStep('menu');
+          if (exp.hasFlowerExperience === false) {
+            setCurrentStep('whatsapp-chat');
+          } else {
+            setCurrentStep('menu');
+          }
         }
       } catch (err) {
         console.warn('Session verification failed, logging out:', err);
@@ -164,10 +169,15 @@ export default function App() {
         // Ronald: Direct entry to the Admin Dashboard
         setCurrentStep('admin');
       } else {
-        // Normal User: Direct entry to post-login selection menu (Flor, Chat, Texto)
         const exp = await api.getExperience();
         setExperience(exp);
-        setCurrentStep('menu');
+        if (exp.hasFlowerExperience === false) {
+          // Future / chat-only user lands directly in WhatsApp chat immediately upon login!
+          setCurrentStep('whatsapp-chat');
+        } else {
+          // User with flower memory lands on menu (Flor, Chat, Texto)
+          setCurrentStep('menu');
+        }
       }
     } catch (err: any) {
       setLoginError(err.message || 'Usuario o contraseña incorrectos. Verifica tus datos.');
@@ -190,7 +200,11 @@ export default function App() {
       setIsLoading(true);
       const exp = await api.getAdminUserExperience(username);
       setExperience(exp);
-      setCurrentStep('menu');
+      if (exp.hasFlowerExperience === false) {
+        setCurrentStep('whatsapp-chat');
+      } else {
+        setCurrentStep('menu');
+      }
     } catch (err: any) {
       alert(err?.message || 'No se pudo cargar la experiencia del usuario.');
     } finally {
@@ -302,12 +316,22 @@ export default function App() {
               <UserMenuView
                 experience={experience}
                 onGoToFlower={() => setCurrentStep('flower-formation')}
-                onGoToChat={() => setCurrentStep('response')}
+                onGoToChat={() => setCurrentStep('whatsapp-chat')}
                 onGoToText={handleProceedToReading}
                 isChatAvailable={
                   experience.id?.toLowerCase() !== 'leiry' &&
                   experience.username?.toLowerCase() !== 'leiry'
                 }
+              />
+            )}
+
+            {/* Step: WhatsApp User Chat (Direct real-time WhatsApp communication) */}
+            {currentStep === 'whatsapp-chat' && experience && (
+              <WhatsAppUserChatView
+                experience={experience}
+                onBackToFlowers={() => setCurrentStep('flower-result')}
+                onBackToReading={handleProceedToReading}
+                onLogout={handleLogout}
               />
             )}
 

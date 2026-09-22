@@ -7,6 +7,7 @@ import {
   CheckCheck,
   Image as ImageIcon,
   Mic,
+  LogOut,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import type { ChatMessage, UserExperienceData, ChatPresenceState } from '../types';
@@ -15,17 +16,20 @@ import { AudioVoiceMessage } from './AudioVoiceMessage';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { AudioVoiceRecorder } from './AudioVoiceRecorder';
 import { ImageSendPreviewModal } from './ImageSendPreviewModal';
+import { ChatReadReceipt } from './ChatReadReceipt';
 
 interface WhatsAppUserChatViewProps {
   experience: UserExperienceData;
   onBackToFlowers: () => void;
   onBackToReading: () => void;
+  onLogout?: () => void;
 }
 
 export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
   experience,
   onBackToFlowers,
   onBackToReading,
+  onLogout,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -74,6 +78,10 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
         chatId,
         (liveMessages) => {
           setMessages(liveMessages);
+          const hasUnread = liveMessages.some((m) => m.senderRole === 'admin' && !m.read);
+          if (hasUnread) {
+            api.markChatMessagesAsRead(chatId, 'user').catch(() => {});
+          }
         },
         () => {
           // silent fallback
@@ -104,6 +112,7 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
         api.setUserChatRecording(chatId, 'user', false).catch(() => {});
       } else if (document.visibilityState === 'visible') {
         api.setUserChatPresence(chatId, 'user', true).catch(() => {});
+        api.markChatMessagesAsRead(chatId, 'user').catch(() => {});
       }
     };
 
@@ -295,24 +304,40 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
             </div>
           </div>
 
-          {/* Quick Return Navigation */}
+          {/* Quick Navigation based on Flower Experience */}
           <div className="flex items-center space-x-1.5">
-            <button
-              type="button"
-              onClick={onBackToFlowers}
-              className="inline-flex items-center space-x-1 text-xs py-1.5 px-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
-            >
-              <Flower2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Flor</span>
-            </button>
-            <button
-              type="button"
-              onClick={onBackToReading}
-              className="inline-flex items-center space-x-1 text-xs py-1.5 px-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Releer</span>
-            </button>
+            {experience.hasFlowerExperience !== false ? (
+              <>
+                <button
+                  type="button"
+                  onClick={onBackToFlowers}
+                  className="inline-flex items-center space-x-1 text-xs py-1.5 px-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
+                >
+                  <Flower2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Flor</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={onBackToReading}
+                  className="inline-flex items-center space-x-1 text-xs py-1.5 px-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Releer</span>
+                </button>
+              </>
+            ) : (
+              onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="inline-flex items-center space-x-1 text-xs py-1.5 px-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
+                  title="Cerrar sesión"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Salir</span>
+                </button>
+              )
+            )}
           </div>
         </div>
 
@@ -419,7 +444,12 @@ export const WhatsAppUserChatView: React.FC<WhatsAppUserChatViewProps> = ({
                           {formatTime(msg.createdAt || msg.timestamp)}
                         </span>
                         {isFromMe && (
-                          <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
+                          <ChatReadReceipt
+                            read={Boolean(msg.read)}
+                            isRecipientActive={Boolean(presence.adminInChat)}
+                            isDarkBackground={false}
+                            className="w-3.5 h-3.5"
+                          />
                         )}
                       </div>
                     </div>
