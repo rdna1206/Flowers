@@ -57,6 +57,7 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
 
   const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
   const [pickerMsgId, setPickerMsgId] = useState<string | null>(null);
+  const [activeReactionMsgId, setActiveReactionMsgId] = useState<string | null>(null);
 
   const IOS_EMOJIS = [
     '❤️', '👍', '😂', '😮', '😢', '🙏',
@@ -666,56 +667,40 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                 <div
                   className={`group/msg flex flex-col ${
                     isFromRonald ? 'items-end' : 'items-start'
-                  } w-full relative my-1`}
-                  onTouchStart={(e) => {
-                    (e.currentTarget as any)._touchStartX = e.touches[0].clientX;
-                  }}
-                  onTouchEnd={(e) => {
-                    const startX = (e.currentTarget as any)._touchStartX || 0;
-                    const diff = e.changedTouches[0].clientX - startX;
-                    if (diff > 60) {
-                      setReplyingTo({
-                        id: msg.id,
-                        text: msg.text,
-                        senderName: isFromRonald ? 'Ronald' : user.name,
-                      });
-                    }
-                  }}
+                  } w-full relative my-1.5`}
                 >
-                  {/* Backdrop to close emoji picker when clicking anywhere outside */}
-                  {pickerMsgId === msg.id && (
+                  {/* Backdrop to close emoji picker/reactions when clicking anywhere outside */}
+                  {(pickerMsgId === msg.id || activeReactionMsgId === msg.id) && (
                     <div
                       className="fixed inset-0 z-40 bg-transparent"
-                      onClick={() => setPickerMsgId(null)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPickerMsgId(null);
+                        setActiveReactionMsgId(null);
+                      }}
                     />
                   )}
 
-                  {/* Hover / Tap Action Toolbar positioned beside message */}
+                  {/* Floating iOS-style Reactions Bar (Visible on Hover on PC OR on Message Tap on Mobile) */}
                   <div
-                    className={`absolute top-1/2 -translate-y-1/2 ${
-                      isFromRonald ? 'right-full mr-2.5' : 'left-full ml-2.5'
-                    } opacity-0 group-hover/msg:opacity-100 group-focus-within/msg:opacity-100 transition-opacity flex items-center space-x-1.5 bg-black/80 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-xl z-30 whitespace-nowrap`}
+                    className={`absolute -top-10 ${
+                      isFromRonald ? 'right-0' : 'left-0'
+                    } ${
+                      activeReactionMsgId === msg.id ? 'flex' : 'hidden group-hover/msg:flex'
+                    } items-center space-x-1 bg-[#0F172A]/95 border border-white/20 backdrop-blur-md px-2.5 py-1 rounded-full shadow-2xl z-50 whitespace-nowrap`}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setReplyingTo({
-                          id: msg.id,
-                          text: msg.text,
-                          senderName: isFromRonald ? 'Ronald' : user.name,
-                        })
-                      }
-                      className="text-white hover:text-cyan-400 transition-colors cursor-pointer"
-                      title="Responder"
-                    >
-                      <Reply className="w-3.5 h-3.5" />
-                    </button>
-                    {['❤️', '👍', '😂'].map((emoji) => (
+                    {['❤️', '👍', '😂', '😮', '😢', '🙏'].map((emoji) => (
                       <button
                         key={emoji}
                         type="button"
-                        onClick={() => handleToggleReaction(msg.id, emoji)}
-                        className="text-sm hover:scale-125 transition-transform cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleReaction(msg.id, emoji);
+                          setActiveReactionMsgId(null);
+                          setPickerMsgId(null);
+                        }}
+                        className="text-base sm:text-lg hover:scale-130 active:scale-90 transition-transform cursor-pointer p-0.5"
                         title={`Reaccionar con ${emoji}`}
                       >
                         {emoji}
@@ -723,8 +708,11 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                     ))}
                     <button
                       type="button"
-                      onClick={() => setPickerMsgId(pickerMsgId === msg.id ? null : msg.id)}
-                      className="p-0.5 text-white hover:text-yellow-300 transition-colors rounded-full bg-white/20 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPickerMsgId(pickerMsgId === msg.id ? null : msg.id);
+                      }}
+                      className="p-1 text-white hover:text-yellow-300 transition-colors rounded-full bg-white/20 hover:bg-white/30 cursor-pointer ml-0.5"
                       title="Más emojis (+)"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -735,16 +723,19 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                   {pickerMsgId === msg.id && (
                     <div
                       className={`absolute z-50 ${
-                        isFromRonald ? 'right-full mr-2.5' : 'left-full ml-2.5'
-                      } top-1/2 -translate-y-1/2 p-3 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl w-64 grid grid-cols-6 gap-2 bg-[#0F172A]/95`}
+                        isFromRonald ? 'right-0' : 'left-0'
+                      } bottom-full mb-3 p-3 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl w-64 max-w-[90vw] grid grid-cols-6 gap-2 bg-[#0F172A]/95`}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       {IOS_EMOJIS.map((emoji) => (
                         <button
                           key={emoji}
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             handleToggleReaction(msg.id, emoji);
                             setPickerMsgId(null);
+                            setActiveReactionMsgId(null);
                           }}
                           className="text-xl p-1.5 rounded-xl hover:bg-white/20 transition-colors text-center cursor-pointer"
                         >
@@ -768,7 +759,8 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                     )}
 
                     <div
-                      className={`rounded-2xl text-xs leading-relaxed relative shadow-md transition-all ${
+                      onClick={() => setActiveReactionMsgId(activeReactionMsgId === msg.id ? null : msg.id)}
+                      className={`rounded-2xl text-xs leading-relaxed relative shadow-md transition-all cursor-pointer ${
                         msg.type === 'image' ? 'p-1.5' : 'px-3.5 py-2'
                       } ${
                         isFromRonald
@@ -870,7 +862,21 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
                         </p>
                       )}
 
-                      <div className="flex items-center justify-end space-x-1 mt-1 -mb-0.5">
+                      <div className="flex items-center justify-end space-x-1.5 mt-1 -mb-0.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setReplyingTo({
+                              id: msg.id,
+                              text: msg.text,
+                              senderName: isFromRonald ? 'Ronald' : user.name,
+                            })
+                          }
+                          className="hover:text-cyan-400 transition-colors cursor-pointer mr-1 p-0.5 text-white/80"
+                          title="Responder"
+                        >
+                          <Reply className="w-3.5 h-3.5" />
+                        </button>
                         <span className="text-[9.5px] text-gray-300 font-mono">
                           {formatTime(msg.createdAt || (msg as any).timestamp)}
                         </span>

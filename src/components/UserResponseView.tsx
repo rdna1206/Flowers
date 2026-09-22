@@ -72,6 +72,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
 
   const [replyingTo, setReplyingTo] = useState<{ id: string; text: string; senderName: string } | null>(null);
   const [pickerMsgId, setPickerMsgId] = useState<string | null>(null);
+  const [activeReactionMsgId, setActiveReactionMsgId] = useState<string | null>(null);
 
   const IOS_EMOJIS = [
     '❤️', '👍', '😂', '😮', '😢', '🙏',
@@ -626,56 +627,40 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                       initial={{ opacity: 0, y: 10, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{ duration: 0.25 }}
-                      className={`group relative flex flex-col ${isFromMe ? 'items-end' : 'items-start'} my-1`}
-                      onTouchStart={(e) => {
-                        (e.currentTarget as any)._touchStartX = e.touches[0].clientX;
-                      }}
-                      onTouchEnd={(e) => {
-                        const startX = (e.currentTarget as any)._touchStartX || 0;
-                        const diff = e.changedTouches[0].clientX - startX;
-                        if (diff > 60) {
-                          setReplyingTo({
-                            id: msg.id,
-                            text: msg.text,
-                            senderName: isFromMe ? 'Tú' : (msg.senderName || 'Ronald'),
-                          });
-                        }
-                      }}
+                      className={`group relative flex flex-col ${isFromMe ? 'items-end' : 'items-start'} my-1.5`}
                     >
-                      {/* Backdrop to close emoji picker when clicking anywhere outside */}
-                      {pickerMsgId === msg.id && (
+                      {/* Backdrop to close emoji picker/reactions when clicking anywhere outside */}
+                      {(pickerMsgId === msg.id || activeReactionMsgId === msg.id) && (
                         <div
                           className="fixed inset-0 z-40 bg-transparent"
-                          onClick={() => setPickerMsgId(null)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPickerMsgId(null);
+                            setActiveReactionMsgId(null);
+                          }}
                         />
                       )}
 
-                      {/* Hover / Tap Action Toolbar (Reply & Quick Reactions) positioned beside message */}
+                      {/* Floating iOS-style Reactions Bar (Visible on Hover on PC OR on Message Tap on Mobile) */}
                       <div
-                        className={`absolute top-1/2 -translate-y-1/2 ${
-                          isFromMe ? 'right-full mr-2.5' : 'left-full ml-2.5'
-                        } opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center space-x-1.5 bg-black/80 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-xl z-30 whitespace-nowrap`}
+                        className={`absolute -top-10 ${
+                          isFromMe ? 'right-0' : 'left-0'
+                        } ${
+                          activeReactionMsgId === msg.id ? 'flex' : 'hidden group-hover:flex'
+                        } items-center space-x-1 bg-[#0F172A]/95 border border-white/20 backdrop-blur-md px-2.5 py-1 rounded-full shadow-2xl z-50 whitespace-nowrap`}
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setReplyingTo({
-                              id: msg.id,
-                              text: msg.text,
-                              senderName: isFromMe ? 'Tú' : (msg.senderName || 'Ronald'),
-                            })
-                          }
-                          className="text-white hover:text-cyan-400 transition-colors cursor-pointer"
-                          title="Responder"
-                        >
-                          <Reply className="w-3.5 h-3.5" />
-                        </button>
-                        {['❤️', '👍', '😂'].map((emoji) => (
+                        {['❤️', '👍', '😂', '😮', '😢', '🙏'].map((emoji) => (
                           <button
                             key={emoji}
                             type="button"
-                            onClick={() => handleToggleReaction(msg.id, emoji)}
-                            className="text-sm hover:scale-125 transition-transform cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleReaction(msg.id, emoji);
+                              setActiveReactionMsgId(null);
+                              setPickerMsgId(null);
+                            }}
+                            className="text-base sm:text-lg hover:scale-130 active:scale-90 transition-transform cursor-pointer p-0.5"
                             title={`Reaccionar con ${emoji}`}
                           >
                             {emoji}
@@ -683,8 +668,11 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                         ))}
                         <button
                           type="button"
-                          onClick={() => setPickerMsgId(pickerMsgId === msg.id ? null : msg.id)}
-                          className="p-0.5 text-white hover:text-yellow-300 transition-colors rounded-full bg-white/20 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPickerMsgId(pickerMsgId === msg.id ? null : msg.id);
+                          }}
+                          className="p-1 text-white hover:text-yellow-300 transition-colors rounded-full bg-white/20 hover:bg-white/30 cursor-pointer ml-0.5"
                           title="Más emojis (+)"
                         >
                           <Plus className="w-3.5 h-3.5" />
@@ -695,20 +683,19 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                       {pickerMsgId === msg.id && (
                         <div
                           className={`absolute z-50 ${
-                            isFromMe ? 'right-full mr-2.5' : 'left-full ml-2.5'
-                          } top-1/2 -translate-y-1/2 p-3 rounded-2xl border shadow-2xl backdrop-blur-xl w-64 grid grid-cols-6 gap-2`}
-                          style={{
-                            backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                            borderColor: borderColor,
-                          }}
+                            isFromMe ? 'right-0' : 'left-0'
+                          } bottom-full mb-3 p-3 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl w-64 max-w-[90vw] grid grid-cols-6 gap-2 bg-[#0F172A]/95`}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {IOS_EMOJIS.map((emoji) => (
                             <button
                               key={emoji}
                               type="button"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 handleToggleReaction(msg.id, emoji);
                                 setPickerMsgId(null);
+                                setActiveReactionMsgId(null);
                               }}
                               className="text-xl p-1.5 rounded-xl hover:bg-white/20 transition-colors text-center cursor-pointer"
                             >
@@ -719,7 +706,8 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                       )}
 
                       <div
-                        className={`max-w-[85%] sm:max-w-[75%] rounded-2xl ${
+                        onClick={() => setActiveReactionMsgId(activeReactionMsgId === msg.id ? null : msg.id)}
+                        className={`max-w-[85%] sm:max-w-[75%] rounded-2xl cursor-pointer ${
                           msg.type === 'image' ? 'p-2' : 'px-4 py-2.5'
                         } shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${
                           isFromMe
@@ -803,10 +791,24 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                         )}
 
                         <div
-                          className={`flex items-center justify-end space-x-1 mt-1 text-[10px] ${
+                          className={`flex items-center justify-end space-x-1.5 mt-1 text-[10px] ${
                             isFromMe ? 'text-white/80' : isDarkTheme ? 'text-gray-400' : 'text-gray-500'
                           }`}
                         >
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReplyingTo({
+                                id: msg.id,
+                                text: msg.text,
+                                senderName: isFromMe ? 'Tú' : (msg.senderName || 'Ronald'),
+                              })
+                            }
+                            className="hover:text-cyan-400 transition-colors cursor-pointer mr-1 p-0.5"
+                            title="Responder"
+                          >
+                            <Reply className="w-3.5 h-3.5" />
+                          </button>
                           <span>{formatMessageTime(msg.createdAt)}</span>
                           {isFromMe && (
                             <ChatReadReceipt
