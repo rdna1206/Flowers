@@ -637,17 +637,16 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
             </div>
           </div>
         ) : (
-          [...messages].reverse().map((msg, index) => {
+          messages.map((msg, index) => {
             const isFromRonald =
               msg.senderRole === 'admin' || msg.senderId === 'ronald';
 
-            // Invertimos también la lógica de prevMsg ya que la lista está invertida
-            const prevMsg = index < messages.length - 1 ? messages[messages.length - 2 - index] : null;
+            const prevMsg = index > 0 ? messages[index - 1] : null;
             const currentDateKey = getMessageDayKey(msg.createdAt || msg.timestamp);
             const prevDateKey = prevMsg
               ? getMessageDayKey(prevMsg.createdAt || prevMsg.timestamp)
               : null;
-            const isNewDay = index === messages.length - 1 || currentDateKey !== prevDateKey;
+            const isNewDay = index === 0 || currentDateKey !== prevDateKey;
             const dateLabel = getChatDateSeparator(msg.createdAt || msg.timestamp);
 
             return (
