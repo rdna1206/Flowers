@@ -126,12 +126,19 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
       unsubscribeChat = api.subscribeToChat(
         chatId,
         (liveMessages) => {
-          setMessages(liveMessages);
+          const sortedMessages = [...liveMessages].sort((a, b) => 
+            new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
+          );
+          setMessages(sortedMessages);
           if (!isMinimized) {
             const hasUnread = liveMessages.some((m) => m.senderRole === 'user' && !m.read);
             if (hasUnread) {
               api.markChatMessagesAsRead(chatId, 'admin').catch(() => {});
             }
+            // Ensure we scroll to the bottom when new messages arrive
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
           }
           if (isMinimized && liveMessages.length > prevMsgCountRef.current) {
             const newCount = liveMessages.length - prevMsgCountRef.current;
@@ -609,7 +616,7 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
 
       {/* Messages Container */}
       <div
-        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col-reverse custom-scrollbar"
+        className="flex-1 overflow-y-auto p-3.5 space-y-2.5 flex flex-col custom-scrollbar"
         style={{
           backgroundColor: '#070A10',
           backgroundImage:
@@ -617,7 +624,6 @@ export const WhatsAppAdminChatWindow: React.FC<WhatsAppAdminChatWindowProps> = (
           backgroundSize: '20px 20px',
         }}
       >
-        <div ref={messagesEndRef} />
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-2">
             <div
