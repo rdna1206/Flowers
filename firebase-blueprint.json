@@ -58,11 +58,14 @@
         "userId": { "type": "string" },
         "userName": { "type": "string" },
         "lastMessageText": { "type": "string" },
+        "lastMessageType": { "type": "string", "enum": ["text", "image", "audio"] },
         "lastMessageAt": { "type": "string" },
         "adminInChat": { "type": "boolean" },
         "userInChat": { "type": "boolean" },
         "adminTyping": { "type": "boolean" },
         "userTyping": { "type": "boolean" },
+        "adminRecording": { "type": "boolean" },
+        "userRecording": { "type": "boolean" },
         "adminLastSeen": { "type": "string" },
         "userLastSeen": { "type": "string" },
         "adminHeartbeat": { "type": "number" },
@@ -83,12 +86,18 @@
         "senderId": { "type": "string" },
         "senderName": { "type": "string" },
         "senderRole": { "type": "string", "enum": ["user", "admin"] },
+        "type": { "type": "string", "enum": ["text", "image", "audio"] },
         "text": { "type": "string" },
+        "mediaUrl": { "type": "string" },
+        "fileName": { "type": "string" },
+        "fileSize": { "type": "number" },
+        "mimeType": { "type": "string" },
+        "audioDuration": { "type": "number" },
         "isOriginalResponse": { "type": "boolean" },
         "read": { "type": "boolean" },
         "createdAt": { "type": "string" }
       },
-      "required": ["id", "chatId", "senderId", "senderRole", "text", "createdAt"]
+      "required": ["id", "chatId", "senderId", "senderRole", "createdAt"]
     }
   },
   "firestore": {

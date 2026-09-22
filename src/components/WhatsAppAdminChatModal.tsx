@@ -1,8 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, X, CheckCheck, Trash2, AlertTriangle, Sparkles, MessageSquare } from 'lucide-react';
+import {
+  Send,
+  X,
+  CheckCheck,
+  Trash2,
+  AlertTriangle,
+  MessageSquare,
+  Image as ImageIcon,
+  Mic,
+} from 'lucide-react';
 import { api } from '../lib/api';
 import type { ChatMessage, UserRecord, ChatPresenceState } from '../types';
+import { AudioVoiceMessage } from './AudioVoiceMessage';
+import { ImageLightboxModal } from './ImageLightboxModal';
+import { AudioVoiceRecorder } from './AudioVoiceRecorder';
+import { ImageSendPreviewModal } from './ImageSendPreviewModal';
 
 interface WhatsAppAdminChatModalProps {
   user: UserRecord | null;
@@ -23,8 +36,19 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
   const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null);
   const [presence, setPresence] = useState<ChatPresenceState>({});
 
+  // Media modals state
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
+  const [lightboxData, setLightboxData] = useState<{
+    url: string;
+    caption?: string;
+    senderName?: string;
+    timestamp?: string;
+  } | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Personalized theme extraction from the user's custom flower profile
@@ -37,6 +61,9 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
   useEffect(() => {
     if (!isOpen || !user) return;
     setShowClearConfirm(false);
+    setIsRecordingVoice(false);
+    setSelectedPhotoFile(null);
+    setLightboxData(null);
     const chatId = user.id;
 
     // 1. Mark Ronald as active/present inside this specific user's chat
@@ -86,12 +113,14 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
     const handleLeave = () => {
       api.setUserChatPresence(chatId, 'admin', false).catch(() => {});
       api.setUserChatTyping(chatId, 'admin', false).catch(() => {});
+      api.setUserChatRecording(chatId, 'admin', false).catch(() => {});
     };
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         api.setUserChatPresence(chatId, 'admin', false).catch(() => {});
         api.setUserChatTyping(chatId, 'admin', false).catch(() => {});
+        api.setUserChatRecording(chatId, 'admin', false).catch(() => {});
       } else if (document.visibilityState === 'visible') {
         api.setUserChatPresence(chatId, 'admin', true).catch(() => {});
       }
@@ -111,12 +140,13 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       api.setUserChatPresence(chatId, 'admin', false).catch(() => {});
       api.setUserChatTyping(chatId, 'admin', false).catch(() => {});
+      api.setUserChatRecording(chatId, 'admin', false).catch(() => {});
     };
   }, [isOpen, user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, presence.userTyping]);
+  }, [messages, presence.userTyping, presence.userRecording]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -155,6 +185,68 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
     } finally {
       setIsSending(false);
     }
+  };
+
+  // Photo Attachment Handler
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size max 10MB
+    if (file.size > 10 * 1024 * 1024) {
+      alert('La imagen seleccionada supera el límite de 10 MB.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setSelectedPhotoFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleConfirmSendPhoto = async (file: File, caption: string) => {
+    if (!user) return;
+    const uploadRes = await api.uploadChatMedia(user.id, file, 'images', file.name);
+    await api.sendChatMessage(
+      user.id,
+      {
+        type: 'image',
+        text: caption,
+        mediaUrl: uploadRes.url,
+        fileName: uploadRes.fileName,
+        fileSize: uploadRes.fileSize,
+        mimeType: uploadRes.mimeType,
+      },
+      'admin',
+      'ronald',
+      'Ronald'
+    );
+  };
+
+  // Audio Voice Note Handler
+  const handleRecordingStateChange = (isRecording: boolean) => {
+    if (!user) return;
+    api.setUserChatRecording(user.id, 'admin', isRecording).catch(() => {});
+  };
+
+  const handleConfirmSendAudio = async (audioBlob: Blob, durationSeconds: number) => {
+    if (!user) return;
+    const uploadRes = await api.uploadChatMedia(user.id, audioBlob, 'audios', `voice_${Date.now()}.webm`);
+    await api.sendChatMessage(
+      user.id,
+      {
+        type: 'audio',
+        text: 'Mensaje de voz',
+        mediaUrl: uploadRes.url,
+        fileName: uploadRes.fileName,
+        fileSize: uploadRes.fileSize,
+        mimeType: uploadRes.mimeType,
+        audioDuration: durationSeconds,
+      },
+      'admin',
+      'ronald',
+      'Ronald'
+    );
+    setIsRecordingVoice(false);
   };
 
   const handleDeleteMessage = async (msgId: string) => {
@@ -258,7 +350,12 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center space-x-2 mt-0.5">
-                  {presence.userTyping ? (
+                  {presence.userRecording ? (
+                    <span className="flex items-center space-x-1.5 text-[11px] text-red-400 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                      <span className="animate-pulse">{user.name} está grabando un audio...</span>
+                    </span>
+                  ) : presence.userTyping ? (
                     <span className="flex items-center space-x-1.5 text-[11px] text-[#25D366] font-medium">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-ping" />
                       <span className="animate-pulse">{user.name} está escribiendo...</span>
@@ -401,9 +498,13 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                         </button>
                       )}
 
-                      {/* Message Bubble */}
+                      {/* Message Bubble (Text / Image / Audio) */}
                       <div
-                        className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed relative shadow-md transition-all ${
+                        className={`rounded-2xl text-sm leading-relaxed relative shadow-md transition-all ${
+                          msg.type === 'image'
+                            ? 'p-2'
+                            : 'px-4 py-2.5'
+                        } ${
                           isFromRonald
                             ? 'bg-[#005C4B] text-white rounded-tr-xs border border-emerald-400/25'
                             : 'bg-[#151E2E] text-[#F1F5F9] rounded-tl-xs border border-white/10'
@@ -439,9 +540,54 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                           </div>
                         )}
 
-                        <p className="whitespace-pre-wrap break-words pr-1 text-sm">
-                          {msg.text}
-                        </p>
+                        {/* CASE 1: IMAGE MESSAGE */}
+                        {msg.type === 'image' && msg.mediaUrl ? (
+                          <div className="flex flex-col space-y-1.5 max-w-[280px] sm:max-w-[320px]">
+                            <div
+                              onClick={() =>
+                                setLightboxData({
+                                  url: msg.mediaUrl!,
+                                  caption: msg.text !== 'Foto' ? msg.text : undefined,
+                                  senderName: isFromRonald ? 'Ronald' : user.name,
+                                  timestamp: formatTime(msg.createdAt),
+                                })
+                              }
+                              className="relative overflow-hidden rounded-xl bg-black/40 cursor-pointer group/img border border-white/10"
+                            >
+                              <img
+                                src={msg.mediaUrl}
+                                alt={msg.text || 'Foto'}
+                                className="w-full max-h-[260px] object-cover transition-transform duration-300 group-hover/img:scale-105"
+                                loading="lazy"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover/img:opacity-100">
+                                <span className="bg-black/60 text-white text-[11px] px-2.5 py-1 rounded-full backdrop-blur-xs font-medium">
+                                  Ver foto
+                                </span>
+                              </div>
+                            </div>
+                            {msg.text && msg.text !== 'Foto' && (
+                              <p className="whitespace-pre-wrap break-words px-1 text-xs sm:text-sm text-white/95">
+                                {msg.text}
+                              </p>
+                            )}
+                          </div>
+                        ) : msg.type === 'audio' && msg.mediaUrl ? (
+                          /* CASE 2: AUDIO VOICE NOTE */
+                          <div className="flex flex-col">
+                            <AudioVoiceMessage
+                              mediaUrl={msg.mediaUrl}
+                              duration={msg.audioDuration}
+                              isMe={isFromRonald}
+                              accentColor={accentColor}
+                            />
+                          </div>
+                        ) : (
+                          /* CASE 3: STANDARD TEXT MESSAGE */
+                          <p className="whitespace-pre-wrap break-words pr-1 text-sm">
+                            {msg.text}
+                          </p>
+                        )}
 
                         <div className="flex items-center justify-end space-x-1.5 mt-1 -mb-0.5">
                           <span className="text-[10px] text-gray-300 font-mono">
@@ -453,7 +599,7 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                         </div>
                       </div>
 
-                      {/* Right side trash icon for User's incoming messages (to let Ronald delete test responses) */}
+                      {/* Right side trash icon for User's incoming messages */}
                       {!isFromRonald && (
                         <button
                           type="button"
@@ -470,7 +616,33 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
                 );
               })
             )}
-            {presence.userTyping && (
+
+            {/* Real-time Indicator: User recording audio */}
+            {presence.userRecording && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-start w-full"
+              >
+                <div
+                  className="px-4 py-2.5 rounded-2xl text-xs rounded-tl-xs border border-red-500/20 flex items-center space-x-2.5 shadow-md bg-[#1F1418] text-red-200"
+                  style={{
+                    borderLeft: `3px solid #EF4444`,
+                  }}
+                >
+                  <div className="flex space-x-1 items-center">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                  </div>
+                  <span className="text-xs text-red-300 font-medium">
+                    {user.name} está grabando un audio...
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Real-time Indicator: User typing text */}
+            {presence.userTyping && !presence.userRecording && (
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -499,38 +671,99 @@ export const WhatsAppAdminChatModal: React.FC<WhatsAppAdminChatModalProps> = ({
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Dark Mode Input Bar */}
-          <form
-            onSubmit={handleSendMessage}
-            className="bg-[#0F172A] px-3.5 py-3 flex items-center gap-2.5 border-t border-white/10 shrink-0"
-          >
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputText}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={`Escribir a ${user.name}...`}
-              className="flex-1 bg-[#1E293B] text-white placeholder-gray-400 text-sm px-4 py-2.5 rounded-xl border border-white/10 focus:border-white/30 focus:outline-hidden transition-all shadow-inner"
-              style={{
-                borderColor: inputText.trim() ? accentColor : undefined,
-              }}
-            />
-            <button
-              type="submit"
-              disabled={isSending || !inputText.trim()}
-              className="w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-md disabled:opacity-40 disabled:pointer-events-none text-white shrink-0 hover:scale-105 active:scale-95"
-              style={{
-                background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-                boxShadow: inputText.trim() ? `0 0 15px ${ambientGlow}` : undefined,
-              }}
-              title="Enviar mensaje"
-            >
-              <Send className="w-4 h-4 ml-0.5" />
-            </button>
-          </form>
+          {/* Bottom Bar: Voice Recorder or Standard Input Bar */}
+          <div className="bg-[#0F172A] px-3.5 py-3 border-t border-white/10 shrink-0">
+            {isRecordingVoice ? (
+              <AudioVoiceRecorder
+                onSendAudio={handleConfirmSendAudio}
+                onRecordingStateChange={handleRecordingStateChange}
+                onCancel={() => setIsRecordingVoice(false)}
+                accentColor={accentColor}
+                isDarkTheme={true}
+              />
+            ) : (
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                {/* Hidden File Input for photos */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+
+                {/* Attach Photo Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 text-gray-300 hover:text-white transition-colors cursor-pointer shrink-0 border border-white/10"
+                  title="Enviar foto"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                </button>
+
+                {/* Voice Note Mic Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsRecordingVoice(true)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 text-gray-300 hover:text-emerald-400 transition-colors cursor-pointer shrink-0 border border-white/10"
+                  title="Grabar nota de voz"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputText}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder={`Escribir a ${user.name}...`}
+                  className="flex-1 bg-[#1E293B] text-white placeholder-gray-400 text-sm px-4 py-2.5 rounded-xl border border-white/10 focus:border-white/30 focus:outline-hidden transition-all shadow-inner"
+                  style={{
+                    borderColor: inputText.trim() ? accentColor : undefined,
+                  }}
+                />
+
+                <button
+                  type="submit"
+                  disabled={isSending || !inputText.trim()}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-md disabled:opacity-40 disabled:pointer-events-none text-white shrink-0 hover:scale-105 active:scale-95"
+                  style={{
+                    background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                    boxShadow: inputText.trim() ? `0 0 15px ${ambientGlow}` : undefined,
+                  }}
+                  title="Enviar mensaje"
+                >
+                  <Send className="w-4 h-4 ml-0.5" />
+                </button>
+              </form>
+            )}
+          </div>
         </motion.div>
+
+        {/* Photo Pre-Send Preview Modal */}
+        {selectedPhotoFile && (
+          <ImageSendPreviewModal
+            imageFile={selectedPhotoFile}
+            onSendImage={handleConfirmSendPhoto}
+            onClose={() => setSelectedPhotoFile(null)}
+            accentColor={primaryColor}
+          />
+        )}
+
+        {/* Fullscreen Photo Lightbox Modal */}
+        {lightboxData && (
+          <ImageLightboxModal
+            imageUrl={lightboxData.url}
+            caption={lightboxData.caption}
+            senderName={lightboxData.senderName}
+            timestamp={lightboxData.timestamp}
+            onClose={() => setLightboxData(null)}
+          />
+        )}
       </div>
     </AnimatePresence>
   );
 };
+

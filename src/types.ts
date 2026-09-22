@@ -87,6 +87,8 @@ export interface ChatPresenceState {
   userInChat?: boolean;
   adminTyping?: boolean;
   userTyping?: boolean;
+  adminRecording?: boolean;
+  userRecording?: boolean;
   adminLastSeen?: string;
   userLastSeen?: string;
   adminHeartbeat?: number;
@@ -100,7 +102,13 @@ export interface ChatMessage {
   senderId: string;
   senderName: string;
   senderRole: 'user' | 'admin';
+  type?: 'text' | 'image' | 'audio';
   text: string;
+  mediaUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  audioDuration?: number;
   isOriginalResponse?: boolean;
   read: boolean;
   createdAt: string;
@@ -112,6 +120,7 @@ export interface ChatSummary {
   userId: string;
   userName: string;
   lastMessageText?: string;
+  lastMessageType?: 'text' | 'image' | 'audio';
   lastMessageAt?: string;
   unreadCountForAdmin?: number;
   unreadCountForUser?: number;
@@ -119,6 +128,8 @@ export interface ChatSummary {
   userInChat?: boolean;
   adminTyping?: boolean;
   userTyping?: boolean;
+  adminRecording?: boolean;
+  userRecording?: boolean;
   adminLastSeen?: string;
   userLastSeen?: string;
   adminHeartbeat?: number;

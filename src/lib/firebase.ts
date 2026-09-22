@@ -21,6 +21,13 @@ import {
   limit,
   Firestore,
 } from 'firebase/firestore';
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+  FirebaseStorage,
+} from 'firebase/storage';
 import type {
   UserRecord,
   UserResponse,
@@ -45,6 +52,7 @@ export const firebaseConfig = {
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const storage: FirebaseStorage = getStorage(app, firebaseConfig.storageBucket);
 
 const USERS_COLLECTION = 'users';
 const CREDENTIALS_COLLECTION = 'credentials';
@@ -456,7 +464,55 @@ export async function ensureChatInitialized(user: UserRecord): Promise<void> {
 }
 
 /**
- * Send a new real-time message in Firestore
+ * Upload chat media (photos, audio voice notes) to Firebase Storage
+ */
+export async function uploadChatMedia(
+  chatId: string,
+  file: Blob | File,
+  folder: 'images' | 'audios',
+  originalFileName?: string
+): Promise<{ url: string; fileName: string; fileSize: number; mimeType: string }> {
+  const normChatId = chatId.trim().toLowerCase();
+  const timestamp = Date.now();
+  const randomSuffix = Math.random().toString(36).substring(2, 8);
+
+  const ext = originalFileName?.split('.').pop()?.toLowerCase() || (folder === 'images' ? 'jpg' : 'webm');
+  const safeName = originalFileName
+    ? originalFileName.replace(/[^a-zA-Z0-9._-]/g, '_')
+    : `${folder === 'images' ? 'photo' : 'voice'}_${timestamp}.${ext}`;
+
+  const storagePath = `chat_media/${normChatId}/${folder}/${timestamp}_${randomSuffix}_${safeName}`;
+  const fileRef = storageRef(storage, storagePath);
+
+  try {
+    const mime = file.type || (folder === 'images' ? 'image/jpeg' : 'audio/webm');
+    const metadata = {
+      contentType: mime,
+      customMetadata: {
+        chatId: normChatId,
+        uploadedAt: new Date().toISOString(),
+      },
+    };
+
+    const uploadResult = await uploadBytes(fileRef, file, metadata);
+    const downloadUrl = await getDownloadURL(uploadResult.ref);
+
+    return {
+      url: downloadUrl,
+      fileName: safeName,
+      fileSize: file.size,
+      mimeType: mime,
+    };
+  } catch (err: any) {
+    console.error('Error uploading chat media to Firebase Storage:', err);
+    throw new Error(
+      `No se pudo subir el archivo (${err?.message || 'Error de almacenamiento en la nube'}). Intenta nuevamente.`
+    );
+  }
+}
+
+/**
+ * Send a new real-time message in Firestore (supports text, image, audio)
  */
 export async function sendChatMessage(
   chatId: string,
@@ -464,12 +520,22 @@ export async function sendChatMessage(
     senderId: string;
     senderName: string;
     senderRole: 'user' | 'admin';
-    text: string;
+    text?: string;
+    type?: 'text' | 'image' | 'audio';
+    mediaUrl?: string;
+    fileName?: string;
+    fileSize?: number;
+    mimeType?: string;
+    audioDuration?: number;
   }
 ): Promise<ChatMessage> {
   const normChatId = chatId.trim().toLowerCase();
   const msgId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
   const now = new Date().toISOString();
+
+  const msgType = message.type || 'text';
+  const rawText = message.text?.trim() || '';
+  const displayText = rawText || (msgType === 'image' ? 'Foto' : msgType === 'audio' ? 'Mensaje de voz' : '');
 
   const newMsg: ChatMessage = {
     id: msgId,
@@ -478,7 +544,13 @@ export async function sendChatMessage(
     senderId: message.senderId,
     senderName: message.senderName,
     senderRole: message.senderRole,
-    text: message.text.trim(),
+    type: msgType,
+    text: displayText,
+    mediaUrl: message.mediaUrl,
+    fileName: message.fileName,
+    fileSize: message.fileSize,
+    mimeType: message.mimeType,
+    audioDuration: message.audioDuration,
     isOriginalResponse: false,
     read: false,
     createdAt: now,
@@ -489,13 +561,23 @@ export async function sendChatMessage(
     await setDoc(msgRef, newMsg);
 
     // Update parent chat summary for real-time list
+    const summaryText =
+      msgType === 'image'
+        ? rawText
+          ? `📷 ${rawText}`
+          : '📷 Foto'
+        : msgType === 'audio'
+        ? '🎤 Mensaje de voz'
+        : displayText;
+
     const chatRef = doc(db, CHATS_COLLECTION, normChatId);
     await setDoc(
       chatRef,
       {
         id: normChatId,
         userId: normChatId,
-        lastMessageText: newMsg.text,
+        lastMessageText: summaryText,
+        lastMessageType: msgType,
         lastMessageAt: now,
         updatedAt: now,
       },
@@ -675,6 +757,8 @@ export function subscribeToAllChats(
             userInChat: isUserActive,
             adminTyping: isAdminActive && Boolean(data.adminTyping),
             userTyping: isUserActive && Boolean(data.userTyping),
+            adminRecording: isAdminActive && Boolean(data.adminRecording),
+            userRecording: isUserActive && Boolean(data.userRecording),
           });
         });
         list.sort((a, b) => (b.lastMessageAt || b.updatedAt || '').localeCompare(a.lastMessageAt || a.updatedAt || ''));
@@ -715,7 +799,7 @@ export async function setUserChatPresence(
           adminLastSeen: nowIso,
           ...(isPresent
             ? { adminHeartbeat: nowTime }
-            : { adminTyping: false, adminHeartbeat: 0 }),
+            : { adminTyping: false, adminRecording: false, adminHeartbeat: 0 }),
           updatedAt: nowIso,
         },
         { merge: true }
@@ -730,7 +814,7 @@ export async function setUserChatPresence(
           userLastSeen: nowIso,
           ...(isPresent
             ? { userHeartbeat: nowTime }
-            : { userTyping: false, userHeartbeat: 0 }),
+            : { userTyping: false, userRecording: false, userHeartbeat: 0 }),
           updatedAt: nowIso,
         },
         { merge: true }
@@ -793,6 +877,7 @@ export async function setUserChatTyping(
         chatRef,
         {
           adminTyping: isTyping,
+          ...(isTyping ? { adminHeartbeat: Date.now(), adminInChat: true } : {}),
         },
         { merge: true }
       );
@@ -801,6 +886,7 @@ export async function setUserChatTyping(
         chatRef,
         {
           userTyping: isTyping,
+          ...(isTyping ? { userHeartbeat: Date.now(), userInChat: true } : {}),
         },
         { merge: true }
       );
@@ -811,7 +897,42 @@ export async function setUserChatTyping(
 }
 
 /**
- * Subscribe in real-time to presence & typing status of a specific chat
+ * Set real-time voice recording status in chat
+ */
+export async function setUserChatRecording(
+  chatId: string,
+  role: 'user' | 'admin',
+  isRecording: boolean
+): Promise<void> {
+  const normChatId = chatId.trim().toLowerCase();
+  try {
+    const chatRef = doc(db, CHATS_COLLECTION, normChatId);
+    if (role === 'admin') {
+      await setDoc(
+        chatRef,
+        {
+          adminRecording: isRecording,
+          ...(isRecording ? { adminHeartbeat: Date.now(), adminInChat: true } : {}),
+        },
+        { merge: true }
+      );
+    } else {
+      await setDoc(
+        chatRef,
+        {
+          userRecording: isRecording,
+          ...(isRecording ? { userHeartbeat: Date.now(), userInChat: true } : {}),
+        },
+        { merge: true }
+      );
+    }
+  } catch {
+    // silent fallback for recording status
+  }
+}
+
+/**
+ * Subscribe in real-time to presence & typing/recording status of a specific chat
  */
 export function subscribeToChatPresence(
   chatId: string,
@@ -830,6 +951,8 @@ export function subscribeToChatPresence(
             userInChat: false,
             adminTyping: false,
             userTyping: false,
+            adminRecording: false,
+            userRecording: false,
           });
           return;
         }
@@ -848,6 +971,8 @@ export function subscribeToChatPresence(
           userInChat: isUserActive,
           adminTyping: isAdminActive && Boolean(data.adminTyping),
           userTyping: isUserActive && Boolean(data.userTyping),
+          adminRecording: isAdminActive && Boolean(data.adminRecording),
+          userRecording: isUserActive && Boolean(data.userRecording),
           adminLastSeen: data.adminLastSeen,
           userLastSeen: data.userLastSeen,
           adminHeartbeat: data.adminHeartbeat,

@@ -31,7 +31,9 @@ import {
   setUserChatPresence,
   updateUserChatHeartbeat,
   setUserChatTyping,
+  setUserChatRecording,
   subscribeToChatPresence,
+  uploadChatMedia,
 } from './firebase';
 
 const TOKEN_KEY = 'floral_session_token';
@@ -363,20 +365,52 @@ export const api = {
   // --------------------------------------------------------------------------
 
   /**
-   * Send a real-time message in a chat
+   * Upload image or voice recording to Firebase Storage
+   */
+  async uploadChatMedia(
+    chatId: string,
+    file: Blob | File,
+    folder: 'images' | 'audios',
+    originalFileName?: string
+  ): Promise<{ url: string; fileName: string; fileSize: number; mimeType: string }> {
+    return await uploadChatMedia(chatId, file, folder, originalFileName);
+  },
+
+  /**
+   * Send a real-time message in a chat (text, image, audio)
    */
   async sendChatMessage(
     chatId: string,
-    text: string,
+    messagePayload:
+      | string
+      | {
+          text?: string;
+          type?: 'text' | 'image' | 'audio';
+          mediaUrl?: string;
+          fileName?: string;
+          fileSize?: number;
+          mimeType?: string;
+          audioDuration?: number;
+        },
     senderRole: 'user' | 'admin',
     senderId: string,
     senderName: string
   ): Promise<ChatMessage> {
+    if (typeof messagePayload === 'string') {
+      return await sendChatMessage(chatId, {
+        senderId,
+        senderName,
+        senderRole,
+        text: messagePayload,
+        type: 'text',
+      });
+    }
+
     return await sendChatMessage(chatId, {
       senderId,
       senderName,
       senderRole,
-      text,
+      ...messagePayload,
     });
   },
 
@@ -447,7 +481,14 @@ export const api = {
   },
 
   /**
-   * Subscribe to real-time presence & typing state of a chat
+   * Update voice recording state in chat
+   */
+  async setUserChatRecording(chatId: string, role: 'user' | 'admin', isRecording: boolean): Promise<void> {
+    await setUserChatRecording(chatId, role, isRecording);
+  },
+
+  /**
+   * Subscribe to real-time presence & typing/recording state of a chat
    */
   subscribeToChatPresence(
     chatId: string,
