@@ -882,6 +882,24 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
                         </div>
                       )}
                     </motion.div>
+
+                    {/* Centered Date Separator Pill */}
+                    {isNewDay && (
+                      <div className="flex justify-center my-2">
+                        <span
+                          className="text-[11px] font-medium px-3.5 py-1 rounded-full border shadow-2xs backdrop-blur-xs"
+                          style={{
+                            backgroundColor: isDarkTheme
+                              ? 'rgba(19, 31, 56, 0.9)'
+                              : 'rgba(255, 255, 255, 0.9)',
+                            borderColor: borderColor,
+                            color: mutedTextColor,
+                          }}
+                        >
+                          {dateLabel}
+                        </span>
+                      </div>
+                    )}
                   </React.Fragment>
                 );
               })}
