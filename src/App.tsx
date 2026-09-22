@@ -15,9 +15,11 @@ import { OrganicFlowerCreation } from './components/OrganicFlowerCreation';
 import { UserResponseView } from './components/UserResponseView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { WhatsAppUserChatView } from './components/WhatsAppUserChatView';
+import { UserMenuView } from './components/UserMenuView';
 
 type AppStep =
   | 'login'
+  | 'menu'
   | 'reading'
   | 'flower-formation'
   | 'flower-result'
@@ -52,7 +54,7 @@ export default function App() {
         } else {
           const exp = await api.getExperience();
           setExperience(exp);
-          setCurrentStep('flower-formation');
+          setCurrentStep('menu');
         }
       } catch (err) {
         console.warn('Session verification failed, logging out:', err);
@@ -79,10 +81,10 @@ export default function App() {
         // Ronald: Direct entry to the Admin Dashboard
         setCurrentStep('admin');
       } else {
-        // Normal User: Pure visual bouquet first, then optional personal message from admin, then response
+        // Normal User: Direct entry to post-login selection menu (Flor, Chat, Texto)
         const exp = await api.getExperience();
         setExperience(exp);
-        setCurrentStep('flower-formation');
+        setCurrentStep('menu');
       }
     } catch (err: any) {
       setLoginError(err.message || 'Usuario o contraseña incorrectos. Verifica tus datos.');
@@ -112,7 +114,7 @@ export default function App() {
       setIsLoading(true);
       const exp = await api.getAdminUserExperience(username);
       setExperience(exp);
-      setCurrentStep('flower-formation');
+      setCurrentStep('menu');
     } catch (err: any) {
       alert(err?.message || 'No se pudo cargar la experiencia del usuario.');
     } finally {
@@ -125,7 +127,7 @@ export default function App() {
       setIsLoading(true);
       const exp = await api.getExperience();
       setExperience(exp);
-      setCurrentStep('flower-formation');
+      setCurrentStep('menu');
     } catch (err) {
       console.error(err);
     } finally {
@@ -181,7 +183,12 @@ export default function App() {
         isDarkTheme={isDarkTheme}
         onLogout={handleLogout}
         onOpenAdmin={() => setCurrentStep('admin')}
-        onViewExperience={handleAdminViewOwnExperience}
+        onViewExperience={
+          currentUser?.role === 'admin'
+            ? handleAdminViewOwnExperience
+            : () => setCurrentStep('menu')
+        }
+        onGoToMenu={() => setCurrentStep('menu')}
       />
 
       {/* Main Content Area */}
@@ -211,6 +218,20 @@ export default function App() {
                 onSelectUserToPreview={handlePreviewAsUser}
                 onViewMyExperience={handleAdminViewOwnExperience}
                 isDarkTheme={isDarkTheme}
+              />
+            )}
+
+            {/* Step: User Selection Menu (Ir a Flor, Ir a Chat, Ir a Texto) */}
+            {currentStep === 'menu' && experience && (
+              <UserMenuView
+                experience={experience}
+                onGoToFlower={() => setCurrentStep('flower-formation')}
+                onGoToChat={() => setCurrentStep('response')}
+                onGoToText={handleProceedToReading}
+                isChatAvailable={
+                  experience.id?.toLowerCase() !== 'leiry' &&
+                  experience.username?.toLowerCase() !== 'leiry'
+                }
               />
             )}
 
@@ -262,8 +283,8 @@ export default function App() {
               />
             )}
 
-            {/* Step 5: "Mi respuesta" (Strictly named "Mi respuesta", saved to Ronald only) */}
-            {currentStep === 'response' &&
+            {/* Step 5: "Mi respuesta" / Chat (Strictly named "Mi respuesta", saved to Ronald only) */}
+            {(currentStep === 'response' || currentStep === 'chat') &&
               experience &&
               experience.id?.toLowerCase() !== 'leiry' &&
               experience.username?.toLowerCase() !== 'leiry' && (

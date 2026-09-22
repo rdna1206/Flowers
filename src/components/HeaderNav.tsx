@@ -10,6 +10,7 @@ interface HeaderNavProps {
   onLogout: () => void;
   onOpenAdmin?: () => void;
   onViewExperience?: () => void;
+  onGoToMenu?: () => void;
   hasUnreadResponses?: boolean;
 }
 
@@ -20,6 +21,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   onLogout,
   onOpenAdmin,
   onViewExperience,
+  onGoToMenu,
 }) => {
   return (
     <header
@@ -41,7 +43,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               color: '#E6EDF8',
             }}
             title="Inicio"
-            onClick={user?.role === 'admin' ? onOpenAdmin : onViewExperience}
+            onClick={user?.role === 'admin' ? onOpenAdmin : (onGoToMenu || onViewExperience)}
           >
             <LogoR className="w-5 h-5 p-0.5" />
           </div>
@@ -51,6 +53,24 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         <div className="flex items-center space-x-2 sm:space-x-3">
           {user && (
             <>
+              {/* If user is regular user outside menu */}
+              {user.role !== 'admin' && currentView !== 'menu' && currentView !== 'login' && onGoToMenu && (
+                <button
+                  id="btn-nav-to-menu"
+                  type="button"
+                  onClick={onGoToMenu}
+                  className="flex items-center space-x-1.5 text-xs font-medium px-3.5 py-1.5 rounded-full border transition-all shadow-2xs cursor-pointer hover:opacity-90"
+                  style={{
+                    backgroundColor: '#102A45',
+                    color: '#E6EDF8',
+                    borderColor: '#2B78E4',
+                  }}
+                  title="Volver al Menú"
+                >
+                  <span>Menú</span>
+                </button>
+              )}
+
               {/* If user is Ronald (admin) */}
               {user.role === 'admin' && (
                 <div className="flex items-center space-x-2">
