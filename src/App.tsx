@@ -39,16 +39,20 @@ export default function App() {
   const lastTouchRef = useRef<number>(Date.now());
 
   const handleLogout = useCallback((reasonMessage?: string) => {
-    // 1. Immediately clear storage token & reset React state so UI instantly switches to login screen
+    // 1. Immediately clear storage token
     clearStoredToken();
+    
+    // 2. Perform background Firebase signout
+    api.logout().catch(() => {});
+    
+    // 3. Reset React state so UI instantly switches to login screen
     setCurrentUser(null);
     setExperience(null);
     setCurrentStep('login');
+    
     if (reasonMessage) {
       setLoginError(reasonMessage);
     }
-    // 2. Perform background Firebase signout without blocking UI
-    api.logout().catch(() => {});
   }, []);
 
   // Initialize session on load & verify 2-hour validity
@@ -273,7 +277,7 @@ export default function App() {
         user={currentUser}
         currentView={currentStep}
         isDarkTheme={isDarkTheme}
-        onLogout={handleLogout}
+        onLogout={() => handleLogout()}
         onOpenAdmin={() => setCurrentStep('admin')}
         onViewExperience={
           currentUser?.role === 'admin'
@@ -337,7 +341,7 @@ export default function App() {
                   onSubmitResponse={handleSubmitResponse}
                   onBackToFlowers={() => setCurrentStep('flower-result')}
                   onBackToReading={handleProceedToReading}
-                  onLogout={handleLogout}
+                  onLogout={() => handleLogout()}
                 />
               )}
 
