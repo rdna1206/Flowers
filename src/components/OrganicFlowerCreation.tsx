@@ -16,6 +16,7 @@ import { KeicyBouquetAnimation } from './KeicyBouquetAnimation';
 import { PaulaBouquetAnimation } from './PaulaBouquetAnimation';
 import { AnelimBouquetAnimation } from './AnelimBouquetAnimation';
 import { GabrielBouquetAnimation } from './GabrielBouquetAnimation';
+import { YefersonBouquetAnimation } from './YefersonBouquetAnimation';
 import { DefaultBouquetAnimation } from './DefaultBouquetAnimation';
 
 interface OrganicFlowerCreationProps {
@@ -252,6 +253,20 @@ export const OrganicFlowerCreation: React.FC<OrganicFlowerCreationProps> = ({
   if (isGabriel) {
     return (
       <GabrielBouquetAnimation
+        mode={mode}
+        onProceedToReading={onProceedToReading || onBackToReading}
+        onProceedToResponse={onProceedToResponse}
+        onBackToReading={onBackToReading}
+        onReplayFormation={onReplayFormation}
+      />
+    );
+  }
+
+  // Yeferson's Bespoke Handcrafted Bouquet: Gray & Black theme with signature White Coffee Flowers
+  const isYeferson = experience.id === 'yeferson' || experience.username?.toLowerCase() === 'yeferson';
+  if (isYeferson) {
+    return (
+      <YefersonBouquetAnimation
         mode={mode}
         onProceedToReading={onProceedToReading || onBackToReading}
         onProceedToResponse={onProceedToResponse}

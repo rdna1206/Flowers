@@ -136,9 +136,6 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
             api.markChatMessagesAsRead(chatId, 'user').catch(() => {});
           }
         }
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
       },
       (err) => {
         console.warn('Chat subscription error:', err);
@@ -189,9 +186,8 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
   }, [chatId]);
 
   useEffect(() => {
-    if (hasStartedChat) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    // With flex-col-reverse, the browser naturally handles anchoring to the bottom.
+    // We only force a focus or specific state updates here if needed.
   }, [messages.length, hasStartedChat, presence.adminTyping, presence.adminRecording]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,10 +227,6 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
       setHasStartedChat(true);
       setInitialResponseText('');
       await api.setUserChatPresence(chatId, 'user', true).catch(() => {});
-
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
     } catch (err) {
       console.error('Error submitting initial response:', err);
     } finally {
@@ -273,11 +265,7 @@ export const UserResponseView: React.FC<UserResponseViewProps> = ({
         experience.name
       );
       setReplyingTo(null);
-
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        inputRef.current?.focus();
-      }, 80);
+      inputRef.current?.focus();
     } catch (err) {
       console.error('Error sending message:', err);
       setInputText(clean);
