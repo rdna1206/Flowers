@@ -717,6 +717,64 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
+  // Dynamic scale multiplier for small viewports so cars and elements scale proportionally
+  const [scaleMultiplier, setScaleMultiplier] = useState<number>(() => {
+    if (typeof window === 'undefined') return 1;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (w < 480 || h < 640) return 0.72;
+    if (w < 768 || h < 768) return 0.84;
+    return 1;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      if (w < 480 || h < 640) {
+        setScaleMultiplier(0.72);
+      } else if (w < 768 || h < 768) {
+        setScaleMultiplier(0.84);
+      } else {
+        setScaleMultiplier(1);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Lock body scroll and gestures while in this experience so screen never moves/scrolls
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    const originalTouchAction = document.body.style.touchAction;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    document.body.style.overscrollBehavior = 'none';
+
+    const preventScroll = (e: TouchEvent | WheelEvent) => {
+      if ((e.target as HTMLElement)?.closest?.('button, a, input')) {
+        return;
+      }
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('wheel', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+      document.body.style.overscrollBehavior = originalOverscroll;
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+  }, []);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -807,7 +865,7 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
   return (
     <div
       id="isaias-hot-wheels-bouquet"
-      className="relative z-10 w-full min-h-[92vh] sm:min-h-[95vh] flex flex-col items-center justify-center overflow-hidden select-none"
+      className="fixed inset-0 z-40 w-full h-[100dvh] max-h-[100dvh] flex flex-col items-center justify-center overflow-hidden select-none touch-none overscroll-none"
       style={{
         background: 'radial-gradient(ellipse at 50% 35%, #07152B 0%, #030814 60%, #010307 100%)',
       }}
@@ -822,7 +880,7 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="absolute top-4 left-4 z-50 w-11 h-11 rounded-full flex items-center justify-center bg-[#07152B]/80 border border-[#00F0FF]/35 text-[#00F0FF] shadow-lg shadow-[#00F0FF]/25 backdrop-blur-md cursor-pointer hover:border-[#00F0FF] hover:bg-[#0E2448]/90 transition-all"
+        className="absolute top-3 left-3 sm:top-4 sm:left-4 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-[#07152B]/85 border border-[#00F0FF]/35 text-[#00F0FF] shadow-lg shadow-[#00F0FF]/25 backdrop-blur-md cursor-pointer hover:border-[#00F0FF] hover:bg-[#0E2448]/90 transition-all pointer-events-auto touch-auto"
         aria-label="Volver"
       >
         <ArrowLeft className="w-5 h-5 text-[#38BDF8]" />
@@ -836,7 +894,7 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="absolute top-4 right-4 z-50 w-11 h-11 rounded-full flex items-center justify-center bg-[#07152B]/80 border border-[#FF4500]/40 text-[#FF4500] shadow-lg shadow-[#FF4500]/25 backdrop-blur-md cursor-pointer hover:border-[#FF4500] hover:bg-[#200A10]/90 transition-all"
+        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-[#07152B]/85 border border-[#FF4500]/40 text-[#FF4500] shadow-lg shadow-[#FF4500]/25 backdrop-blur-md cursor-pointer hover:border-[#FF4500] hover:bg-[#200A10]/90 transition-all pointer-events-auto touch-auto"
         aria-label="Música"
         title="Lover is a Day"
       >
@@ -855,10 +913,10 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       {/* ======================================================== */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Deep cyan aura behind the floral bouquet */}
-        <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] sm:w-[700px] h-[520px] sm:h-[700px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.18)_0%,rgba(2,132,199,0.1)_45%,transparent_75%)] blur-3xl" />
+        <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[520px] md:w-[700px] h-[340px] sm:h-[520px] md:h-[700px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.18)_0%,rgba(2,132,199,0.1)_45%,transparent_75%)] blur-3xl" />
         
         {/* Subtle fiery speed glow accent */}
-        <div className="absolute top-[28%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,85,0,0.09)_0%,transparent_70%)] blur-2xl" />
+        <div className="absolute top-[28%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-[260px] sm:w-[380px] h-[260px] sm:h-[380px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,85,0,0.09)_0%,transparent_70%)] blur-2xl" />
 
         {/* Ambient floating fireflies / sparkles */}
         {[...Array(20)].map((_, i) => (
@@ -924,7 +982,7 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
               />
               <HotWheelsGTOVector
                 theme={theme}
-                scale={car.scale}
+                scale={car.scale * scaleMultiplier}
                 flipX={car.flipX}
                 spinningWheels={true}
               />
@@ -936,13 +994,13 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       {/* ======================================================== */}
       {/* LAYER 2: THE SACRED CYAN BOUQUET (CENTRAL BOTANICAL PIECE)*/}
       {/* ANIMATED GENTLE BREEZE SWAYING EFFECT                    */}
-      {/* The flowers, stems, and petals sway gracefully with wind */}
+      {/* Auto-scales to fit exact viewport of phone or desktop    */}
       {/* ======================================================== */}
       <motion.div
-        className="relative z-20 w-full max-w-[500px] sm:max-w-[580px] h-[780px] sm:h-[840px] flex items-center justify-center px-2 origin-bottom"
+        className="relative z-20 w-auto h-full max-h-[70dvh] sm:max-h-[76dvh] max-w-[min(90vw,460px)] sm:max-w-[520px] aspect-[600/860] flex items-center justify-center origin-bottom pointer-events-none"
         animate={{
           rotate: [-1.4, 1.2, -1.4],
-          x: [-3, 3, -3],
+          x: [-2.5, 2.5, -2.5],
         }}
         transition={{
           duration: 5.6,
@@ -952,7 +1010,8 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       >
         <svg
           viewBox="0 0 600 860"
-          className="w-full h-full overflow-visible drop-shadow-[0_20px_60px_rgba(0,0,0,0.95)]"
+          preserveAspectRatio="xMidYMid meet"
+          className="w-full h-full max-w-full max-h-full drop-shadow-[0_15px_45px_rgba(0,0,0,0.95)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -1363,7 +1422,7 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
               />
               <HotWheelsGTOVector
                 theme={theme}
-                scale={car.scale}
+                scale={car.scale * scaleMultiplier}
                 flipX={car.flipX}
                 spinningWheels={true}
               />
@@ -1408,7 +1467,7 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
               />
               <HotWheelsGTOVector
                 theme={theme}
-                scale={car.scale}
+                scale={car.scale * scaleMultiplier}
                 flipX={car.flipX}
                 spinningWheels={true}
               />
