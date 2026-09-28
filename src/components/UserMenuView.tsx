@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Flower2, MessageSquare, BookOpen, Lock } from 'lucide-react';
+import { Flower2, MessageSquare, BookOpen, Lock, Flame } from 'lucide-react';
 import type { UserExperienceData } from '../types';
 
 interface UserMenuViewProps {
@@ -8,6 +8,7 @@ interface UserMenuViewProps {
   onGoToFlower: () => void;
   onGoToChat: () => void;
   onGoToText: () => void;
+  onGoToHotWheels?: () => void;
   isChatAvailable: boolean;
 }
 
@@ -16,10 +17,16 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
   onGoToFlower,
   onGoToChat,
   onGoToText,
+  onGoToHotWheels,
   isChatAvailable,
 }) => {
   const theme = experience.theme || {};
   const isJhon = experience.id === 'jhon' || experience.username?.toLowerCase() === 'jhon';
+  const isIsaias =
+    experience.id?.toLowerCase() === 'isaias' ||
+    experience.username?.toLowerCase() === 'isaias' ||
+    experience.name?.toLowerCase().includes('isaias') ||
+    experience.name?.toLowerCase().includes('isaías');
   const isDarkTheme =
     theme.backgroundColor?.startsWith('#0') ||
     theme.backgroundColor?.startsWith('#1') ||
@@ -71,9 +78,13 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
         </h1>
       </motion.div>
 
-      {/* 3 Main Options Grid - Large Clickable Buttons with zero additional text */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-        {/* OPTION 1: IR A FLOR */}
+      {/* Options Grid */}
+      <div
+        className={`w-full grid ${
+          isIsaias ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'
+        } gap-4 sm:gap-6`}
+      >
+        {/* OPTION 1: IR A FLOR (Original intact experience) */}
         <motion.button
           id="btn-menu-option-flower"
           type="button"
@@ -116,7 +127,52 @@ export const UserMenuView: React.FC<UserMenuViewProps> = ({
           </h2>
         </motion.button>
 
-        {/* OPTION 2: IR A CHAT */}
+        {/* OPTION FOR ISAIAS: HOT WHEELS (Second independent experience) */}
+        {isIsaias && onGoToHotWheels && (
+          <motion.button
+            id="btn-menu-option-hot-wheels"
+            type="button"
+            onClick={onGoToHotWheels}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            whileHover={{ scale: 1.03, y: -4 }}
+            whileTap={{ scale: 0.98 }}
+            className="group relative flex flex-col items-center justify-center text-center p-8 sm:p-10 rounded-2xl sm:rounded-3xl border shadow-xl backdrop-blur-md transition-all cursor-pointer overflow-hidden min-h-[180px] sm:min-h-[220px]"
+            style={{
+              backgroundColor: surfaceColor,
+              borderColor: 'rgba(255, 102, 0, 0.45)',
+            }}
+          >
+            {/* Ambient Flame / Speed Glow */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl sm:rounded-3xl"
+              style={{
+                background: 'radial-gradient(circle at 50% 35%, rgba(255, 102, 0, 0.3) 0%, transparent 70%)',
+              }}
+            />
+
+            {/* Glowing Accent Badge */}
+            <div
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-lg border"
+              style={{
+                backgroundColor: 'rgba(255, 85, 0, 0.18)',
+                borderColor: 'rgba(255, 136, 0, 0.6)',
+                color: '#FF6600',
+              }}
+            >
+              <Flame className="w-7 h-7 sm:w-8 sm:h-8 stroke-[1.8] text-[#FF5500] animate-pulse" />
+            </div>
+
+            <h2
+              className="text-lg sm:text-xl font-black tracking-wider uppercase transition-colors bg-gradient-to-r from-[#FF5500] via-[#FFAA00] to-[#FFE600] bg-clip-text text-transparent"
+            >
+              HOT WHEELS
+            </h2>
+          </motion.button>
+        )}
+
+        {/* OPTION 2 (or 3): IR A CHAT */}
         {isChatAvailable ? (
           <motion.button
             id="btn-menu-option-chat"

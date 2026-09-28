@@ -15,6 +15,7 @@ import { OrganicFlowerCreation } from './components/OrganicFlowerCreation';
 import { UserResponseView } from './components/UserResponseView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { UserMenuView } from './components/UserMenuView';
+import { IsaiasHotWheelsExperience } from './components/IsaiasHotWheelsExperience';
 
 type AppStep =
   | 'login'
@@ -25,7 +26,8 @@ type AppStep =
   | 'response'
   | 'chat'
   | 'whatsapp-chat'
-  | 'admin';
+  | 'admin'
+  | 'hot-wheels';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<UserSummary | null>(null);
@@ -322,12 +324,23 @@ export default function App() {
               <UserMenuView
                 experience={experience}
                 onGoToFlower={() => setCurrentStep('flower-formation')}
+                onGoToHotWheels={() => setCurrentStep('hot-wheels')}
                 onGoToChat={() => setCurrentStep('whatsapp-chat')}
                 onGoToText={handleProceedToReading}
                 isChatAvailable={
                   experience.id?.toLowerCase() !== 'leiry' &&
                   experience.username?.toLowerCase() !== 'leiry'
                 }
+              />
+            )}
+
+            {/* Step: Hot Wheels Experience (Exclusive independent option for Isaías #24) */}
+            {currentStep === 'hot-wheels' && experience && (
+              <IsaiasHotWheelsExperience
+                experience={experience}
+                onBackToMenu={() => setCurrentStep('menu')}
+                onProceedToChat={() => setCurrentStep('whatsapp-chat')}
+                onProceedToText={handleProceedToReading}
               />
             )}
 
