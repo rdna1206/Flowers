@@ -42,10 +42,10 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     secondaryColor: '#2563EB',
     accentStripe: '#EF4444',
     whitePanel: '#FFFFFF',
-    rimLipColor: '#FF4500', // Signature neon orange lip ring as in reference
+    rimLipColor: '#FF4500',
     numberBadge: '10',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(0, 240, 255, 0.55)',
+    glowAura: 'rgba(0, 240, 255, 0.65)',
   },
   // 1. High-Octane Fire Crimson Red (Rojo Brillante)
   {
@@ -56,7 +56,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#FF5500',
     numberBadge: '24',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(239, 68, 68, 0.55)',
+    glowAura: 'rgba(239, 68, 68, 0.65)',
   },
   // 2. Toxic Acid Lime Green (Verde Neón Brillante)
   {
@@ -67,7 +67,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#84CC16',
     numberBadge: '10',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(74, 222, 128, 0.55)',
+    glowAura: 'rgba(74, 222, 128, 0.65)',
   },
   // 3. Sunset Blaze Neon Orange (Naranja Vibrante)
   {
@@ -78,7 +78,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#FBBF24',
     numberBadge: '24',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(249, 115, 22, 0.55)',
+    glowAura: 'rgba(249, 115, 22, 0.65)',
   },
   // 4. Deep Ultraviolet Metallic Purple (Morado Real)
   {
@@ -89,7 +89,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#38BDF8',
     numberBadge: '10',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(168, 85, 247, 0.55)',
+    glowAura: 'rgba(168, 85, 247, 0.65)',
   },
   // 5. Electric Neon Hot Pink / Magenta (Rosado Neón)
   {
@@ -100,7 +100,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#F43F5E',
     numberBadge: '24',
     lightColor: '#FFFFFF',
-    glowAura: 'rgba(244, 63, 94, 0.55)',
+    glowAura: 'rgba(244, 63, 94, 0.65)',
   },
   // 6. Speed Solar Yellow (Amarillo Neón)
   {
@@ -111,7 +111,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#FF4500',
     numberBadge: '10',
     lightColor: '#FFFFFF',
-    glowAura: 'rgba(250, 204, 21, 0.55)',
+    glowAura: 'rgba(250, 204, 21, 0.65)',
   },
   // 7. Electric Pearl Cyan / Turquoise (Cian Vibrante)
   {
@@ -122,7 +122,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#FF3B30',
     numberBadge: '24',
     lightColor: '#FFFFFF',
-    glowAura: 'rgba(6, 182, 212, 0.55)',
+    glowAura: 'rgba(6, 182, 212, 0.65)',
   },
   // 8. Sterling Quicksilver Platinum (Plateado Cromado)
   {
@@ -133,7 +133,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#FF3B30',
     numberBadge: '10',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(226, 232, 240, 0.5)',
+    glowAura: 'rgba(226, 232, 240, 0.65)',
   },
   // 9. Emerald Racing Green (Verde Esmeralda)
   {
@@ -144,7 +144,7 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#34D399',
     numberBadge: '24',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(16, 185, 129, 0.55)',
+    glowAura: 'rgba(16, 185, 129, 0.65)',
   },
   // 10. Neon Ruby Raspberry (Rosado Rubí)
   {
@@ -155,9 +155,9 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#00F0FF',
     numberBadge: '10',
     lightColor: '#FFFFFF',
-    glowAura: 'rgba(236, 72, 153, 0.55)',
+    glowAura: 'rgba(236, 72, 153, 0.65)',
   },
-  // 11. Obsidian Metallic Black & Copper (Negro Metálico)
+  // 11. Obsidian Metallic Midnight Black & Copper (Negro Metálico)
   {
     primaryColor: '#0F172A',
     secondaryColor: '#1E293B',
@@ -166,7 +166,139 @@ const CAR_PALETTES: HotWheelsCarTheme[] = [
     rimLipColor: '#00F0FF',
     numberBadge: '24',
     lightColor: '#38BDF8',
-    glowAura: 'rgba(56, 189, 248, 0.55)',
+    glowAura: 'rgba(56, 189, 248, 0.65)',
+  },
+  // 12. Hyper Aqua Teal (Azul Turquesa Acuático)
+  {
+    primaryColor: '#0F766E',
+    secondaryColor: '#14B8A6',
+    accentStripe: '#EC4899',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#06B6D4',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(20, 184, 166, 0.65)',
+  },
+  // 13. Candy Apple Scarlet (Rojo Manzana Caramelo)
+  {
+    primaryColor: '#991B1B',
+    secondaryColor: '#DC2626',
+    accentStripe: '#FBBF24',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#F59E0B',
+    numberBadge: '24',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(220, 38, 38, 0.65)',
+  },
+  // 14. Cyber Lavender Violet (Lavanda Cibernético)
+  {
+    primaryColor: '#6B21A8',
+    secondaryColor: '#A855F7',
+    accentStripe: '#06B6D4',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FACC15',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(168, 85, 247, 0.65)',
+  },
+  // 15. Electric Indigo Sapphire (Azul Zafiro Índigo)
+  {
+    primaryColor: '#312E81',
+    secondaryColor: '#4F46E5',
+    accentStripe: '#FB7185',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FF4500',
+    numberBadge: '24',
+    lightColor: '#38BDF8',
+    glowAura: 'rgba(99, 102, 241, 0.65)',
+  },
+  // 16. Golden Amber Flame (Ámbar Dorado Solar)
+  {
+    primaryColor: '#B45309',
+    secondaryColor: '#F59E0B',
+    accentStripe: '#EF4444',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FACC15',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(245, 158, 11, 0.65)',
+  },
+  // 17. Coral Sunset Rose (Rosa Coral Sunset)
+  {
+    primaryColor: '#BE123C',
+    secondaryColor: '#FB7185',
+    accentStripe: '#0D9488',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#F43F5E',
+    numberBadge: '24',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(251, 113, 133, 0.65)',
+  },
+  // 18. Mint Ice Metallic (Verde Menta Metalizado)
+  {
+    primaryColor: '#047857',
+    secondaryColor: '#34D399',
+    accentStripe: '#9333EA',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#10B981',
+    numberBadge: '10',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(52, 211, 153, 0.65)',
+  },
+  // 19. Titan Graphite Silver (Grafito Titanio)
+  {
+    primaryColor: '#334155',
+    secondaryColor: '#64748B',
+    accentStripe: '#22C55E',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#E2E8F0',
+    numberBadge: '24',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(148, 163, 184, 0.65)',
+  },
+  // 20. Cyber Neon Magenta (Magenta Cibernético)
+  {
+    primaryColor: '#701A75',
+    secondaryColor: '#D946EF',
+    accentStripe: '#FACC15',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#00F0FF',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(217, 70, 239, 0.65)',
+  },
+  // 21. British Racing Forest Green (Verde Bosque Competitivo)
+  {
+    primaryColor: '#064E3B',
+    secondaryColor: '#059669',
+    accentStripe: '#F97316',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#EF4444',
+    numberBadge: '24',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(5, 150, 105, 0.65)',
+  },
+  // 22. Phoenix Sunburst Tangerine (Mandarina Fénix)
+  {
+    primaryColor: '#9A3412',
+    secondaryColor: '#EA580C',
+    accentStripe: '#FACC15',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FF4500',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(234, 88, 12, 0.65)',
+  },
+  // 23. Arctic Frost Sky Blue (Azul Cielo Glaciar)
+  {
+    primaryColor: '#0284C7',
+    secondaryColor: '#38BDF8',
+    accentStripe: '#EC4899',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#00F0FF',
+    numberBadge: '24',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(56, 189, 248, 0.65)',
   },
 ];
 
@@ -557,14 +689,14 @@ interface RainCarConfig {
 }
 
 const RAIN_CARS_CONFIG: RainCarConfig[] = [
-  // --- BACKGROUND STREAM (Behind bouquet, 2 cars) ---
+  // --- BACKGROUND STREAM (Behind bouquet, 1 car) ---
   {
     id: 'bg-stream-1',
-    paletteIndex: 0, // Royal Blue
+    paletteIndex: 0, // Starts with Spectraflame Royal Blue
     depthLayer: 'background',
-    scale: 0.52,
+    scale: 0.50,
     duration: 6.8,
-    delay: -1.2,
+    delay: 0,
     startX: -15,
     startY: 8,
     endX: 115,
@@ -573,31 +705,15 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     midRotate: 28,
     endRotate: 32,
   },
-  {
-    id: 'bg-stream-2',
-    paletteIndex: 1, // Rojo Brillante
-    depthLayer: 'background',
-    scale: 0.48,
-    duration: 7.5,
-    delay: -3.8,
-    startX: 110,
-    startY: -10,
-    endX: -20,
-    endY: 80,
-    initialRotate: -34,
-    midRotate: -28,
-    endRotate: -20,
-    flipX: true,
-  },
 
   // --- MIDGROUND STREAM (Weaving through bouquet, 2 cars) ---
   {
     id: 'mid-stream-1',
-    paletteIndex: 2, // Verde Neón Brillante
+    paletteIndex: 5, // Starts with Neon Hot Pink
     depthLayer: 'midground',
-    scale: 0.78,
-    duration: 5.8,
-    delay: -0.6,
+    scale: 0.76,
+    duration: 5.6,
+    delay: 1.2,
     startX: -20,
     startY: 22,
     endX: 120,
@@ -608,29 +724,29 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'mid-stream-2',
-    paletteIndex: 4, // Morado Real
+    paletteIndex: 10, // Starts with Ruby Raspberry
     depthLayer: 'midground',
-    scale: 0.82,
-    duration: 6.4,
-    delay: -2.9,
-    startX: 118,
-    startY: 12,
-    endX: -18,
-    endY: 92,
-    initialRotate: -26,
-    midRotate: -32,
-    endRotate: -28,
+    scale: 0.78,
+    duration: 6.0,
+    delay: 3.0,
+    startX: 120,
+    startY: 18,
+    endX: -20,
+    endY: 78,
+    initialRotate: -20,
+    midRotate: -25,
+    endRotate: -18,
     flipX: true,
   },
 
-  // --- FOREGROUND STREAM (Soaring near camera, 3 cars) ---
+  // --- FOREGROUND STREAM (Soaring near camera, 2 cars) ---
   {
     id: 'fg-stream-1',
-    paletteIndex: 6, // Amarillo Neón
+    paletteIndex: 15, // Starts with Electric Indigo Sapphire
     depthLayer: 'foreground',
     scale: 0.90,
     duration: 4.8,
-    delay: -1.0,
+    delay: 0.5,
     startX: -25,
     startY: 32,
     endX: 125,
@@ -641,11 +757,11 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-2',
-    paletteIndex: 5, // Rosado Neón Fucsia
+    paletteIndex: 20, // Starts with Cyber Neon Magenta
     depthLayer: 'foreground',
     scale: 0.88,
     duration: 5.2,
-    delay: -3.4,
+    delay: 2.4,
     startX: 125,
     startY: 28,
     endX: -25,
@@ -655,22 +771,80 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     endRotate: -20,
     flipX: true,
   },
-  {
-    id: 'fg-stream-3',
-    paletteIndex: 7, // Cian Vibrante
-    depthLayer: 'foreground',
-    scale: 0.85,
-    duration: 4.5,
-    delay: -2.3,
-    startX: 10,
-    startY: -20,
-    endX: 95,
-    endY: 120,
-    initialRotate: 38,
-    midRotate: 42,
-    endRotate: 36,
-  },
 ];
+
+/**
+ * Single Stream Car Item that dynamically changes to a new color from the 24-color pool
+ * every time it finishes an animation pass and re-enters the screen.
+ */
+const StreamCarItem: React.FC<{
+  config: RainCarConfig;
+  scaleMultiplier: number;
+}> = ({ config, scaleMultiplier }) => {
+  const [paletteIndex, setPaletteIndex] = useState<number>(config.paletteIndex);
+  const [cycleIndex, setCycleIndex] = useState<number>(0);
+
+  const theme = CAR_PALETTES[paletteIndex % CAR_PALETTES.length];
+
+  const beamClasses =
+    config.depthLayer === 'foreground'
+      ? 'top-1/2 -left-24 -translate-y-1/2 w-36 h-3 blur-[2px]'
+      : config.depthLayer === 'midground'
+      ? 'top-1/2 -left-20 -translate-y-1/2 w-28 h-2 blur-[1.5px]'
+      : 'top-1/2 -left-16 -translate-y-1/2 w-20 h-1.5 blur-[1px]';
+
+  const containerShadow =
+    config.depthLayer === 'foreground'
+      ? 'drop-shadow-[0_18px_36px_rgba(0,0,0,0.95)]'
+      : config.depthLayer === 'midground'
+      ? 'drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)]'
+      : 'filter blur-[0.6px] opacity-75';
+
+  return (
+    <motion.div
+      key={`${config.id}-cycle-${cycleIndex}`}
+      className={`absolute ${containerShadow}`}
+      style={{
+        top: 0,
+        left: 0,
+      }}
+      initial={{
+        x: `${config.startX}vw`,
+        y: `${config.startY}vh`,
+        rotate: config.initialRotate,
+      }}
+      animate={{
+        x: [`${config.startX}vw`, `${(config.startX + config.endX) / 2}vw`, `${config.endX}vw`],
+        y: [`${config.startY}vh`, `${(config.startY + config.endY) / 2}vh`, `${config.endY}vh`],
+        rotate: [config.initialRotate, config.midRotate, config.endRotate],
+      }}
+      transition={{
+        duration: config.duration,
+        ease: 'linear',
+        delay: cycleIndex === 0 ? Math.max(0, config.delay) : 0,
+      }}
+      onAnimationComplete={() => {
+        // As soon as this car leaves the screen, pick a new distinct color from the 24 palettes!
+        setPaletteIndex((prev) => (prev + 1) % CAR_PALETTES.length);
+        setCycleIndex((c) => c + 1);
+      }}
+    >
+      {/* Headlight front glow beam */}
+      <div
+        className={`absolute ${beamClasses} rounded-full`}
+        style={{
+          background: `linear-gradient(to left, ${theme.glowAura}, transparent)`,
+        }}
+      />
+      <HotWheelsGTOVector
+        theme={theme}
+        scale={config.scale * scaleMultiplier}
+        flipX={config.flipX}
+        spinningWheels={true}
+      />
+    </motion.div>
+  );
+};
 
 export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps> = ({
   onBackToMenu,
@@ -829,9 +1003,103 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       id="isaias-hot-wheels-bouquet"
       className="absolute inset-0 z-30 w-full h-full flex flex-col items-center justify-center overflow-hidden select-none touch-none overscroll-none"
       style={{
-        background: 'radial-gradient(ellipse at 50% 35%, #07152B 0%, #030814 60%, #010307 100%)',
+        background: 'radial-gradient(ellipse at 50% 30%, #0c1630 0%, #050b18 50%, #010206 100%)',
       }}
     >
+      <style>{`
+        @keyframes twinkleSoft {
+          0%, 100% { opacity: 0.2; transform: scale(0.75); }
+          50% { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes starCrossPulse {
+          0%, 100% { opacity: 0.25; transform: scale(0.6) rotate(0deg); }
+          50% { opacity: 1; transform: scale(1.25) rotate(45deg); filter: drop-shadow(0 0 8px currentColor); }
+        }
+        @keyframes cosmicFloat1 {
+          0% { transform: translateY(0px) translateX(0px) scale(0.7); opacity: 0; }
+          20% { opacity: 0.9; }
+          50% { transform: translateY(-70px) translateX(20px) scale(1.1); opacity: 1; }
+          80% { opacity: 0.85; }
+          100% { transform: translateY(-160px) translateX(-15px) scale(0.8); opacity: 0; }
+        }
+        @keyframes cosmicFloat2 {
+          0% { transform: translateY(0px) translateX(0px) scale(0.8); opacity: 0; }
+          25% { opacity: 0.95; }
+          50% { transform: translateY(-90px) translateX(-24px) scale(1.2); opacity: 1; }
+          75% { opacity: 0.8; }
+          100% { transform: translateY(-190px) translateX(18px) scale(0.7); opacity: 0; }
+        }
+        @keyframes cosmicFloat3 {
+          0% { transform: translateY(0px) translateX(0px) scale(0.7); opacity: 0; }
+          30% { opacity: 1; transform: translateY(-55px) translateX(16px) scale(1.15); }
+          70% { opacity: 0.9; transform: translateY(-120px) translateX(-18px) scale(1); }
+          100% { transform: translateY(-180px) translateX(10px) scale(0.6); opacity: 0; }
+        }
+        @keyframes verticalShootingStar1 {
+          0% {
+            transform: translate3d(0, -180px, 0);
+            opacity: 0;
+          }
+          1% {
+            opacity: 1;
+          }
+          12% {
+            transform: translate3d(0, 110vh, 0);
+            opacity: 0.9;
+          }
+          15% {
+            transform: translate3d(0, 115vh, 0);
+            opacity: 0;
+          }
+          100% {
+            transform: translate3d(0, 115vh, 0);
+            opacity: 0;
+          }
+        }
+        @keyframes verticalShootingStar2 {
+          0% {
+            transform: translate3d(0, -180px, 0);
+            opacity: 0;
+          }
+          1% {
+            opacity: 1;
+          }
+          11% {
+            transform: translate3d(0, 110vh, 0);
+            opacity: 0.9;
+          }
+          14% {
+            transform: translate3d(0, 115vh, 0);
+            opacity: 0;
+          }
+          100% {
+            transform: translate3d(0, 115vh, 0);
+            opacity: 0;
+          }
+        }
+        @keyframes verticalShootingStar3 {
+          0% {
+            transform: translate3d(0, -180px, 0);
+            opacity: 0;
+          }
+          1% {
+            opacity: 1;
+          }
+          10% {
+            transform: translate3d(0, 110vh, 0);
+            opacity: 0.9;
+          }
+          13% {
+            transform: translate3d(0, 115vh, 0);
+            opacity: 0;
+          }
+          100% {
+            transform: translate3d(0, 115vh, 0);
+            opacity: 0;
+          }
+        }
+      `}</style>
+
       <audio ref={audioRef} preload="auto" />
 
       {/* Floating Minimalist Music Toggle for "Lover is a Day" (Pure icon, zero text) */}
@@ -857,86 +1125,167 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       </motion.button>
 
       {/* ======================================================== */}
-      {/* LAYER 0: AMBIENT CELESTIAL BACKGROUND & SPARKLES         */}
+      {/* LAYER 0: STARRY GALAXY NIGHT SKY & NEBULA                */}
       {/* ======================================================== */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Galaxy deep purple & cyan nebula dust */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_25%,rgba(139,92,246,0.18)_0%,rgba(14,165,233,0.14)_45%,transparent_75%)] blur-3xl" />
+        <div className="absolute top-[25%] left-[25%] w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle_at_center,rgba(236,72,153,0.12)_0%,transparent_70%)] blur-3xl" />
+
         {/* Deep cyan aura behind the floral bouquet */}
         <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[520px] md:w-[700px] h-[340px] sm:h-[520px] md:h-[700px] rounded-full bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.18)_0%,rgba(2,132,199,0.1)_45%,transparent_75%)] blur-3xl" />
         
         {/* Subtle fiery speed glow accent */}
         <div className="absolute top-[28%] left-[52%] -translate-x-1/2 -translate-y-1/2 w-[260px] sm:w-[380px] h-[260px] sm:h-[380px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,85,0,0.09)_0%,transparent_70%)] blur-2xl" />
 
-        {/* Ambient floating fireflies / sparkles */}
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={`ambient-sparkle-${i}`}
-            className="absolute rounded-full"
-            style={{
-              width: `${(i % 3) + 2}px`,
-              height: `${(i % 3) + 2}px`,
-              backgroundColor: i % 4 === 0 ? '#38BDF8' : i % 4 === 1 ? '#00F0FF' : i % 4 === 2 ? '#FF4500' : '#FFFFFF',
-              boxShadow: '0 0 8px currentColor',
-              top: `${10 + ((i * 19) % 80)}%`,
-              left: `${5 + ((i * 27) % 90)}%`,
-            }}
-            animate={{
-              y: [0, -25, 0],
-              x: [0, (i % 2 === 0 ? 15 : -15), 0],
-              opacity: [0.2, 0.9, 0.2],
-              scale: [0.8, 1.4, 0.8],
-            }}
-            transition={{
-              duration: 4 + (i % 5) * 1.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: i * 0.3,
-            }}
-          />
-        ))}
+        {/* 1. Realistic Strictly Vertical Shooting Stars (Downward Falling Light Lines) */}
+        {/* Vertical Star 1: Left celestial sector */}
+        <div
+          className="absolute -top-32 left-[15%] w-[1.5px] h-[120px] pointer-events-none rounded-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(56, 189, 248, 0.15) 30%, rgba(0, 240, 255, 0.6) 70%, #FFFFFF 100%)',
+            boxShadow: '0 0 6px rgba(0, 240, 255, 0.8), 0 0 12px rgba(255, 255, 255, 0.9)',
+            animation: 'verticalShootingStar1 10s infinite ease-in 1s',
+            willChange: 'transform, opacity',
+          }}
+        >
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-2 rounded-full bg-white shadow-[0_0_8px_#FFFFFF,0_0_14px_#00F0FF]" />
+        </div>
+
+        {/* Vertical Star 2: Right celestial sector */}
+        <div
+          className="absolute -top-32 left-[78%] w-[1.5px] h-[130px] pointer-events-none rounded-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(251, 191, 36, 0.15) 30%, rgba(251, 191, 36, 0.6) 70%, #FFFFFF 100%)',
+            boxShadow: '0 0 6px rgba(251, 191, 36, 0.8), 0 0 12px rgba(255, 255, 255, 0.9)',
+            animation: 'verticalShootingStar2 14s infinite ease-in 5.5s',
+            willChange: 'transform, opacity',
+          }}
+        >
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-2 rounded-full bg-white shadow-[0_0_8px_#FFFFFF,0_0_14px_#FBBF24]" />
+        </div>
+
+        {/* Vertical Star 3: Center-Right sector */}
+        <div
+          className="absolute -top-36 left-[48%] w-[1.5px] h-[140px] pointer-events-none rounded-full"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 0%, rgba(236, 72, 153, 0.15) 30%, rgba(168, 85, 247, 0.6) 70%, #FFFFFF 100%)',
+            boxShadow: '0 0 6px rgba(168, 85, 247, 0.8), 0 0 12px rgba(255, 255, 255, 0.9)',
+            animation: 'verticalShootingStar3 18s infinite ease-in 9.5s',
+            willChange: 'transform, opacity',
+          }}
+        >
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_#FFFFFF,0_0_16px_#C084FC]" />
+        </div>
+
+        {/* 2. Sparkling 4-Point Diamond Cross Stars (✦) */}
+        <div className="absolute inset-0">
+          {[
+            { top: '12%', left: '16%', size: 12, color: '#00F0FF', delay: '0s', duration: '3.4s' },
+            { top: '22%', left: '82%', size: 14, color: '#FDE047', delay: '1.2s', duration: '4.2s' },
+            { top: '42%', left: '9%', size: 11, color: '#38BDF8', delay: '2.1s', duration: '3.8s' },
+            { top: '68%', left: '88%', size: 13, color: '#F43F5E', delay: '0.6s', duration: '4.6s' },
+            { top: '18%', left: '50%', size: 10, color: '#FFFFFF', delay: '1.8s', duration: '3.2s' },
+            { top: '56%', left: '22%', size: 12, color: '#C084FC', delay: '2.7s', duration: '4.0s' },
+            { top: '80%', left: '80%', size: 11, color: '#00F0FF', delay: '1.4s', duration: '3.6s' },
+            { top: '34%', left: '76%', size: 10, color: '#FDE047', delay: '0.3s', duration: '4.4s' },
+          ].map((cross, i) => (
+            <div
+              key={`cross-${i}`}
+              className="absolute pointer-events-none flex items-center justify-center"
+              style={{
+                top: cross.top,
+                left: cross.left,
+                width: `${cross.size}px`,
+                height: `${cross.size}px`,
+                color: cross.color,
+                animation: `starCrossPulse ${cross.duration} infinite ease-in-out ${cross.delay}`,
+              }}
+            >
+              <svg viewBox="0 0 24 24" className="w-full h-full fill-current" style={{ filter: `drop-shadow(0 0 4px ${cross.color})` }}>
+                <path d="M12 0 L14 9.5 L24 12 L14 14.5 L12 24 L10 14.5 L0 12 L10 9.5 Z" />
+              </svg>
+            </div>
+          ))}
+        </div>
+
+        {/* 3. Starry Constellation Twinkle Dots */}
+        <div className="absolute inset-0 opacity-80">
+          {[
+            { top: '8%', left: '28%', size: '2px', delay: '0.2s', duration: '3.1s' },
+            { top: '16%', left: '72%', size: '2.5px', delay: '1.5s', duration: '4.0s' },
+            { top: '26%', left: '14%', size: '1.8px', delay: '2.4s', duration: '3.6s' },
+            { top: '38%', left: '89%', size: '2.2px', delay: '0.8s', duration: '4.8s' },
+            { top: '50%', left: '6%', size: '2px', delay: '1.9s', duration: '3.3s' },
+            { top: '64%', left: '92%', size: '2.4px', delay: '0.5s', duration: '4.5s' },
+            { top: '76%', left: '12%', size: '1.8px', delay: '2.2s', duration: '3.7s' },
+            { top: '86%', left: '48%', size: '2.5px', delay: '1.1s', duration: '4.1s' },
+            { top: '92%', left: '84%', size: '2px', delay: '0.4s', duration: '3.9s' },
+            { top: '6%', left: '60%', size: '2px', delay: '2.8s', duration: '5.0s' },
+            { top: '48%', left: '38%', size: '1.5px', delay: '1.3s', duration: '4.2s' },
+            { top: '72%', left: '64%', size: '2.2px', delay: '2.0s', duration: '3.5s' },
+          ].map((star, i) => (
+            <div
+              key={`star-${i}`}
+              className="absolute rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)]"
+              style={{
+                top: star.top,
+                left: star.left,
+                width: star.size,
+                height: star.size,
+                animation: `twinkleSoft ${star.duration} infinite ease-in-out ${star.delay}`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* 4. Multi-Layer Realistic Floating Stardust Embers (Organic Dynamic Motion) */}
+        <div className="absolute inset-0">
+          {[
+            // Stream 1 - gentle left-to-right wave float
+            { top: '88%', left: '18%', anim: 'cosmicFloat1', duration: '6.2s', delay: '0s', color: '#00F0FF', size: '2.5px' },
+            { top: '82%', left: '74%', anim: 'cosmicFloat2', duration: '5.8s', delay: '1.4s', color: '#38BDF8', size: '2px' },
+            { top: '78%', left: '42%', anim: 'cosmicFloat3', duration: '5.2s', delay: '2.6s', color: '#FBBF24', size: '3px' },
+            { top: '92%', left: '55%', anim: 'cosmicFloat1', duration: '6.6s', delay: '0.8s', color: '#FFFFFF', size: '2px' },
+            { top: '65%', left: '12%', anim: 'cosmicFloat2', duration: '5.5s', delay: '3.2s', color: '#F43F5E', size: '2.5px' },
+            { top: '74%', left: '86%', anim: 'cosmicFloat3', duration: '6.0s', delay: '1.9s', color: '#00F0FF', size: '2px' },
+            { top: '58%', left: '78%', anim: 'cosmicFloat1', duration: '5.0s', delay: '2.1s', color: '#C084FC', size: '2.8px' },
+            { top: '85%', left: '32%', anim: 'cosmicFloat2', duration: '6.4s', delay: '0.4s', color: '#FFFFFF', size: '1.8px' },
+            { top: '68%', left: '62%', anim: 'cosmicFloat3', duration: '5.7s', delay: '1.7s', color: '#38BDF8', size: '2.2px' },
+            { top: '90%', left: '8%', anim: 'cosmicFloat1', duration: '7.0s', delay: '3.8s', color: '#FBBF24', size: '2.5px' },
+            { top: '48%', left: '22%', anim: 'cosmicFloat2', duration: '5.4s', delay: '2.3s', color: '#00F0FF', size: '2px' },
+            { top: '38%', left: '68%', anim: 'cosmicFloat3', duration: '5.9s', delay: '0.9s', color: '#F43F5E', size: '2.6px' },
+            { top: '70%', left: '26%', anim: 'cosmicFloat1', duration: '6.1s', delay: '1.1s', color: '#38BDF8', size: '2px' },
+            { top: '60%', left: '48%', anim: 'cosmicFloat2', duration: '5.3s', delay: '2.9s', color: '#FFFFFF', size: '2.4px' },
+            { top: '84%', left: '66%', anim: 'cosmicFloat3', duration: '6.8s', delay: '0.2s', color: '#00F0FF', size: '2.2px' },
+            { top: '52%', left: '84%', anim: 'cosmicFloat1', duration: '5.6s', delay: '3.5s', color: '#FDE047', size: '2.8px' },
+            { top: '76%', left: '16%', anim: 'cosmicFloat2', duration: '6.3s', delay: '1.6s', color: '#C084FC', size: '2px' },
+            { top: '94%', left: '44%', anim: 'cosmicFloat3', duration: '5.1s', delay: '2.8s', color: '#38BDF8', size: '3px' },
+          ].map((sparkle, i) => (
+            <div
+              key={`sparkle-gem-${i}`}
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                top: sparkle.top,
+                left: sparkle.left,
+                width: sparkle.size,
+                height: sparkle.size,
+                backgroundColor: sparkle.color,
+                boxShadow: `0 0 8px ${sparkle.color}, 0 0 16px ${sparkle.color}`,
+                animation: `${sparkle.anim} ${sparkle.duration} infinite ease-in-out ${sparkle.delay}`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* ======================================================== */}
       {/* LAYER 1: BACKGROUND CASCADING HOT WHEELS (Behind Bouquet)*/}
       {/* ======================================================== */}
       <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
-        {RAIN_CARS_CONFIG.filter((c) => c.depthLayer === 'background').map((car) => {
-          const theme = CAR_PALETTES[car.paletteIndex % CAR_PALETTES.length];
-          return (
-            <motion.div
-              key={car.id}
-              className="absolute filter blur-[0.6px] opacity-75"
-              style={{
-                top: 0,
-                left: 0,
-              }}
-              animate={{
-                x: [`${car.startX}vw`, `${(car.startX + car.endX) / 2}vw`, `${car.endX}vw`],
-                y: [`${car.startY}vh`, `${(car.startY + car.endY) / 2}vh`, `${car.endY}vh`],
-                rotate: [car.initialRotate, car.midRotate, car.endRotate],
-              }}
-              transition={{
-                duration: car.duration,
-                repeat: Infinity,
-                ease: 'linear',
-                delay: car.delay,
-              }}
-            >
-              {/* Speed streak trail */}
-              <div
-                className="absolute top-1/2 -left-12 -translate-y-1/2 w-20 h-1.5 rounded-full blur-[1px]"
-                style={{
-                  background: `linear-gradient(to right, transparent, ${theme.glowAura})`,
-                }}
-              />
-              <HotWheelsGTOVector
-                theme={theme}
-                scale={car.scale * scaleMultiplier}
-                flipX={car.flipX}
-                spinningWheels={true}
-              />
-            </motion.div>
-          );
-        })}
+        {RAIN_CARS_CONFIG.filter((c) => c.depthLayer === 'background').map((car) => (
+          <StreamCarItem key={car.id} config={car} scaleMultiplier={scaleMultiplier} />
+        ))}
       </div>
 
       {/* ======================================================== */}
@@ -1339,44 +1688,9 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       {/* LAYER 3: MIDGROUND CASCADING HOT WHEELS (Between Blooms) */}
       {/* ======================================================== */}
       <div className="absolute inset-0 pointer-events-none z-25 overflow-hidden">
-        {RAIN_CARS_CONFIG.filter((c) => c.depthLayer === 'midground').map((car) => {
-          const theme = CAR_PALETTES[car.paletteIndex % CAR_PALETTES.length];
-          return (
-            <motion.div
-              key={car.id}
-              className="absolute drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)]"
-              style={{
-                top: 0,
-                left: 0,
-              }}
-              animate={{
-                x: [`${car.startX}vw`, `${(car.startX + car.endX) / 2}vw`, `${car.endX}vw`],
-                y: [`${car.startY}vh`, `${(car.startY + car.endY) / 2}vh`, `${car.endY}vh`],
-                rotate: [car.initialRotate, car.midRotate, car.endRotate],
-              }}
-              transition={{
-                duration: car.duration,
-                repeat: Infinity,
-                ease: 'linear',
-                delay: car.delay,
-              }}
-            >
-              {/* Subtle nitro speed trail */}
-              <div
-                className="absolute top-1/2 -left-16 -translate-y-1/2 w-28 h-2 rounded-full blur-[1.5px]"
-                style={{
-                  background: `linear-gradient(to right, transparent, ${theme.glowAura})`,
-                }}
-              />
-              <HotWheelsGTOVector
-                theme={theme}
-                scale={car.scale * scaleMultiplier}
-                flipX={car.flipX}
-                spinningWheels={true}
-              />
-            </motion.div>
-          );
-        })}
+        {RAIN_CARS_CONFIG.filter((c) => c.depthLayer === 'midground').map((car) => (
+          <StreamCarItem key={car.id} config={car} scaleMultiplier={scaleMultiplier} />
+        ))}
       </div>
 
       {/* ======================================================== */}
@@ -1384,44 +1698,9 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
       {/* High impact, large scale, crisp Hot Wheels side flame   */}
       {/* ======================================================== */}
       <div className="absolute inset-0 pointer-events-none z-35 overflow-hidden">
-        {RAIN_CARS_CONFIG.filter((c) => c.depthLayer === 'foreground').map((car) => {
-          const theme = CAR_PALETTES[car.paletteIndex % CAR_PALETTES.length];
-          return (
-            <motion.div
-              key={car.id}
-              className="absolute drop-shadow-[0_18px_36px_rgba(0,0,0,0.95)]"
-              style={{
-                top: 0,
-                left: 0,
-              }}
-              animate={{
-                x: [`${car.startX}vw`, `${(car.startX + car.endX) / 2}vw`, `${car.endX}vw`],
-                y: [`${car.startY}vh`, `${(car.startY + car.endY) / 2}vh`, `${car.endY}vh`],
-                rotate: [car.initialRotate, car.midRotate, car.endRotate],
-              }}
-              transition={{
-                duration: car.duration,
-                repeat: Infinity,
-                ease: 'linear',
-                delay: car.delay,
-              }}
-            >
-              {/* Luminous speed trail and exhaust sparks */}
-              <div
-                className="absolute top-1/2 -left-20 -translate-y-1/2 w-36 h-3 rounded-full blur-[2px]"
-                style={{
-                  background: `linear-gradient(to right, transparent, ${theme.glowAura})`,
-                }}
-              />
-              <HotWheelsGTOVector
-                theme={theme}
-                scale={car.scale * scaleMultiplier}
-                flipX={car.flipX}
-                spinningWheels={true}
-              />
-            </motion.div>
-          );
-        })}
+        {RAIN_CARS_CONFIG.filter((c) => c.depthLayer === 'foreground').map((car) => (
+          <StreamCarItem key={car.id} config={car} scaleMultiplier={scaleMultiplier} />
+        ))}
       </div>
     </div>
   );

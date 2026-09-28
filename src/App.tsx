@@ -260,7 +260,7 @@ export default function App() {
       {/* EXCLUSIVE MAIN HOME SCREEN BACKGROUND vs REGULAR APP BACKGROUNDS */}
       {currentStep === 'login' ? (
         <MainHomePageBackground />
-      ) : (
+      ) : currentStep === 'hot-wheels' ? null : (
         <>
           {/* Dynamic Space Background Video (Vertical/Cell vs Horizontal/Desktop) */}
           <BackgroundVideo />
