@@ -36,82 +36,137 @@ export interface HotWheelsCarTheme {
 }
 
 const CAR_PALETTES: HotWheelsCarTheme[] = [
-  // 1. Hero Classic Metallic Royal Blue (Exact match to Pontiac GTO image)
+  // 0. Hero Classic Spectraflame Royal Blue
   {
     primaryColor: '#1D4ED8',
     secondaryColor: '#2563EB',
     accentStripe: '#EF4444',
     whitePanel: '#FFFFFF',
-    rimLipColor: '#FF4500', // Bright neon orange lip ring as in reference
+    rimLipColor: '#FF4500', // Signature neon orange lip ring as in reference
     numberBadge: '10',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(0, 240, 255, 0.45)',
+    glowAura: 'rgba(0, 240, 255, 0.55)',
   },
-  // 2. High-Octane Fire Crimson Red
+  // 1. High-Octane Fire Crimson Red (Rojo Brillante)
   {
     primaryColor: '#B91C1C',
-    secondaryColor: '#DC2626',
+    secondaryColor: '#EF4444',
     accentStripe: '#F59E0B',
     whitePanel: '#FFFFFF',
     rimLipColor: '#FF5500',
     numberBadge: '24',
     lightColor: '#FEF08A',
-    glowAura: 'rgba(239, 68, 68, 0.45)',
+    glowAura: 'rgba(239, 68, 68, 0.55)',
   },
-  // 3. Obsidian Metallic Black & Copper
+  // 2. Toxic Acid Lime Green (Verde Neón Brillante)
+  {
+    primaryColor: '#15803D',
+    secondaryColor: '#22C55E',
+    accentStripe: '#FACC15',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#84CC16',
+    numberBadge: '10',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(74, 222, 128, 0.55)',
+  },
+  // 3. Sunset Blaze Neon Orange (Naranja Vibrante)
+  {
+    primaryColor: '#C2410C',
+    secondaryColor: '#F97316',
+    accentStripe: '#DC2626',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FBBF24',
+    numberBadge: '24',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(249, 115, 22, 0.55)',
+  },
+  // 4. Deep Ultraviolet Metallic Purple (Morado Real)
+  {
+    primaryColor: '#581C87',
+    secondaryColor: '#9333EA',
+    accentStripe: '#F43F5E',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#38BDF8',
+    numberBadge: '10',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(168, 85, 247, 0.55)',
+  },
+  // 5. Electric Neon Hot Pink / Magenta (Rosado Neón)
+  {
+    primaryColor: '#9D174D',
+    secondaryColor: '#EC4899',
+    accentStripe: '#38BDF8',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#F43F5E',
+    numberBadge: '24',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(244, 63, 94, 0.55)',
+  },
+  // 6. Speed Solar Yellow (Amarillo Neón)
+  {
+    primaryColor: '#CA8A04',
+    secondaryColor: '#FACC15',
+    accentStripe: '#DC2626',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FF4500',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(250, 204, 21, 0.55)',
+  },
+  // 7. Electric Pearl Cyan / Turquoise (Cian Vibrante)
+  {
+    primaryColor: '#0369A1',
+    secondaryColor: '#06B6D4',
+    accentStripe: '#F97316',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FF3B30',
+    numberBadge: '24',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(6, 182, 212, 0.55)',
+  },
+  // 8. Sterling Quicksilver Platinum (Plateado Cromado)
+  {
+    primaryColor: '#475569',
+    secondaryColor: '#94A3B8',
+    accentStripe: '#EF4444',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#FF3B30',
+    numberBadge: '10',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(226, 232, 240, 0.5)',
+  },
+  // 9. Emerald Racing Green (Verde Esmeralda)
+  {
+    primaryColor: '#047857',
+    secondaryColor: '#10B981',
+    accentStripe: '#F59E0B',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#34D399',
+    numberBadge: '24',
+    lightColor: '#FEF08A',
+    glowAura: 'rgba(16, 185, 129, 0.55)',
+  },
+  // 10. Neon Ruby Raspberry (Rosado Rubí)
+  {
+    primaryColor: '#831843',
+    secondaryColor: '#BE185D',
+    accentStripe: '#FBBF24',
+    whitePanel: '#FFFFFF',
+    rimLipColor: '#00F0FF',
+    numberBadge: '10',
+    lightColor: '#FFFFFF',
+    glowAura: 'rgba(236, 72, 153, 0.55)',
+  },
+  // 11. Obsidian Metallic Black & Copper (Negro Metálico)
   {
     primaryColor: '#0F172A',
     secondaryColor: '#1E293B',
     accentStripe: '#F97316',
     whitePanel: '#E2E8F0',
     rimLipColor: '#00F0FF',
-    numberBadge: '10',
-    lightColor: '#38BDF8',
-    glowAura: 'rgba(56, 189, 248, 0.45)',
-  },
-  // 4. Sunset Blaze Neon Orange
-  {
-    primaryColor: '#C2410C',
-    secondaryColor: '#EA580C',
-    accentStripe: '#DC2626',
-    whitePanel: '#FFFFFF',
-    rimLipColor: '#FBBF24',
-    numberBadge: '10',
-    lightColor: '#FEF08A',
-    glowAura: 'rgba(249, 115, 22, 0.45)',
-  },
-  // 5. Deep Royal Purple Metallic
-  {
-    primaryColor: '#581C87',
-    secondaryColor: '#7C3AED',
-    accentStripe: '#F43F5E',
-    whitePanel: '#FFFFFF',
-    rimLipColor: '#38BDF8',
     numberBadge: '24',
-    lightColor: '#FEF08A',
-    glowAura: 'rgba(168, 85, 247, 0.45)',
-  },
-  // 6. Electric Pearl Cyan
-  {
-    primaryColor: '#0369A1',
-    secondaryColor: '#0284C7',
-    accentStripe: '#F97316',
-    whitePanel: '#FFFFFF',
-    rimLipColor: '#FF3B30',
-    numberBadge: '10',
-    lightColor: '#FFFFFF',
-    glowAura: 'rgba(0, 240, 255, 0.55)',
-  },
-  // 7. Sterling Quicksilver Platinum
-  {
-    primaryColor: '#475569',
-    secondaryColor: '#64748B',
-    accentStripe: '#EF4444',
-    whitePanel: '#FFFFFF',
-    rimLipColor: '#EF4444',
-    numberBadge: '10',
-    lightColor: '#FEF08A',
-    glowAura: 'rgba(226, 232, 240, 0.4)',
+    lightColor: '#38BDF8',
+    glowAura: 'rgba(56, 189, 248, 0.55)',
   },
 ];
 
@@ -505,7 +560,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   // --- BACKGROUND STREAM (Behind bouquet, high depth, subtle blur) ---
   {
     id: 'bg-stream-1',
-    paletteIndex: 0, // Royal Blue GTO (Reference hero)
+    paletteIndex: 0, // Hero Classic Royal Blue
     depthLayer: 'background',
     scale: 0.52,
     duration: 6.8,
@@ -520,7 +575,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'bg-stream-2',
-    paletteIndex: 1, // Crimson Red
+    paletteIndex: 1, // Rojo Brillante (Crimson Fire)
     depthLayer: 'background',
     scale: 0.48,
     duration: 7.5,
@@ -536,7 +591,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'bg-stream-3',
-    paletteIndex: 3, // Blaze Orange
+    paletteIndex: 2, // Verde Neón Brillante (Toxic Acid Lime)
     depthLayer: 'background',
     scale: 0.55,
     duration: 6.2,
@@ -551,7 +606,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'bg-stream-4',
-    paletteIndex: 4, // Deep Purple
+    paletteIndex: 4, // Morado Real (Ultraviolet Purple)
     depthLayer: 'background',
     scale: 0.50,
     duration: 8.2,
@@ -565,11 +620,26 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     endRotate: -35,
     flipX: true,
   },
+  {
+    id: 'bg-stream-5',
+    paletteIndex: 6, // Amarillo Neón (Speed Solar Yellow)
+    depthLayer: 'background',
+    scale: 0.51,
+    duration: 7.2,
+    delay: -4.0,
+    startX: -10,
+    startY: 70,
+    endX: 110,
+    endY: 20,
+    initialRotate: -18,
+    midRotate: -14,
+    endRotate: -22,
+  },
 
   // --- MIDGROUND STREAM (Weaving alongside and through flower crowns) ---
   {
     id: 'mid-stream-1',
-    paletteIndex: 5, // Electric Cyan Pearl
+    paletteIndex: 7, // Cian Vibrante (Electric Pearl Cyan)
     depthLayer: 'midground',
     scale: 0.78,
     duration: 5.8,
@@ -584,7 +654,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'mid-stream-2',
-    paletteIndex: 2, // Obsidian Black & Copper
+    paletteIndex: 5, // Rosado Neón (Electric Hot Pink / Magenta)
     depthLayer: 'midground',
     scale: 0.82,
     duration: 6.4,
@@ -600,7 +670,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'mid-stream-3',
-    paletteIndex: 0, // Royal Blue GTO
+    paletteIndex: 3, // Naranja Vibrante (Sunset Blaze Orange)
     depthLayer: 'midground',
     scale: 0.85,
     duration: 5.4,
@@ -615,7 +685,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'mid-stream-4',
-    paletteIndex: 6, // Sterling Platinum
+    paletteIndex: 8, // Plateado Cromado (Sterling Quicksilver Platinum)
     depthLayer: 'midground',
     scale: 0.75,
     duration: 7.0,
@@ -627,6 +697,37 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     initialRotate: -38,
     midRotate: -30,
     endRotate: -25,
+    flipX: true,
+  },
+  {
+    id: 'mid-stream-5',
+    paletteIndex: 9, // Verde Esmeralda (Emerald Racing Green)
+    depthLayer: 'midground',
+    scale: 0.80,
+    duration: 6.0,
+    delay: -5.0,
+    startX: 20,
+    startY: -15,
+    endX: 105,
+    endY: 105,
+    initialRotate: 35,
+    midRotate: 40,
+    endRotate: 32,
+  },
+  {
+    id: 'mid-stream-6',
+    paletteIndex: 10, // Rosado Rubí (Neon Ruby Raspberry)
+    depthLayer: 'midground',
+    scale: 0.76,
+    duration: 6.6,
+    delay: -1.8,
+    startX: 115,
+    startY: 45,
+    endX: -15,
+    endY: 15,
+    initialRotate: 20,
+    midRotate: 16,
+    endRotate: 24,
     flipX: true,
   },
 
@@ -648,7 +749,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-2',
-    paletteIndex: 1, // Crimson Red Muscle
+    paletteIndex: 1, // Rojo Brillante (High-Octane Crimson Red)
     depthLayer: 'foreground',
     scale: 0.88,
     duration: 5.2,
@@ -664,7 +765,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-3',
-    paletteIndex: 3, // Sunset Blaze Orange
+    paletteIndex: 5, // Rosado Neón (Electric Hot Pink)
     depthLayer: 'foreground',
     scale: 0.85,
     duration: 4.5,
@@ -679,7 +780,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-4',
-    paletteIndex: 2, // Obsidian Black & Cyan
+    paletteIndex: 2, // Verde Neón Brillante (Toxic Lime)
     depthLayer: 'foreground',
     scale: 0.94,
     duration: 5.0,
@@ -695,7 +796,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-5',
-    paletteIndex: 5, // Pearl Cyan
+    paletteIndex: 4, // Morado Real (Ultraviolet Purple)
     depthLayer: 'foreground',
     scale: 0.88,
     duration: 5.6,
@@ -707,6 +808,37 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     initialRotate: -15,
     midRotate: -10,
     endRotate: -8,
+  },
+  {
+    id: 'fg-stream-6',
+    paletteIndex: 6, // Amarillo Neón (Speed Solar Yellow)
+    depthLayer: 'foreground',
+    scale: 0.90,
+    duration: 5.3,
+    delay: -3.8,
+    startX: 115,
+    startY: 60,
+    endX: -20,
+    endY: 10,
+    initialRotate: 18,
+    midRotate: 12,
+    endRotate: 16,
+    flipX: true,
+  },
+  {
+    id: 'fg-stream-7',
+    paletteIndex: 3, // Naranja Vibrante (Sunset Blaze Orange)
+    depthLayer: 'foreground',
+    scale: 0.91,
+    duration: 4.9,
+    delay: -2.6,
+    startX: -15,
+    startY: 15,
+    endX: 120,
+    endY: 85,
+    initialRotate: 26,
+    midRotate: 30,
+    endRotate: 24,
   },
 ];
 
