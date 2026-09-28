@@ -557,10 +557,10 @@ interface RainCarConfig {
 }
 
 const RAIN_CARS_CONFIG: RainCarConfig[] = [
-  // --- BACKGROUND STREAM (Behind bouquet, high depth, subtle blur) ---
+  // --- BACKGROUND STREAM (Behind bouquet, 2 cars) ---
   {
     id: 'bg-stream-1',
-    paletteIndex: 0, // Hero Classic Royal Blue
+    paletteIndex: 0, // Royal Blue
     depthLayer: 'background',
     scale: 0.52,
     duration: 6.8,
@@ -575,7 +575,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'bg-stream-2',
-    paletteIndex: 1, // Rojo Brillante (Crimson Fire)
+    paletteIndex: 1, // Rojo Brillante
     depthLayer: 'background',
     scale: 0.48,
     duration: 7.5,
@@ -589,57 +589,11 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     endRotate: -20,
     flipX: true,
   },
-  {
-    id: 'bg-stream-3',
-    paletteIndex: 2, // Verde Neón Brillante (Toxic Acid Lime)
-    depthLayer: 'background',
-    scale: 0.55,
-    duration: 6.2,
-    delay: -5.4,
-    startX: 15,
-    startY: -15,
-    endX: 95,
-    endY: 115,
-    initialRotate: 42,
-    midRotate: 38,
-    endRotate: 45,
-  },
-  {
-    id: 'bg-stream-4',
-    paletteIndex: 4, // Morado Real (Ultraviolet Purple)
-    depthLayer: 'background',
-    scale: 0.50,
-    duration: 8.2,
-    delay: -2.1,
-    startX: 85,
-    startY: -12,
-    endX: 5,
-    endY: 110,
-    initialRotate: -36,
-    midRotate: -40,
-    endRotate: -35,
-    flipX: true,
-  },
-  {
-    id: 'bg-stream-5',
-    paletteIndex: 6, // Amarillo Neón (Speed Solar Yellow)
-    depthLayer: 'background',
-    scale: 0.51,
-    duration: 7.2,
-    delay: -4.0,
-    startX: -10,
-    startY: 70,
-    endX: 110,
-    endY: 20,
-    initialRotate: -18,
-    midRotate: -14,
-    endRotate: -22,
-  },
 
-  // --- MIDGROUND STREAM (Weaving alongside and through flower crowns) ---
+  // --- MIDGROUND STREAM (Weaving through bouquet, 2 cars) ---
   {
     id: 'mid-stream-1',
-    paletteIndex: 7, // Cian Vibrante (Electric Pearl Cyan)
+    paletteIndex: 2, // Verde Neón Brillante
     depthLayer: 'midground',
     scale: 0.78,
     duration: 5.8,
@@ -654,7 +608,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'mid-stream-2',
-    paletteIndex: 5, // Rosado Neón (Electric Hot Pink / Magenta)
+    paletteIndex: 4, // Morado Real
     depthLayer: 'midground',
     scale: 0.82,
     duration: 6.4,
@@ -668,75 +622,13 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     endRotate: -28,
     flipX: true,
   },
-  {
-    id: 'mid-stream-3',
-    paletteIndex: 3, // Naranja Vibrante (Sunset Blaze Orange)
-    depthLayer: 'midground',
-    scale: 0.85,
-    duration: 5.4,
-    delay: -4.5,
-    startX: 30,
-    startY: -18,
-    endX: 110,
-    endY: 98,
-    initialRotate: 32,
-    midRotate: 36,
-    endRotate: 30,
-  },
-  {
-    id: 'mid-stream-4',
-    paletteIndex: 8, // Plateado Cromado (Sterling Quicksilver Platinum)
-    depthLayer: 'midground',
-    scale: 0.75,
-    duration: 7.0,
-    delay: -6.1,
-    startX: 75,
-    startY: -15,
-    endX: -15,
-    endY: 95,
-    initialRotate: -38,
-    midRotate: -30,
-    endRotate: -25,
-    flipX: true,
-  },
-  {
-    id: 'mid-stream-5',
-    paletteIndex: 9, // Verde Esmeralda (Emerald Racing Green)
-    depthLayer: 'midground',
-    scale: 0.80,
-    duration: 6.0,
-    delay: -5.0,
-    startX: 20,
-    startY: -15,
-    endX: 105,
-    endY: 105,
-    initialRotate: 35,
-    midRotate: 40,
-    endRotate: 32,
-  },
-  {
-    id: 'mid-stream-6',
-    paletteIndex: 10, // Rosado Rubí (Neon Ruby Raspberry)
-    depthLayer: 'midground',
-    scale: 0.76,
-    duration: 6.6,
-    delay: -1.8,
-    startX: 115,
-    startY: 45,
-    endX: -15,
-    endY: 15,
-    initialRotate: 20,
-    midRotate: 16,
-    endRotate: 24,
-    flipX: true,
-  },
 
-  // --- FOREGROUND STREAM (Sharp, Crisp, Soaring with 3D Depth & Speed) ---
+  // --- FOREGROUND STREAM (Soaring near camera, 3 cars) ---
   {
     id: 'fg-stream-1',
-    paletteIndex: 0, // Hero Pontiac GTO Royal Blue (Reference Hero)
+    paletteIndex: 6, // Amarillo Neón
     depthLayer: 'foreground',
-    scale: 0.92,
+    scale: 0.90,
     duration: 4.8,
     delay: -1.0,
     startX: -25,
@@ -749,7 +641,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-2',
-    paletteIndex: 1, // Rojo Brillante (High-Octane Crimson Red)
+    paletteIndex: 5, // Rosado Neón Fucsia
     depthLayer: 'foreground',
     scale: 0.88,
     duration: 5.2,
@@ -765,7 +657,7 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
   },
   {
     id: 'fg-stream-3',
-    paletteIndex: 5, // Rosado Neón (Electric Hot Pink)
+    paletteIndex: 7, // Cian Vibrante
     depthLayer: 'foreground',
     scale: 0.85,
     duration: 4.5,
@@ -777,68 +669,6 @@ const RAIN_CARS_CONFIG: RainCarConfig[] = [
     initialRotate: 38,
     midRotate: 42,
     endRotate: 36,
-  },
-  {
-    id: 'fg-stream-4',
-    paletteIndex: 2, // Verde Neón Brillante (Toxic Lime)
-    depthLayer: 'foreground',
-    scale: 0.94,
-    duration: 5.0,
-    delay: -4.8,
-    startX: 120,
-    startY: 5,
-    endX: -25,
-    endY: 105,
-    initialRotate: -32,
-    midRotate: -45,
-    endRotate: -30,
-    flipX: true,
-  },
-  {
-    id: 'fg-stream-5',
-    paletteIndex: 4, // Morado Real (Ultraviolet Purple)
-    depthLayer: 'foreground',
-    scale: 0.88,
-    duration: 5.6,
-    delay: -0.2,
-    startX: -20,
-    startY: 65,
-    endX: 120,
-    endY: 25,
-    initialRotate: -15,
-    midRotate: -10,
-    endRotate: -8,
-  },
-  {
-    id: 'fg-stream-6',
-    paletteIndex: 6, // Amarillo Neón (Speed Solar Yellow)
-    depthLayer: 'foreground',
-    scale: 0.90,
-    duration: 5.3,
-    delay: -3.8,
-    startX: 115,
-    startY: 60,
-    endX: -20,
-    endY: 10,
-    initialRotate: 18,
-    midRotate: 12,
-    endRotate: 16,
-    flipX: true,
-  },
-  {
-    id: 'fg-stream-7',
-    paletteIndex: 3, // Naranja Vibrante (Sunset Blaze Orange)
-    depthLayer: 'foreground',
-    scale: 0.91,
-    duration: 4.9,
-    delay: -2.6,
-    startX: -15,
-    startY: 15,
-    endX: 120,
-    endY: 85,
-    initialRotate: 26,
-    midRotate: 30,
-    endRotate: 24,
   },
 ];
 
@@ -997,26 +827,12 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
   return (
     <div
       id="isaias-hot-wheels-bouquet"
-      className="fixed inset-0 z-40 w-full h-[100dvh] max-h-[100dvh] flex flex-col items-center justify-center overflow-hidden select-none touch-none overscroll-none"
+      className="absolute inset-0 z-30 w-full h-full flex flex-col items-center justify-center overflow-hidden select-none touch-none overscroll-none"
       style={{
         background: 'radial-gradient(ellipse at 50% 35%, #07152B 0%, #030814 60%, #010307 100%)',
       }}
     >
       <audio ref={audioRef} preload="auto" />
-
-      {/* Floating Minimalist Back Button (Pure icon, zero text) */}
-      <motion.button
-        type="button"
-        onClick={handleBack}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="absolute top-3 left-3 sm:top-4 sm:left-4 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-[#07152B]/85 border border-[#00F0FF]/35 text-[#00F0FF] shadow-lg shadow-[#00F0FF]/25 backdrop-blur-md cursor-pointer hover:border-[#00F0FF] hover:bg-[#0E2448]/90 transition-all pointer-events-auto touch-auto"
-        aria-label="Volver"
-      >
-        <ArrowLeft className="w-5 h-5 text-[#38BDF8]" />
-      </motion.button>
 
       {/* Floating Minimalist Music Toggle for "Lover is a Day" (Pure icon, zero text) */}
       <motion.button
@@ -1026,9 +842,9 @@ export const IsaiasHotWheelsExperience: React.FC<IsaiasHotWheelsExperienceProps>
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center bg-[#07152B]/85 border border-[#FF4500]/40 text-[#FF4500] shadow-lg shadow-[#FF4500]/25 backdrop-blur-md cursor-pointer hover:border-[#FF4500] hover:bg-[#200A10]/90 transition-all pointer-events-auto touch-auto"
+        className="absolute bottom-4 right-4 z-50 w-11 h-11 rounded-full flex items-center justify-center bg-[#07152B]/90 border border-[#FF4500]/40 text-[#FF4500] shadow-xl shadow-[#FF4500]/30 backdrop-blur-md cursor-pointer hover:border-[#FF4500] hover:bg-[#200A10]/95 transition-all pointer-events-auto touch-auto"
         aria-label="Música"
-        title="Lover is a Day"
+        title="Silenciar / Reproducir música"
       >
         {isPlaying ? (
           <div className="relative flex items-center justify-center">
